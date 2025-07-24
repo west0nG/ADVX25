@@ -126,6 +126,10 @@ body {
     color: #f9fafb;
     width: 250px;
     transition: all 0.3s ease;
+    caret-color: #25f2f2;
+    text-align: left;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 .search-box input:focus {
@@ -177,6 +181,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: 1;
+    pointer-events: none;
 }
 
 .hero-overlay {
@@ -187,6 +192,7 @@ body {
     height: 100%;
     background: linear-gradient(135deg, rgba(10, 15, 26, 0.8) 0%, rgba(26, 32, 44, 0.6) 100%);
     z-index: 2;
+    pointer-events: none;
 }
 
 .hero-content {
@@ -196,6 +202,7 @@ body {
     max-width: 800px;
     padding: 0 2rem;
     animation: heroFadeIn 1s ease-out;
+    pointer-events: auto;
 }
 
 @keyframes heroFadeIn {
@@ -791,12 +798,24 @@ body {
     padding: 0.75rem 1rem;
     color: #f9fafb;
     transition: all 0.3s ease;
+    caret-color: #25f2f2;
+    text-align: left;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 .form-input:focus {
     outline: none;
     border-color: #25f2f2;
     box-shadow: 0 0 15px rgba(37, 242, 242, 0.4);
+}
+
+/* Ensure textarea has proper cursor behavior */
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
 }
 
 .ingredient-item,
