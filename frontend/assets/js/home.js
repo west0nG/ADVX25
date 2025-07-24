@@ -230,27 +230,58 @@ window.addEventListener('scroll', () => {
 
 // Add typewriter effect to hero title
 function typewriterEffect() {
+    console.log('Typewriter effect function called');
     const title = document.querySelector('.hero h1');
-    const text = title.textContent;
+    console.log('Title element found:', title);
+    const originalText = title.textContent;
+    console.log('Original text:', originalText);
+    
+    // Clear the title
     title.textContent = '';
-    title.style.borderRight = '2px solid #25f2f2';
+    
+    // Create a cursor span first
+    const cursorSpan = document.createElement('span');
+    cursorSpan.textContent = '|';
+    cursorSpan.style.color = '#25f2f2'; // Cool cyan color
+    cursorSpan.style.fontWeight = 'normal';
+    cursorSpan.style.fontSize = '3.5rem';
+    // No shadows, no effects - just a clean cursor
+    // No animation initially - cursor stays solid during typing
+    title.appendChild(cursorSpan);
+    console.log('Cursor created and added to title');
     
     let i = 0;
     const timer = setInterval(() => {
-        if (i < text.length) {
-            title.textContent += text.charAt(i);
+        if (i < originalText.length) {
+            // Insert character before the cursor
+            const char = document.createTextNode(originalText.charAt(i));
+            title.insertBefore(char, cursorSpan);
             i++;
+            console.log('Added character:', originalText.charAt(i-1));
         } else {
+            // All text is complete, change to slower blink and keep flashing
             clearInterval(timer);
+            console.log('Typewriter complete, cursor will flash slowly');
+            cursorSpan.style.animation = 'blinkSlow 2s infinite'; // Slower blink
             setTimeout(() => {
-                title.style.borderRight = 'none';
-            }, 1000);
+                cursorSpan.remove();
+                console.log('Cursor removed');
+            }, 5000); // Keep flashing for 5 seconds
         }
-    }, 50);
+    }, 80);
 }
 
 // Start typewriter effect after loading
-setTimeout(typewriterEffect, 1500);
+console.log('Starting typewriter effect...');
+
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, setting up typewriter...');
+    setTimeout(() => {
+        console.log('Executing typewriter effect...');
+        typewriterEffect();
+    }, 1500);
+});
 
 // Add mouse movement parallax
 document.addEventListener('mousemove', (e) => {

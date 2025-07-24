@@ -225,6 +225,16 @@ body {
     50% { filter: hue-rotate(30deg); }
 }
 
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+@keyframes blinkSlow {
+    0%, 60% { opacity: 1; }
+    61%, 100% { opacity: 0; }
+}
+
 .hero p {
     font-size: 1.2rem;
     color: #9ca3af;
