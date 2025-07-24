@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - SipNFT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="marketplace.html" class="active">Marketplace</a></li>
+                <li><a href="create.html">Create NFT</a></li>
+                <li><a href="profile.html">Profile</a></li>
+            </ul>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search recipes...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="#" class="connect-btn">Connect Wallet</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Marketplace Hero -->
+    <section class="marketplace-hero">
+        <div class="hero-content">
+            <h1>Discover Unique Cocktail Recipes</h1>
+            <p>Browse thousands of exclusive cocktail NFTs from world-renowned mixologists</p>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <div class="filter-group">
+                <label>Category:</label>
+                <div class="filter-options">
+                    <button class="filter-option active" data-category="all">All</button>
+                    <button class="filter-option" data-category="classic">Classic</button>
+                    <button class="filter-option" data-category="modern">Modern</button>
+                    <button class="filter-option" data-category="tropical">Tropical</button>
+                    <button class="filter-option" data-category="non-alcoholic">Non-Alcoholic</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Price Range:</label>
+                <div class="filter-options">
+                    <button class="filter-option active" data-price="all">All</button>
+                    <button class="filter-option" data-price="0-0.5">0 - 0.5 ETH</button>
+                    <button class="filter-option" data-price="0.5-1">0.5 - 1 ETH</button>
+                    <button class="filter-option" data-price="1+">1+ ETH</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Sort By:</label>
+                <select class="sort-select">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="popular">Most Popular</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- NFT Grid -->
+    <section class="marketplace-grid">
+        <div class="nft-grid" id="nft-grid">
+            <!-- NFT cards will be dynamically generated -->
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="pagination-btn" data-page="prev">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <div class="page-numbers">
+                <button class="pagination-btn active" data-page="1">1</button>
+                <button class="pagination-btn" data-page="2">2</button>
+                <button class="pagination-btn" data-page="3">3</button>
+                <span>...</span>
+                <button class="pagination-btn" data-page="10">10</button>
+            </div>
+            <button class="pagination-btn" data-page="next">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About Us</a>
+                <a href="#">Support</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+            <div class="copyright">
+                © 2024 SipNFT. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/marketplace.js"></script>
+</body>
+</html> 

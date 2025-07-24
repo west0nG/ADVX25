@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SipNFT - The Art of Cocktails, On-Chain</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="pages/marketplace.html">Marketplace</a></li>
+                <li><a href="pages/create.html">Create NFT</a></li>
+                <li><a href="pages/profile.html">Profile</a></li>
+            </ul>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search recipes...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="#" class="connect-btn">Connect Wallet</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-overlay"></div>
+        <div class="floating-elements">
+            <i class="floating-icon fas fa-cocktail" style="top: 20%; left: 10%; font-size: 2rem; animation-delay: 0s;"></i>
+            <i class="floating-icon fas fa-wine-glass" style="top: 60%; right: 15%; font-size: 1.5rem; animation-delay: 2s;"></i>
+            <i class="floating-icon fas fa-glass-whiskey" style="bottom: 30%; left: 20%; font-size: 1.8rem; animation-delay: 4s;"></i>
+        </div>
+        <div class="hero-content">
+            <h1>Sip, Own, Create: The Art of the Cocktail, On-Chain</h1>
+            <p>Discover, collect, and mint exclusive cocktail recipes as unique NFTs. Own a piece of mixology history or create your own liquid legacy.</p>
+            <div class="hero-buttons">
+                <a href="pages/marketplace.html" class="btn-primary">Explore Marketplace</a>
+                <a href="pages/create.html" class="btn-secondary">Mint Your Recipe</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured NFTs -->
+    <section class="section fade-in" id="featured">
+        <h2 class="section-title">Featured & Trending</h2>
+        <div class="nft-grid">
+            <div class="nft-card">
+                <div style="position: relative;">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/313ff143-3da0-4108-b181-bbddce950b8f.jpeg" alt="The Perfect Manhattan" class="nft-image">
+                    <div class="nft-price">0.58 ETH</div>
+                </div>
+                <div class="nft-info">
+                    <h3>The Perfect Manhattan</h3>
+                    <div class="nft-creator">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Creator" class="creator-avatar">
+                        <span>@ClassicMixologist</span>
+                        <span style="margin-left: auto; color: #9ca3af;">#024</span>
+                    </div>
+                </div>
+            </div>
+            <div class="nft-card">
+                <div style="position: relative;">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/e54f339e-235e-4246-a4f7-6cb0f21d2ca6.jpeg" alt="Neon Dreams" class="nft-image">
+                    <div class="nft-price">1.2 ETH</div>
+                </div>
+                <div class="nft-info">
+                    <h3>Neon Dreams</h3>
+                    <div class="nft-creator">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/92eb35ba-c295-406e-ba06-3ff38ef83dc8.jpeg" alt="Creator" class="creator-avatar">
+                        <span>@FutureMix</span>
+                        <span style="margin-left: auto; color: #9ca3af;">#107</span>
+                    </div>
+                </div>
+            </div>
+            <div class="nft-card">
+                <div style="position: relative;">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/48343c70-7eb5-4fa2-9816-f4ef4e162411.jpeg" alt="Island Paradise" class="nft-image">
+                    <div class="nft-price">0.75 ETH</div>
+                </div>
+                <div class="nft-info">
+                    <h3>Island Paradise</h3>
+                    <div class="nft-creator">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/d5298df2-1d97-499a-b761-38a5a9db07ac.jpeg" alt="Creator" class="creator-avatar">
+                        <span>@TikiMaster</span>
+                        <span style="margin-left: auto; color: #9ca3af;">#089</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="section fade-in" id="categories">
+        <h2 class="section-title">Explore Categories</h2>
+        <div class="category-grid">
+            <div class="category-card">
+                <img src="https://static.paraflowcontent.com/public/resource/image/332d64f2-579a-484c-995b-1079a0f9ca5f.jpeg" alt="Classic Cocktails" class="category-bg">
+                <div class="category-overlay">
+                    <h3>Classic</h3>
+                    <p>Timeless recipes that defined mixology</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://static.paraflowcontent.com/public/resource/image/ba8d3a63-545f-4315-84ed-cdec7398b05c.jpeg" alt="Modern Cocktails" class="category-bg">
+                <div class="category-overlay">
+                    <h3>Modern</h3>
+                    <p>Contemporary twists and molecular innovations</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://static.paraflowcontent.com/public/resource/image/7f49f0a0-2563-4404-b3af-ed545f45f183.jpeg" alt="Tropical Cocktails" class="category-bg">
+                <div class="category-overlay">
+                    <h3>Tropical</h3>
+                    <p>Exotic flavors from island paradises</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://static.paraflowcontent.com/public/resource/image/adb33f79-cb60-4d94-937a-67e8f83b0768.jpeg" alt="Non-Alcoholic" class="category-bg">
+                <div class="category-overlay">
+                    <h3>Non-Alcoholic</h3>
+                    <p>Sophisticated zero-proof concoctions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="section fade-in" id="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Discover</h3>
+                <p>Explore our marketplace of exclusive cocktail recipes from renowned mixologists and enthusiasts worldwide.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3>Collect</h3>
+                <p>Purchase and own digital rights to cocktail recipes as NFTs, with full access to ingredients and preparation methods.</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <i class="fas fa-martini-glass-citrus"></i>
+                </div>
+                <h3>Mint</h3>
+                <p>Create and tokenize your own signature cocktail recipes to sell or trade on the marketplace.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About Us</a>
+                <a href="#">Support</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+            <div class="copyright">
+                © 2024 SipNFT. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/home.js"></script>
+</body>
+</html> 
