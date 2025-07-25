@@ -21,17 +21,9 @@ module.exports = {
     },
     sepolia: {
       url: process.env.SEPOLIA_URL || "https://sepolia.infura.io/v3/f52246a2572c4208b4b4276ce808d560",
-      accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : [],
-      timeout: 60000
-    },
-    mainnet: {
-      url: process.env.MAINNET_URL || "",
-      accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : []
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 11155111
     }
-  },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD"
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY

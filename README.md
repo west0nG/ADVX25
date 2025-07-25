@@ -1,5 +1,11 @@
 # Bars Help Bars - 产品需求文档
 
+# 以太坊测试链合约地址
+部署者地址: 0xffEa650e76B756aBAb614CC0143210eEB7813Bea
+CA1:0x33E309CA718747dc881Cc8E900DD5b3b60a39B18
+CA2:0x7C25cdC826C467B6b3856B48F54BD14cF3202411
+CA4:0xe7482833c9A590BF23687dd7d09c8D586577AB97
+
 ## 项目概述
 **项目名称**: Bars Help Bars  
 **项目类型**: Web3 酒吧生态系统  
@@ -166,3 +172,11 @@
 ![系统架构图](framework.png)
 4. 去中心化存储
    * IPFS（存储图片、配方等大文件）
+
+
+-----
+<a href="https://github.com/west0nG/ADVX25/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=west0nG/ADVX25" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).

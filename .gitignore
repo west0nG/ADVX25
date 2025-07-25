@@ -93,3 +93,10 @@ typechain-types/
 # Solidity coverage
 coverage/
 coverage.json 
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc 
