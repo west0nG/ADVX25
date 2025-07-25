@@ -96,6 +96,22 @@ class APIService {
         }
     }
 
+    // 2. Upload metadata to IPFS: json -> CID
+    async uploadMetadataToIPFS(metadata) {
+        try {
+            const url = `${this.baseUrl}${this.endpoints.uploadIPFS}`;
+            const result = await this.makeRequest(url, {
+                method: 'POST',
+                body: JSON.stringify({ metadata: metadata })
+            });
+            
+            return result.cid; // Assuming backend returns { cid: "..." }
+        } catch (error) {
+            console.error('Failed to upload metadata to IPFS:', error);
+            throw error;
+        }
+    }
+
     // 2. Store recipe: json{recipe name, intro, owner NFT address, ..., CID, NFT ID, NFT hash} -> bool
     async storeRecipe(recipeData) {
         try {
