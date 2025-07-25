@@ -11,4 +11,6 @@ class Bar(Base):
     bar_location = Column(String, nullable=False)
     bar_intro = Column(String, nullable=True)
     owner_address = Column(String, nullable=False, index=True) 
+    owned_recipes = Column(String[999], nullable=True)
+    used_recipes = Column(String[999], nullable=True)
     
