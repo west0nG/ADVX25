@@ -20,8 +20,9 @@ module.exports = {
       url: "http://127.0.0.1:8545"
     },
     sepolia: {
-      url: process.env.SEPOLIA_URL || "",
-      accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : []
+      url: process.env.SEPOLIA_URL || "https://sepolia.infura.io/v3/f52246a2572c4208b4b4276ce808d560",
+      accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : [],
+      timeout: 60000
     },
     mainnet: {
       url: process.env.MAINNET_URL || "",

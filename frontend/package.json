@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "python -m http.server 8000",
-    "dev": "python -m http.server 8000",
+    "dev": "live-server --port=8000 --host=localhost --open=/index.html --watch=.",
     "serve": "python -m http.server 8000",
     "build": "echo 'No build process needed for static HTML/CSS/JS'",
     "test": "echo 'No tests specified'"
@@ -31,7 +31,9 @@
     "url": "https://github.com/barshelpbars/frontend/issues"
   },
   "homepage": "https://barshelpbars.com",
-  "devDependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
   "dependencies": {},
   "engines": {
     "node": ">=14.0.0"

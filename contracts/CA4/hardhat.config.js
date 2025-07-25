@@ -20,7 +20,7 @@ module.exports = {
       url: "http://127.0.0.1:8545"
     },
     sepolia: {
-      url: process.env.SEPOLIA_URL || "",
+      url: process.env.SEPOLIA_URL || "https://sepolia.infura.io/v3/f52246a2572c4208b4b4276ce808d560",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111
     }

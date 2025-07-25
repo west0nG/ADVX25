@@ -12,11 +12,12 @@ async function main() {
   const idnft6551 = await IDNFT6551.deploy("ID NFT 6551", "IDNFT6551");
   
   console.log("⏳ 等待合约部署确认...");
-  await idnft6551.deployed();
+  await idnft6551.waitForDeployment();
 
+  const contractAddress = await idnft6551.getAddress();
   console.log("✅ IDNFT6551 合约部署成功!");
-  console.log("📍 合约地址:", idnft6551.address);
-  console.log("🔗 Sepolia Etherscan:", `https://sepolia.etherscan.io/address/${idnft6551.address}`);
+  console.log("📍 合约地址:", contractAddress);
+  console.log("🔗 Sepolia Etherscan:", `https://sepolia.etherscan.io/address/${contractAddress}`);
 
   // 验证合约信息
   console.log("\n📋 合约信息:");
@@ -28,7 +29,7 @@ async function main() {
   // 保存部署信息
   const deploymentInfo = {
     contractName: "IDNFT6551",
-    contractAddress: idnft6551.address,
+    contractAddress: contractAddress,
     deployer: deployer.address,
     network: "sepolia",
     timestamp: new Date().toISOString(),

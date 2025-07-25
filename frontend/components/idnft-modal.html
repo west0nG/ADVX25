@@ -1,0 +1,161 @@
+<!-- ID NFT Metadata Modal -->
+<div id="idnft-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-id-card"></i> 创建酒吧身份NFT</h3>
+            <button class="modal-close" onclick="closeIDNFTModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="form-section">
+                <p class="form-description">
+                    欢迎来到BarsHelpBars！为了获得完整的平台访问权限，您需要创建一个酒吧身份NFT。
+                    请填写以下信息来创建您的专属身份。
+                </p>
+                
+                <form id="idnft-form" class="idnft-form">
+                    <!-- 基本信息 -->
+                    <div class="form-group">
+                        <label for="bar-name">酒吧名称 *</label>
+                        <input type="text" id="bar-name" name="barName" required 
+                               placeholder="例如：The Golden Bar">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bar-description">酒吧描述</label>
+                        <textarea id="bar-description" name="barDescription" rows="3"
+                                  placeholder="描述您的酒吧特色、风格或理念..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bar-type">酒吧类型</label>
+                            <select id="bar-type" name="barType">
+                                <option value="">选择类型</option>
+                                <option value="cocktail">鸡尾酒吧</option>
+                                <option value="wine">葡萄酒吧</option>
+                                <option value="beer">啤酒吧</option>
+                                <option value="whiskey">威士忌吧</option>
+                                <option value="general">综合酒吧</option>
+                                <option value="lounge">休闲酒吧</option>
+                                <option value="pub">英式酒吧</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="establishment-year">成立年份</label>
+                            <input type="number" id="establishment-year" name="establishmentYear" 
+                                   min="1900" max="2024" placeholder="例如：2020">
+                        </div>
+                    </div>
+                    
+                    <!-- 位置信息 -->
+                    <div class="form-section-title">
+                        <h4><i class="fas fa-map-marker-alt"></i> 位置信息</h4>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bar-country">国家/地区</label>
+                            <input type="text" id="bar-country" name="barCountry" 
+                                   placeholder="例如：中国">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bar-city">城市</label>
+                            <input type="text" id="bar-city" name="barCity" 
+                                   placeholder="例如：上海">
+                        </div>
+                    </div>
+                    
+                    <!-- 特色信息 -->
+                    <div class="form-section-title">
+                        <h4><i class="fas fa-star"></i> 特色信息</h4>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specialties">特色饮品</label>
+                        <input type="text" id="specialties" name="specialties" 
+                               placeholder="例如：经典马提尼、创新鸡尾酒">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="awards">获奖荣誉</label>
+                        <input type="text" id="awards" name="awards" 
+                               placeholder="例如：2023年度最佳鸡尾酒吧">
+                    </div>
+                    
+                    <!-- 社交媒体 -->
+                    <div class="form-section-title">
+                        <h4><i class="fas fa-share-alt"></i> 社交媒体</h4>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="instagram">Instagram</label>
+                            <input type="text" id="instagram" name="instagram" 
+                                   placeholder="@yourbar">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="website">官方网站</label>
+                            <input type="url" id="website" name="website" 
+                                   placeholder="https://yourbar.com">
+                        </div>
+                    </div>
+                    
+                    <!-- 联系信息 -->
+                    <div class="form-section-title">
+                        <h4><i class="fas fa-phone"></i> 联系信息</h4>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-email">联系邮箱</label>
+                        <input type="email" id="contact-email" name="contactEmail" 
+                               placeholder="contact@yourbar.com">
+                    </div>
+                    
+                    <!-- 上传图片 -->
+                    <div class="form-section-title">
+                        <h4><i class="fas fa-image"></i> 酒吧图片</h4>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bar-image">酒吧照片</label>
+                        <div class="image-upload-area" id="image-upload-area">
+                            <input type="file" id="bar-image" name="barImage" 
+                                   accept="image/*" style="display: none;">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>点击上传酒吧照片</p>
+                                <span>支持 JPG, PNG, WebP 格式，最大 5MB</span>
+                            </div>
+                            <img id="image-preview" style="display: none;" alt="预览">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeIDNFTModal()">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+                <button type="button" class="btn-primary" onclick="submitIDNFTForm()" id="submit-idnft-btn">
+                    <i class="fas fa-magic"></i> 创建ID NFT
+                </button>
+            </div>
+            
+            <div class="form-status" id="form-status" style="display: none;">
+                <div class="status-content">
+                    <i class="fas fa-spinner fa-spin" id="status-icon"></i>
+                    <span id="status-text">正在处理...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

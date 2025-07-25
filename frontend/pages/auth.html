@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Wallet - SipNFT</title>
+    <title>连接钱包 - BarsHelpBars</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
 </head>
@@ -13,20 +13,19 @@
         <nav class="nav">
             <div class="logo">
                 <i class="fas fa-martini-glass-citrus"></i>
-                <span>SipNFT</span>
+                <span>BarsHelpBars</span>
             </div>
             <ul class="nav-links">
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="marketplace.html">Marketplace</a></li>
-                <li><a href="profile.html">Bar Profiles</a></li>
-                <li><a href="main.html">Dashboard</a></li>
+                <li><a href="../index.html">首页</a></li>
+                <li><a href="marketplace.html">市场</a></li>
+                <li><a href="profile.html">酒吧档案</a></li>
             </ul>
             <div class="header-actions">
                 <div class="search-box">
-                    <input type="text" placeholder="Search recipes...">
+                    <input type="text" placeholder="搜索配方...">
                     <i class="fas fa-search"></i>
                 </div>
-                <a href="auth.html" class="connect-btn">Connect Wallet</a>
+                <a href="auth.html" class="connect-btn">连接钱包</a>
             </div>
         </nav>
     </header>
@@ -35,7 +34,7 @@
     <section class="create-hero">
         <div class="hero-content">
             <h1>Connect Your Wallet</h1>
-            <p>Connect with MetaMask to access your SipNFT dashboard and start trading cocktail recipes</p>
+            <p>Connect with MetaMask to access your BarsHelpBars account and start trading cocktail recipes</p>
         </div>
     </section>
 
@@ -55,7 +54,7 @@
                             </div>
                             <div class="metamask-content">
                                 <h4>MetaMask Wallet</h4>
-                                <p>The most popular Web3 wallet. Connect securely to access your dashboard.</p>
+                                <p>The most popular Web3 wallet. Connect securely to access your BarsHelpBars account.</p>
                             </div>
                             <button type="button" class="btn-primary metamask-btn" id="connect-metamask" onclick="connectMetaMask()">
                                 <i class="fab fa-ethereum"></i>
@@ -104,7 +103,7 @@
                                 <i class="fas fa-tachometer-alt"></i>
                             </div>
                             <div class="benefit-content">
-                                <h4>Personal Dashboard</h4>
+                                <h4>Personal Profile</h4>
                                 <p>Manage your NFT collection and track your trading activity</p>
                             </div>
                         </div>
@@ -155,7 +154,18 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
+    <!-- Ethers.js for blockchain interaction -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    
+    <!-- ID NFT Service -->
+    <script src="../assets/js/idnft-service.js"></script>
+    
+    <!-- ID NFT Modal Handler -->
+    <script src="../assets/js/idnft-modal.js"></script>
+    
+    <!-- Original Auth Script -->
     <script src="../assets/js/auth.js"></script>
+    
     <script>
         // Load footer
         fetch('../components/footer.html')
