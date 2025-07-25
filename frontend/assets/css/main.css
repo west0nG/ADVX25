@@ -1,3 +1,6 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 /* Base Styles */
 * {
     margin: 0;
@@ -6,11 +9,48 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, #0a0f1a 0%, #1a202c 100%);
     color: #f9fafb;
     overflow-x: hidden;
-    line-height: 1.6;
+    line-height: 1.8;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+}
+
+h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 700; }
+h2 { font-size: clamp(2rem, 4vw, 2.5rem); }
+h3 { font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
+h4 { font-size: clamp(1.1rem, 2vw, 1.25rem); }
+
+/* Enhanced text elements */
+p {
+    font-weight: 400;
+    line-height: 1.9;
+    letter-spacing: 0.015em;
+}
+
+/* Code and monospace elements */
+code, pre, .monospace {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+/* Modern button typography */
+button, .btn, .btn-primary, .btn-secondary {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.04em;
 }
 
 /* Smooth scrolling for the entire page */
@@ -64,6 +104,8 @@ html {
     font-size: 1.5rem;
     font-weight: 600;
     color: #25f2f2;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.05em;
 }
 
 .logo i {
@@ -88,6 +130,9 @@ html {
     transition: all 0.3s ease;
     position: relative;
     padding: 0.5rem 0;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.03em;
 }
 
 .nav-links a:hover,
@@ -152,7 +197,9 @@ html {
     border-radius: 25px;
     text-decoration: none;
     font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
     transition: all 0.3s ease;
+    letter-spacing: 0.04em;
 }
 
 .connect-btn:hover {
@@ -228,6 +275,7 @@ html {
 }
 
 .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -236,6 +284,8 @@ html {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: gradientShift 3s ease-in-out infinite;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
 }
 
 @keyframes gradientShift {
@@ -257,7 +307,8 @@ html {
     font-size: 1.2rem;
     color: #9ca3af;
     margin-bottom: 2rem;
-    line-height: 1.8;
+    line-height: 2.0;
+    letter-spacing: 0.02em;
 }
 
 .hero-buttons {
@@ -274,12 +325,14 @@ html {
     border-radius: 50px;
     text-decoration: none;
     font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    letter-spacing: 0.04em;
 }
 
 .btn-primary:hover {
@@ -294,12 +347,14 @@ html {
     border-radius: 50px;
     text-decoration: none;
     font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
     transition: all 0.3s ease;
     border: 2px solid #25f2f2;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    letter-spacing: 0.04em;
 }
 
 .btn-secondary:hover {
@@ -374,6 +429,7 @@ html {
 }
 
 .section-title {
+    font-family: 'Space Grotesk', sans-serif;
     text-align: center;
     font-size: 2.5rem;
     font-weight: 700;
@@ -385,6 +441,8 @@ html {
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.8s ease;
+    letter-spacing: 0.03em;
+    line-height: 1.3;
 }
 
 .section-title.visible {
@@ -494,6 +552,8 @@ html {
     border-radius: 20px;
     font-weight: 600;
     font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
 }
 
 .nft-info {
@@ -501,9 +561,13 @@ html {
 }
 
 .nft-info h3 {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 1.2rem;
+    font-weight: 600;
     margin-bottom: 1rem;
     color: #f9fafb;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
 }
 
 .nft-creator {
@@ -578,17 +642,23 @@ html {
 }
 
 .category-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 1.5rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
     background: linear-gradient(135deg, #25f2f2, #ec4899);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
 }
 
 .category-card p {
     color: #9ca3af;
     font-size: 0.9rem;
+    line-height: 1.7;
+    letter-spacing: 0.015em;
 }
 
 /* Steps Grid */
@@ -723,23 +793,28 @@ html {
 }
 
 .step h3 {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 1.3rem;
+    font-weight: 600;
     margin-bottom: 1rem;
     color: #f9fafb;
     position: relative;
     z-index: 2;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateY(0);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
 }
 
 .step p {
     color: #9ca3af;
-    line-height: 1.6;
+    line-height: 1.8;
     position: relative;
     z-index: 2;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateY(0);
     opacity: 0.8;
+    letter-spacing: 0.015em;
 }
 
 .step:hover h3 {
@@ -781,6 +856,8 @@ html {
     font-weight: 600;
     color: #25f2f2;
     margin-bottom: 2rem;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.05em;
 }
 
 .footer-links {
@@ -1438,7 +1515,9 @@ html {
     color: #25f2f2;
     padding: 0.25rem 0.5rem;
     border-radius: 5px;
-    font-family: monospace;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-weight: 500;
+    letter-spacing: 0.025em;
 }
 
 /* Responsive Design */
