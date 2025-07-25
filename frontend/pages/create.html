@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create NFT - SipNFT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="profile.html">Bar Profiles</a></li>
+                <li><a href="main.html">Dashboard</a></li>
+            </ul>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search recipes...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="auth.html" class="connect-btn">Connect Wallet</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Create Hero -->
+    <section class="create-hero">
+        <div class="hero-content">
+            <h1>Mint Your Signature Cocktail</h1>
+            <p>Share your mixology masterpiece with the world and earn from your creativity</p>
+        </div>
+    </section>
+
+    <!-- Create Form -->
+    <section class="create-form-section">
+        <div class="form-container">
+            <form class="create-form" id="create-form">
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cocktail-name">Cocktail Name *</label>
+                            <input type="text" id="cocktail-name" name="name" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category *</label>
+                            <select id="category" name="category" required class="form-input">
+                                <option value="">Select Category</option>
+                                <option value="classic">Classic</option>
+                                <option value="modern">Modern</option>
+                                <option value="tropical">Tropical</option>
+                                <option value="non-alcoholic">Non-Alcoholic</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" rows="4" required class="form-input" placeholder="Tell the story behind your cocktail..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Recipe Details -->
+                <div class="form-section">
+                    <h3><i class="fas fa-list"></i> Recipe Details</h3>
+                    <div class="form-group">
+                        <label>Ingredients *</label>
+                        <div id="ingredients-list">
+                            <div class="ingredient-item">
+                                <input type="text" name="ingredients[]" placeholder="e.g., 2 oz Gin" required class="form-input">
+                                <button type="button" class="remove-btn" onclick="removeIngredient(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" onclick="addIngredient()">
+                            <i class="fas fa-plus"></i> Add Ingredient
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label>Instructions *</label>
+                        <div id="instructions-list">
+                            <div class="instruction-item">
+                                <input type="text" name="instructions[]" placeholder="e.g., Fill shaker with ice" required class="form-input">
+                                <button type="button" class="remove-btn" onclick="removeInstruction(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" onclick="addInstruction()">
+                            <i class="fas fa-plus"></i> Add Step
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Media -->
+                <div class="form-section">
+                    <h3><i class="fas fa-image"></i> Media</h3>
+                    <div class="form-group">
+                        <label for="cocktail-image">Cocktail Image *</label>
+                        <div class="image-upload">
+                            <input type="file" id="cocktail-image" name="image" accept="image/*" required>
+                            <div class="upload-area" id="upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload or drag and drop</p>
+                                <span>PNG, JPG up to 10MB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing -->
+                <div class="form-section">
+                    <h3><i class="fas fa-tag"></i> Pricing</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price">Price (ETH) *</label>
+                            <input type="number" id="price" name="price" step="0.01" min="0" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="royalties">Royalties (%)</label>
+                            <input type="number" id="royalties" name="royalties" min="0" max="50" value="10" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="previewNFT()">Preview</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-mint"></i> Mint NFT
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">About Us</a>
+                <a href="#">Support</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+            <div class="copyright">
+                © 2024 SipNFT. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/create.js"></script>
+</body>
+</html> 
