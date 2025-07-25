@@ -129,8 +129,19 @@ contract RecipeNFT is ERC721URIStorage, Ownable {
         uint256 createdAt,
         uint256 updatedAt
     ) {
+        // Use public ownerOf to check existence
+        require(_isValidToken(tokenId), "ERC721: invalid token ID");
         RecipeMetadata storage meta = recipeMetadata[tokenId];
         return (meta.tokenURI, meta.isActive, meta.createdAt, meta.updatedAt);
+    }
+
+    // Internal helper to check token existence using ownerOf
+    function _isValidToken(uint256 tokenId) internal view returns (bool) {
+        try this.ownerOf(tokenId) returns (address) {
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     /**
