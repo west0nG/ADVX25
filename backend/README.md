@@ -47,3 +47,8 @@ backend/
 ## 数据流
 ![数据流](数据流.png)
 > 图：后端主要数据流示意  
+
+## 初始化数据库
+* postgres=# CREATE USER bars WITH PASSWORD 'bars123';
+* postgres=# CREATE DATABASE barsdb OWNER bars;
+* postgres=# GRANT ALL PRIVILEGES ON DATABASE barsdb TO bars;
