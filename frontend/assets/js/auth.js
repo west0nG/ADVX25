@@ -37,10 +37,10 @@ function checkExistingConnection() {
         window.ethereum.request({ method: 'eth_accounts' })
         .then(accounts => {
             if (accounts.length > 0) {
-                // User is already connected, redirect to main dashboard
-                showConnectionSuccess('Already connected! Redirecting to dashboard...');
+                // User is already connected, redirect to profile
+                showConnectionSuccess('Already connected! Redirecting to profile...');
                 setTimeout(() => {
-                    window.location.href = 'main.html';
+                    window.location.href = 'profile.html';
                 }, 2000);
             }
         })
@@ -82,9 +82,9 @@ async function connectMetaMask() {
             // Show success
             showConnectionSuccess('Connected successfully!', `Connected to ${getShortAddress(walletAddress)}`);
             
-            // Redirect to main dashboard after delay
+            // Redirect to profile after delay
             setTimeout(() => {
-                window.location.href = 'main.html';
+                window.location.href = 'profile.html';
             }, 2000);
             
             return walletAddress;
@@ -148,7 +148,7 @@ function showConnectionSuccess(title, message = '') {
     
     if (statusCard && statusTitle && statusMessage && statusIcon) {
         statusTitle.textContent = title;
-        statusMessage.textContent = message || 'Redirecting to your dashboard...';
+        statusMessage.textContent = message || 'Redirecting to your profile...';
         statusIcon.className = 'fas fa-check-circle';
         statusIcon.style.color = '#10b981';
         statusCard.style.display = 'block';

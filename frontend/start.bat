@@ -1,8 +1,8 @@
 @echo off
-REM SipNFT Frontend Start Script for Windows
-REM This script starts a local HTTP server for the SipNFT frontend
+REM BarsHelpBars Frontend Start Script for Windows
+REM This script starts a local HTTP server for the BarsHelpBars frontend
 
-echo 🍸 Starting SipNFT Frontend Server...
+echo 🍸 Starting BarsHelpBars Frontend Server...
 echo ======================================
 
 REM Check if Python 3 is available

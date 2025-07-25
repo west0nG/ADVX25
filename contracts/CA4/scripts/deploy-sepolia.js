@@ -8,10 +8,10 @@ async function main() {
   console.log("部署账户:", deployer.address);
   console.log("账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "ETH");
 
-  // Sepolia测试网上的合约地址（需要根据实际部署情况更新）
+  // Sepolia测试网上的合约地址（使用之前部署的合约地址）
   const USDT_ADDRESS = process.env.USDT_ADDRESS || "0x7169D38820dfd117C3FA1f22a697dBA58d90BA06"; // Sepolia USDT
-  const IDNFT_ADDRESS = process.env.IDNFT_ADDRESS || "0x..."; // 需要填入实际部署的IDNFT地址
-  const RECIPE_NFT_ADDRESS = process.env.RECIPE_NFT_ADDRESS || "0x..."; // 需要填入实际部署的RecipeNFT地址
+  const IDNFT_ADDRESS = process.env.IDNFT_ADDRESS || "0x33E309CA718747dc881Cc8E900DD5b3b60a39B18"; // CA1部署的IDNFT地址
+  const RECIPE_NFT_ADDRESS = process.env.RECIPE_NFT_ADDRESS || "0x7C25cdC826C467B6b3856B48F54BD14cF3202411"; // CA2部署的RecipeNFT地址
 
   console.log("使用的合约地址:");
   console.log("USDT:", USDT_ADDRESS);

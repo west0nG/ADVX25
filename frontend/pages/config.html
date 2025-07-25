@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置设置 - BarsHelpBars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>BarsHelpBars</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">首页</a></li>
+                <li><a href="marketplace.html">市场</a></li>
+                <li><a href="profile.html">酒吧档案</a></li>
+            </ul>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索配方...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="auth.html" class="connect-btn">连接钱包</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Config Hero -->
+    <section class="create-hero">
+        <div class="hero-content">
+            <h1>配置设置</h1>
+            <p>配置您的BarsHelpBars应用程序设置，包括区块链合约地址和网络配置</p>
+        </div>
+    </section>
+
+    <!-- Config Form -->
+    <section class="create-form-section">
+        <div class="form-container">
+            <div class="create-form">
+                <!-- Blockchain Configuration -->
+                <div class="form-section">
+                    <h3><i class="fas fa-link"></i> 区块链配置</h3>
+                    
+                    <div class="form-group">
+                        <label for="network-select">选择网络</label>
+                        <select id="network-select" class="form-input">
+                            <option value="sepolia">Sepolia 测试网</option>
+                            <option value="mainnet">以太坊主网</option>
+                            <option value="polygon">Polygon</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="idnft-contract">ID NFT 合约地址</label>
+                        <input type="text" id="idnft-contract" class="form-input" 
+                               placeholder="0x..." value="">
+                        <small>请输入CA1合约的部署地址</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rpc-url">RPC URL (可选)</label>
+                        <input type="text" id="rpc-url" class="form-input" 
+                               placeholder="https://sepolia.infura.io/v3/YOUR_PROJECT_ID">
+                        <small>如果使用自定义RPC，请填写完整的URL</small>
+                    </div>
+                </div>
+
+                <!-- IPFS Configuration -->
+                <div class="form-section">
+                    <h3><i class="fas fa-cloud"></i> IPFS 配置</h3>
+                    
+                    <div class="form-group">
+                        <label for="ipfs-gateway">IPFS Gateway</label>
+                        <input type="text" id="ipfs-gateway" class="form-input" 
+                               placeholder="https://ipfs.io/ipfs/" 
+                               value="https://ipfs.io/ipfs/">
+                        <small>用于访问IPFS内容的网关地址</small>
+                    </div>
+                </div>
+
+                <!-- Application Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-cog"></i> 应用程序设置</h3>
+                    
+                    <div class="form-group">
+                        <label for="language-select">语言</label>
+                        <select id="language-select" class="form-input">
+                            <option value="zh">中文</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="theme-select">主题</label>
+                        <select id="theme-select" class="form-input">
+                            <option value="light">浅色主题</option>
+                            <option value="dark">深色主题</option>
+                            <option value="auto">跟随系统</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-section">
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="resetConfig()">
+                            <i class="fas fa-undo"></i> 重置配置
+                        </button>
+                        <button type="button" class="btn-primary" onclick="saveConfig()">
+                            <i class="fas fa-save"></i> 保存配置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="form-section">
+                    <div id="config-status" style="display: none;">
+                        <div class="status-content">
+                            <i class="fas fa-check-circle" id="status-icon"></i>
+                            <span id="status-text">配置已保存</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script>
+        // Load footer
+        fetch('../components/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+            });
+
+        // Load current configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentConfig();
+        });
+
+        // Load current configuration
+        function loadCurrentConfig() {
+            const config = {
+                network: localStorage.getItem('config_network') || 'sepolia',
+                idnftContract: localStorage.getItem('config_idnft_contract') || '',
+                rpcUrl: localStorage.getItem('config_rpc_url') || '',
+                ipfsGateway: localStorage.getItem('config_ipfs_gateway') || 'https://ipfs.io/ipfs/',
+                language: localStorage.getItem('config_language') || 'zh',
+                theme: localStorage.getItem('config_theme') || 'light'
+            };
+
+            document.getElementById('network-select').value = config.network;
+            document.getElementById('idnft-contract').value = config.idnftContract;
+            document.getElementById('rpc-url').value = config.rpcUrl;
+            document.getElementById('ipfs-gateway').value = config.ipfsGateway;
+            document.getElementById('language-select').value = config.language;
+            document.getElementById('theme-select').value = config.theme;
+        }
+
+        // Save configuration
+        function saveConfig() {
+            const config = {
+                network: document.getElementById('network-select').value,
+                idnftContract: document.getElementById('idnft-contract').value,
+                rpcUrl: document.getElementById('rpc-url').value,
+                ipfsGateway: document.getElementById('ipfs-gateway').value,
+                language: document.getElementById('language-select').value,
+                theme: document.getElementById('theme-select').value
+            };
+
+            // Validate contract address
+            if (config.idnftContract && !/^0x[a-fA-F0-9]{40}$/.test(config.idnftContract)) {
+                showStatus('合约地址格式不正确', 'error');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('config_network', config.network);
+            localStorage.setItem('config_idnft_contract', config.idnftContract);
+            localStorage.setItem('config_rpc_url', config.rpcUrl);
+            localStorage.setItem('config_ipfs_gateway', config.ipfsGateway);
+            localStorage.setItem('config_language', config.language);
+            localStorage.setItem('config_theme', config.theme);
+
+            // Also save to global config for ID NFT service
+            if (config.idnftContract) {
+                localStorage.setItem('idnft_contract_address', config.idnftContract);
+            }
+
+            showStatus('配置已保存成功！', 'success');
+        }
+
+        // Reset configuration
+        function resetConfig() {
+            if (confirm('确定要重置所有配置吗？')) {
+                localStorage.removeItem('config_network');
+                localStorage.removeItem('config_idnft_contract');
+                localStorage.removeItem('config_rpc_url');
+                localStorage.removeItem('config_ipfs_gateway');
+                localStorage.removeItem('config_language');
+                localStorage.removeItem('config_theme');
+                localStorage.removeItem('idnft_contract_address');
+
+                loadCurrentConfig();
+                showStatus('配置已重置', 'success');
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type = 'success') {
+            const statusElement = document.getElementById('config-status');
+            const statusText = document.getElementById('status-text');
+            const statusIcon = document.getElementById('status-icon');
+
+            statusText.textContent = message;
+            statusElement.style.display = 'block';
+
+            if (type === 'success') {
+                statusIcon.className = 'fas fa-check-circle';
+                statusElement.style.background = '#f0f9ff';
+                statusElement.style.border = '1px solid #bae6fd';
+                statusIcon.style.color = '#10b981';
+            } else {
+                statusIcon.className = 'fas fa-exclamation-triangle';
+                statusElement.style.background = '#fef2f2';
+                statusElement.style.border = '1px solid #fecaca';
+                statusIcon.style.color = '#ef4444';
+            }
+
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 
