@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID NFT 6551 铸造平台</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .erc6551-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .wallet-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .wallet-info {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .wallet-info.show {
+            display: block;
+        }
+
+        .address {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-erc6551 {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+
+        .btn-erc6551:hover {
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .nft-preview {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .nft-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .account-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .account-info h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .network-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .features {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 5px 0;
+            color: #666;
+        }
+
+        .feature-list li:before {
+            content: "✅ ";
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ID NFT 6551</h1>
+            <p>铸造你的专属ERC-6551身份NFT</p>
+            <div class="erc6551-badge">ERC-6551 Token Bound Account</div>
+        </div>
+
+        <div class="features">
+            <h3>🚀 ERC-6551 特性</h3>
+            <ul class="feature-list">
+                <li>每个NFT都有自己的钱包地址</li>
+                <li>NFT可以持有其他代币和NFT</li>
+                <li>支持复杂的交互和交易</li>
+                <li>真正的数字身份解决方案</li>
+            </ul>
+        </div>
+
+        <div class="wallet-section">
+            <button id="connectWallet" class="btn">连接钱包</button>
+            <div id="walletInfo" class="wallet-info">
+                <div class="network-info" id="networkInfo">网络: 未连接</div>
+                <div>钱包地址: <div class="address" id="walletAddress"></div></div>
+                <div>余额: <span id="walletBalance">0</span> ETH</div>
+            </div>
+        </div>
+
+        <div id="mintSection" style="display: none;">
+            <div class="form-group">
+                <label for="contractAddress">合约地址:</label>
+                <input type="text" id="contractAddress" placeholder="输入已部署的ERC-6551合约地址">
+            </div>
+
+            <div class="form-group">
+                <label for="recipientAddress">接收地址:</label>
+                <input type="text" id="recipientAddress" placeholder="NFT接收地址">
+            </div>
+
+            <button id="mintNFT" class="btn btn-erc6551">铸造 ERC-6551 ID NFT</button>
+            <button id="checkNFT" class="btn btn-secondary">查询我的 NFT</button>
+            <button id="checkAccount" class="btn btn-secondary">查询 NFT 账户</button>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+
+        <div id="nftPreview" class="nft-preview" style="display: none;">
+            <div class="nft-image">🎫</div>
+            <h3>ID NFT #<span id="tokenId">1</span></h3>
+            <p id="nftMetadata">正在加载元数据...</p>
+            <div id="accountInfo" class="account-info" style="display: none;">
+                <h4>🔗 ERC-6551 账户信息</h4>
+                <p>账户地址: <span id="accountAddress"></span></p>
+                <p>账户余额: <span id="accountBalance">0</span> ETH</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let provider, signer, contract;
+        const CONTRACT_ABI = [
+            "function createIDNFT(address to, string memory uri) external returns (uint256)",
+            "function tokenURI(uint256 tokenId) public view returns (string memory)",
+            "function balanceOf(address owner) public view returns (uint256)",
+            "function ownerOf(uint256 tokenId) public view returns (address)",
+            "function totalSupply() public view returns (uint256)",
+            "function tokenByIndex(uint256 index) public view returns (uint256)",
+            "function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256)",
+            "function getAccountAddress(uint256 tokenId) external view returns (address)",
+            "function getTokenIdByAccount(address accountAddress) external view returns (uint256)",
+            "function getIDMetadata(uint256 tokenId) external view returns (tuple(string tokenURI, bool isActive, uint256 createdAt, uint256 updatedAt, address accountAddress))",
+            "function supportsERC6551() external pure returns (bool)"
+        ];
+
+        // 示例元数据
+        const sampleMetadata = {
+            "name": "ID NFT 6551 #1",
+            "description": "这是一个基于ERC-6551标准的身份NFT，拥有自己的钱包地址，可以持有其他代币和NFT。",
+            "image": "https://ipfs.io/ipfs/QmYourImageHash",
+            "attributes": [
+                {
+                    "trait_type": "身份类型",
+                    "value": "ERC-6551数字公民"
+                },
+                {
+                    "trait_type": "稀有度",
+                    "value": "传奇"
+                },
+                {
+                    "trait_type": "铸造时间",
+                    "value": new Date().toISOString()
+                },
+                {
+                    "trait_type": "区块链",
+                    "value": "Sepolia测试网"
+                },
+                {
+                    "trait_type": "标准",
+                    "value": "ERC-6551"
+                },
+                {
+                    "trait_type": "功能",
+                    "value": "Token Bound Account"
+                }
+            ]
+        };
+
+        // 连接钱包
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus('请安装MetaMask钱包', 'error');
+                    return;
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                
+                const address = await signer.getAddress();
+                const balance = await provider.getBalance(address);
+                const network = await provider.getNetwork();
+
+                document.getElementById('walletAddress').textContent = address;
+                document.getElementById('walletBalance').textContent = ethers.utils.formatEther(balance);
+                document.getElementById('networkInfo').textContent = `网络: ${network.name} (Chain ID: ${network.chainId})`;
+                
+                document.getElementById('walletInfo').classList.add('show');
+                document.getElementById('mintSection').style.display = 'block';
+                document.getElementById('connectWallet').textContent = '钱包已连接';
+                document.getElementById('connectWallet').disabled = true;
+
+                showStatus('钱包连接成功！', 'success');
+
+                // 检查网络
+                if (network.chainId !== 11155111) { // Sepolia chain ID
+                    showStatus('请切换到Sepolia测试网', 'error');
+                }
+
+            } catch (error) {
+                showStatus('连接钱包失败: ' + error.message, 'error');
+            }
+        }
+
+        // 铸造NFT
+        async function mintNFT() {
+            try {
+                const contractAddress = document.getElementById('contractAddress').value.trim();
+                const recipientAddress = document.getElementById('recipientAddress').value.trim();
+
+                if (!contractAddress || !recipientAddress) {
+                    showStatus('请填写合约地址和接收地址', 'error');
+                    return;
+                }
+
+                if (!ethers.utils.isAddress(contractAddress) || !ethers.utils.isAddress(recipientAddress)) {
+                    showStatus('请输入有效的以太坊地址', 'error');
+                    return;
+                }
+
+                showStatus('正在铸造ERC-6551 NFT...', 'info');
+                document.getElementById('mintNFT').disabled = true;
+                document.getElementById('mintNFT').innerHTML = '<span class="loading"></span> 铸造中...';
+
+                contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+
+                // 检查合约是否支持ERC-6551
+                const supports6551 = await contract.supportsERC6551();
+                if (!supports6551) {
+                    showStatus('该合约不支持ERC-6551标准', 'error');
+                    return;
+                }
+
+                // 生成元数据URI（这里使用示例数据）
+                const metadataURI = "https://ipfs.io/ipfs/QmYourMetadataHash";
+                
+                const tx = await contract.createIDNFT(recipientAddress, metadataURI);
+                showStatus('交易已提交，等待确认...', 'info');
+
+                const receipt = await tx.wait();
+                showStatus(`ERC-6551 NFT铸造成功！交易哈希: ${receipt.transactionHash}`, 'success');
+
+                // 获取新铸造的token ID
+                const totalSupply = await contract.totalSupply();
+                const tokenId = totalSupply.toNumber();
+
+                // 显示NFT预览
+                showNFTPreview(tokenId, sampleMetadata);
+
+            } catch (error) {
+                showStatus('铸造失败: ' + error.message, 'error');
+            } finally {
+                document.getElementById('mintNFT').disabled = false;
+                document.getElementById('mintNFT').textContent = '铸造 ERC-6551 ID NFT';
+            }
+        }
+
+        // 查询NFT
+        async function checkNFT() {
+            try {
+                const contractAddress = document.getElementById('contractAddress').value.trim();
+                const address = await signer.getAddress();
+
+                if (!contractAddress) {
+                    showStatus('请填写合约地址', 'error');
+                    return;
+                }
+
+                showStatus('正在查询NFT...', 'info');
+                document.getElementById('checkNFT').disabled = true;
+
+                contract = new ethers.Contract(contractAddress, CONTRACT_ABI, provider);
+                
+                const balance = await contract.balanceOf(address);
+                
+                if (balance.toNumber() === 0) {
+                    showStatus('你的钱包中没有ID NFT', 'info');
+                    return;
+                }
+
+                // 获取第一个NFT的token ID
+                const tokenId = await contract.tokenOfOwnerByIndex(address, 0);
+                const tokenURI = await contract.tokenURI(tokenId);
+
+                showStatus(`找到 ${balance} 个ID NFT`, 'success');
+                showNFTPreview(tokenId.toNumber(), sampleMetadata);
+
+            } catch (error) {
+                showStatus('查询失败: ' + error.message, 'error');
+            } finally {
+                document.getElementById('checkNFT').disabled = false;
+            }
+        }
+
+        // 查询NFT账户
+        async function checkAccount() {
+            try {
+                const contractAddress = document.getElementById('contractAddress').value.trim();
+                const address = await signer.getAddress();
+
+                if (!contractAddress) {
+                    showStatus('请填写合约地址', 'error');
+                    return;
+                }
+
+                showStatus('正在查询NFT账户...', 'info');
+                document.getElementById('checkAccount').disabled = true;
+
+                contract = new ethers.Contract(contractAddress, CONTRACT_ABI, provider);
+                
+                const balance = await contract.balanceOf(address);
+                
+                if (balance.toNumber() === 0) {
+                    showStatus('你的钱包中没有ID NFT', 'info');
+                    return;
+                }
+
+                // 获取第一个NFT的token ID
+                const tokenId = await contract.tokenOfOwnerByIndex(address, 0);
+                
+                // 获取ERC-6551账户地址
+                const accountAddress = await contract.getAccountAddress(tokenId);
+                const accountBalance = await provider.getBalance(accountAddress);
+
+                showStatus(`找到ERC-6551账户: ${accountAddress}`, 'success');
+                
+                // 显示账户信息
+                document.getElementById('accountAddress').textContent = accountAddress;
+                document.getElementById('accountBalance').textContent = ethers.utils.formatEther(accountBalance);
+                document.getElementById('accountInfo').style.display = 'block';
+
+            } catch (error) {
+                showStatus('查询账户失败: ' + error.message, 'error');
+            } finally {
+                document.getElementById('checkAccount').disabled = false;
+            }
+        }
+
+        // 显示NFT预览
+        function showNFTPreview(tokenId, metadata) {
+            document.getElementById('tokenId').textContent = tokenId;
+            document.getElementById('nftMetadata').innerHTML = `
+                <strong>${metadata.name}</strong><br>
+                ${metadata.description}<br><br>
+                <strong>属性:</strong><br>
+                ${metadata.attributes.map(attr => `${attr.trait_type}: ${attr.value}`).join('<br>')}
+            `;
+            document.getElementById('nftPreview').style.display = 'block';
+        }
+
+        // 显示状态信息
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 事件监听器
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        document.getElementById('mintNFT').addEventListener('click', mintNFT);
+        document.getElementById('checkNFT').addEventListener('click', checkNFT);
+        document.getElementById('checkAccount').addEventListener('click', checkAccount);
+
+        // 自动填充接收地址
+        document.getElementById('recipientAddress').addEventListener('focus', async function() {
+            if (signer) {
+                const address = await signer.getAddress();
+                this.value = address;
+            }
+        });
+
+        // 页面加载时检查是否已连接钱包
+        window.addEventListener('load', async function() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        connectWallet();
+                    }
+                } catch (error) {
+                    console.log('未检测到已连接的钱包');
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

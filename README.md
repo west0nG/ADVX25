@@ -13,7 +13,11 @@
 
 ### 2. 数据结构定义
 
-#### 2.1 ID NFT 数据结构 (ERC 6551)
+#### 2.1 NFT系列说明
+- **ID NFT系列**: 所有ID NFT属于同一个NFT系列，用于统一管理酒吧身份认证
+- **Recipe NFT系列**: 每个ID NFT所创建的Recipe NFT属于同一个系列，便于配方知识产权的统一管理
+
+#### 2.2 ID NFT 数据结构 (ERC 6551)
 ```json
 {
   "metadata": {
@@ -26,7 +30,7 @@
 }
 ```
 
-#### 2.2 Recipe NFT 数据结构 (ERC 4907)
+#### 2.3 Recipe NFT 数据结构 (ERC 4907)
 ```json
 {
   "metadata": {
@@ -144,3 +148,21 @@
 
 ### 5. AI设计Bar
 待处理 先不需要管 先实现其他功能
+
+## 目前的架构
+1. 智能合约（Solidity）
+   * ID NFT（ERC-6551，酒吧身份）IDNFT.sol
+   * Recipe NFT（ERC-4907，配方知识产权+授权）RecipeNFT.sol
+   * 授权/交易逻辑（USDT支付、授权关系）Marketplace.sol
+2. 前端（React/Vue/Next.js等）
+   * 钱包连接（MetaMask）
+   * NFT创建/展示/交易页面
+   * 授权购买流程
+   * 市场浏览（仿OpenSea）
+3. 后端（可能要）
+   * AI Agents
+   * IPFS上传代理
+   * 统计与分析
+![系统架构图](framework.png)
+4. 去中心化存储
+   * IPFS（存储图片、配方等大文件）

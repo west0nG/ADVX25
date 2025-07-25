@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethers.js 测试页面</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Ethers.js 测试页面</h1>
+        <p>这个页面用于测试Ethers.js库是否正常工作。</p>
+        
+        <div id="status"></div>
+        
+        <button onclick="testEthers()">测试 Ethers.js</button>
+        <button onclick="testMetaMask()">测试 MetaMask</button>
+        <button onclick="testNetwork()">测试网络连接</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function addResult(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML += `<p>${message}</p>`;
+        }
+
+        async function testEthers() {
+            try {
+                showStatus('正在测试Ethers.js库...', 'info');
+                
+                // 检查ethers对象是否存在
+                if (typeof ethers === 'undefined') {
+                    throw new Error('Ethers.js库未加载');
+                }
+                
+                addResult('✅ Ethers.js库已加载');
+                
+                // 测试基本功能
+                const provider = new ethers.providers.JsonRpcProvider();
+                addResult('✅ 可以创建Provider');
+                
+                // 测试地址验证
+                const isValidAddress = ethers.utils.isAddress('0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6');
+                addResult(`✅ 地址验证功能正常: ${isValidAddress}`);
+                
+                // 测试格式化
+                const formatted = ethers.utils.formatEther('1000000000000000000');
+                addResult(`✅ 格式化功能正常: 1 ETH = ${formatted} ETH`);
+                
+                showStatus('Ethers.js测试完成！', 'success');
+                
+            } catch (error) {
+                addResult(`❌ Ethers.js测试失败: ${error.message}`);
+                showStatus('Ethers.js测试失败', 'error');
+            }
+        }
+
+        async function testMetaMask() {
+            try {
+                showStatus('正在测试MetaMask...', 'info');
+                
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask未安装');
+                }
+                
+                addResult('✅ MetaMask已安装');
+                
+                // 请求账户
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    addResult(`✅ 已连接账户: ${accounts[0]}`);
+                } else {
+                    addResult('⚠️ 未连接账户，请点击"连接账户"');
+                }
+                
+                showStatus('MetaMask测试完成！', 'success');
+                
+            } catch (error) {
+                addResult(`❌ MetaMask测试失败: ${error.message}`);
+                showStatus('MetaMask测试失败', 'error');
+            }
+        }
+
+        async function testNetwork() {
+            try {
+                showStatus('正在测试网络连接...', 'info');
+                
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask未安装');
+                }
+                
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const network = await provider.getNetwork();
+                
+                addResult(`✅ 当前网络: ${network.name} (Chain ID: ${network.chainId})`);
+                
+                if (network.chainId === 11155111) {
+                    addResult('✅ 已连接到Sepolia测试网');
+                } else {
+                    addResult('⚠️ 请切换到Sepolia测试网 (Chain ID: 11155111)');
+                }
+                
+                showStatus('网络测试完成！', 'success');
+                
+            } catch (error) {
+                addResult(`❌ 网络测试失败: ${error.message}`);
+                showStatus('网络测试失败', 'error');
+            }
+        }
+
+        // 页面加载时自动测试Ethers.js
+        window.addEventListener('load', function() {
+            addResult('🚀 页面加载完成，开始测试...');
+            testEthers();
+        });
+    </script>
+</body>
+</html> 

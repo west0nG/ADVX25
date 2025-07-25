@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+asyncpg
+sqlalchemy
+alembic
