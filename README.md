@@ -167,6 +167,8 @@
 4. 去中心化存储
    * IPFS（存储图片、配方等大文件）
 
+
+-----
 <a href="https://github.com/west0nG/ADVX25/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=west0nG/ADVX25" />
 </a>
