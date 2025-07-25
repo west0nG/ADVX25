@@ -1,0 +1,34 @@
+{
+  "name": "bars-help-bars-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Bars Help Bars NFT marketplace",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:manual": "hardhat run scripts/test-contract.js",
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network testnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network mainnet"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart-contracts",
+    "nft",
+    "erc721",
+    "erc6551",
+    "erc4907"
+  ],
+  "author": "Bars Help Bars Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+} 
