@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test DB Access</title>
+</head>
+<body>
+    <h1>Test DB Access</h1>
+    <button onclick="fetchBars()">Fetch Bar Names</button>
+    <ul id="bar-list"></ul>
+    <script>
+        async function fetchBars() {
+            const response = await fetch('http://localhost:8000/test/bars/');
+            const data = await response.json();
+            const barList = document.getElementById('bar-list');
+            barList.innerHTML = '';
+            data.slice(0, 10).forEach(bar => {
+                const li = document.createElement('li');
+                li.textContent = bar.bar_name;
+                barList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html> 
