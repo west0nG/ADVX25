@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Wallet - SipNFT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>SipNFT</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="profile.html">Bar Profiles</a></li>
+                <li><a href="main.html">Dashboard</a></li>
+            </ul>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search recipes...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="auth.html" class="connect-btn">Connect Wallet</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Auth Hero -->
+    <section class="create-hero">
+        <div class="hero-content">
+            <h1>Connect Your Wallet</h1>
+            <p>Connect with MetaMask to access your SipNFT dashboard and start trading cocktail recipes</p>
+        </div>
+    </section>
+
+    <!-- Auth Form -->
+    <section class="create-form-section">
+        <div class="form-container">
+            <div class="create-form">
+                <!-- MetaMask Connection -->
+                <div class="form-section">
+                    <h3><i class="fab fa-ethereum"></i> Connect with MetaMask</h3>
+                    
+                    <div class="wallet-connection-area">
+                        <!-- MetaMask Button -->
+                        <div class="metamask-connect-card" id="metamask-card">
+                            <div class="metamask-icon">
+                                <i class="fab fa-ethereum"></i>
+                            </div>
+                            <div class="metamask-content">
+                                <h4>MetaMask Wallet</h4>
+                                <p>The most popular Web3 wallet. Connect securely to access your dashboard.</p>
+                            </div>
+                            <button type="button" class="btn-primary metamask-btn" id="connect-metamask" onclick="connectMetaMask()">
+                                <i class="fab fa-ethereum"></i>
+                                Connect MetaMask
+                            </button>
+                        </div>
+
+                        <!-- Connection Status -->
+                        <div class="connection-status-card" id="connection-status" style="display: none;">
+                            <div class="status-content">
+                                <div class="status-icon">
+                                    <i class="fas fa-spinner fa-spin" id="status-icon"></i>
+                                </div>
+                                <div class="status-text">
+                                    <h4 id="status-title">Connecting...</h4>
+                                    <p id="status-message">Please approve the connection in your MetaMask wallet</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="requirements-card">
+                            <h4><i class="fas fa-info-circle"></i> Requirements</h4>
+                            <ul class="requirements-list">
+                                <li><i class="fas fa-check"></i> MetaMask browser extension installed</li>
+                                <li><i class="fas fa-check"></i> Ethereum or Polygon network supported</li>
+                                <li><i class="fas fa-check"></i> Valid wallet address</li>
+                            </ul>
+                            <div class="install-metamask" id="install-metamask" style="display: none;">
+                                <p><strong>Don't have MetaMask?</strong></p>
+                                <a href="https://metamask.io/download/" target="_blank" class="btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Install MetaMask
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefits Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-star"></i> What You Get</h3>
+                    <div class="benefits-grid">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Personal Dashboard</h4>
+                                <p>Manage your NFT collection and track your trading activity</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Create NFTs</h4>
+                                <p>Mint your own cocktail recipes as unique NFTs</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Trade Recipes</h4>
+                                <p>Buy and sell exclusive cocktail recipes with bars worldwide</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Bar Network</h4>
+                                <p>Connect with premium bars and establishments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Notice -->
+                <div class="form-section">
+                    <div class="security-notice">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="notice-content">
+                            <h4>Secure Connection</h4>
+                            <p>We never store your private keys. Your wallet remains in your full control at all times. By connecting, you agree to our <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        // Load footer
+        fetch('../components/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+            });
+    </script>
+</body>
+</html> 
