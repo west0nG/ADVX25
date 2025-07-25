@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
+// 123
 /**
  * @title RecipeNFT - 鸡尾酒配方NFT合约
  * @dev 存储IPFS URI、激活状态、时间戳，允许元数据更新和激活/停用
@@ -129,8 +129,19 @@ contract RecipeNFT is ERC721URIStorage, Ownable {
         uint256 createdAt,
         uint256 updatedAt
     ) {
+        // Use public ownerOf to check existence
+        require(_isValidToken(tokenId), "ERC721: invalid token ID");
         RecipeMetadata storage meta = recipeMetadata[tokenId];
         return (meta.tokenURI, meta.isActive, meta.createdAt, meta.updatedAt);
+    }
+
+    // Internal helper to check token existence using ownerOf
+    function _isValidToken(uint256 tokenId) internal view returns (bool) {
+        try this.ownerOf(tokenId) returns (address) {
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     /**

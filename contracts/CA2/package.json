@@ -8,11 +8,12 @@
     "compile": "npx hardhat compile"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.0"
+    "@openzeppelin/contracts": "^5.4.0"
   },
   "devDependencies": {
-    "hardhat": "^2.20.0",
-    "ethers": "^6.7.0",
-    "chai": "^4.3.7"
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "chai": "^4.5.0",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.26.1"
   }
-} 
+}
