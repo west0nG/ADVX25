@@ -27,4 +27,3 @@ def upload_ipfs_test(file: UploadFile = File(...)):
         f.write(file.file.read())
     result = upload_to_pinata(temp_path)
     return result
-
