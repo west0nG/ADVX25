@@ -33,9 +33,39 @@
 
     <!-- Marketplace Hero -->
     <section class="marketplace-hero">
+        <div class="floating-elements">
+            <i class="floating-icon fas fa-cocktail" style="top: 15%; left: 8%; font-size: 1.5rem; animation-delay: 0s; color: rgba(37, 242, 242, 0.4);"></i>
+            <i class="floating-icon fas fa-wine-glass" style="top: 70%; right: 12%; font-size: 1.2rem; animation-delay: 1s; color: rgba(236, 72, 153, 0.4);"></i>
+            <i class="floating-icon fas fa-glass-whiskey" style="bottom: 20%; left: 15%; font-size: 1.8rem; animation-delay: 2s; color: rgba(168, 85, 247, 0.4);"></i>
+            <i class="floating-icon fas fa-martini-glass-citrus" style="top: 25%; right: 20%; font-size: 1.3rem; animation-delay: 3s; color: rgba(37, 242, 242, 0.3);"></i>
+            <i class="floating-icon fas fa-beer" style="bottom: 40%; right: 8%; font-size: 1.6rem; animation-delay: 4s; color: rgba(236, 72, 153, 0.3);"></i>
+            <i class="floating-icon fas fa-wine-bottle" style="top: 50%; left: 5%; font-size: 1.4rem; animation-delay: 2.5s; color: rgba(168, 85, 247, 0.3);"></i>
+        </div>
         <div class="hero-content">
             <h1>Discover Unique Cocktail Recipes</h1>
             <p>Browse thousands of exclusive cocktail NFTs from world-renowned mixologists</p>
+        </div>
+    </section>
+
+    <!-- Marketplace Stats -->
+    <section class="marketplace-stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Total NFTs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">18.7</div>
+                <div class="stat-label">Total Volume (ETH)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">0.67</div>
+                <div class="stat-label">Floor Price (ETH)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">156</div>
+                <div class="stat-label">Owners</div>
+            </div>
         </div>
     </section>
 
@@ -76,12 +106,14 @@
 
     <!-- NFT Grid -->
     <section class="marketplace-grid">
-        <div class="nft-grid" id="nft-grid">
-            <!-- NFT cards will be dynamically generated -->
+        <div class="section-content">
+            <div class="nft-grid" id="nft-grid">
+                <!-- NFT cards will be dynamically generated -->
+            </div>
         </div>
-        
-        <!-- Pagination -->
-        <div class="pagination">
+            
+            <!-- Pagination -->
+            <div class="pagination">
             <button class="pagination-btn" data-page="prev">
                 <i class="fas fa-chevron-left"></i> Previous
             </button>
@@ -95,6 +127,7 @@
             <button class="pagination-btn" data-page="next">
                 Next <i class="fas fa-chevron-right"></i>
             </button>
+            </div>
         </div>
     </section>
 
