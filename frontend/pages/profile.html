@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - SipNFT</title>
+    <title>Bar Profiles - SipNFT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
 </head>
@@ -18,217 +18,311 @@
             <ul class="nav-links">
                 <li><a href="../index.html">Home</a></li>
                 <li><a href="marketplace.html">Marketplace</a></li>
-                <li><a href="create.html">Create NFT</a></li>
-                <li><a href="profile.html" class="active">Profile</a></li>
+                <li><a href="profile.html" class="active">Bar Profiles</a></li>
+                <li><a href="main.html">Dashboard</a></li>
             </ul>
             <div class="header-actions">
                 <div class="search-box">
                     <input type="text" placeholder="Search recipes...">
                     <i class="fas fa-search"></i>
                 </div>
-                <a href="#" class="connect-btn">Connect Wallet</a>
+                <a href="auth.html" class="connect-btn">Connect Wallet</a>
             </div>
         </nav>
     </header>
 
     <!-- Profile Hero -->
     <section class="profile-hero">
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Profile Avatar">
+        <div class="floating-elements">
+            <i class="floating-icon fas fa-building" style="top: 15%; left: 8%; font-size: 1.5rem; animation-delay: 0s; color: rgba(37, 242, 242, 0.4);"></i>
+            <i class="floating-icon fas fa-cocktail" style="top: 70%; right: 12%; font-size: 1.2rem; animation-delay: 1s; color: rgba(236, 72, 153, 0.4);"></i>
+            <i class="floating-icon fas fa-map-marker-alt" style="bottom: 20%; left: 15%; font-size: 1.8rem; animation-delay: 2s; color: rgba(168, 85, 247, 0.4);"></i>
+            <i class="floating-icon fas fa-star" style="top: 25%; right: 20%; font-size: 1.3rem; animation-delay: 3s; color: rgba(37, 242, 242, 0.3);"></i>
+            <i class="floating-icon fas fa-wine-glass" style="bottom: 40%; right: 8%; font-size: 1.6rem; animation-delay: 4s; color: rgba(236, 72, 153, 0.3);"></i>
+        </div>
+        <div class="hero-content">
+            <h1>Bar Network</h1>
+            <p>Discover premium bars and establishments that have purchased unique cocktail recipes from our NFT marketplace</p>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="marketplace-stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number">247</div>
+                <div class="stat-label">Active Bars</div>
             </div>
-            <div class="profile-info">
-                <h1>@CocktailCreator</h1>
-                <p>Passionate mixologist creating unique cocktail experiences</p>
-                <div class="profile-stats">
-                    <div class="stat">
-                        <span class="stat-number">24</span>
-                        <span class="stat-label">NFTs Created</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">156</span>
-                        <span class="stat-label">NFTs Collected</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">2.4 ETH</span>
-                        <span class="stat-label">Total Earned</span>
-                    </div>
+            <div class="stat-item">
+                <div class="stat-number">1,234</div>
+                <div class="stat-label">Recipes Purchased</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">156.7</div>
+                <div class="stat-label">Total ETH Volume</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">45</div>
+                <div class="stat-label">Cities</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <div class="filter-group">
+                <label>Location:</label>
+                <div class="filter-options">
+                    <button class="filter-option active" data-location="all">All Locations</button>
+                    <button class="filter-option" data-location="new-york">New York</button>
+                    <button class="filter-option" data-location="los-angeles">Los Angeles</button>
+                    <button class="filter-option" data-location="chicago">Chicago</button>
+                    <button class="filter-option" data-location="miami">Miami</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Type:</label>
+                <div class="filter-options">
+                    <button class="filter-option active" data-type="all">All Types</button>
+                    <button class="filter-option" data-type="cocktail-lounge">Cocktail Lounge</button>
+                    <button class="filter-option" data-type="rooftop">Rooftop</button>
+                    <button class="filter-option" data-type="speakeasy">Speakeasy</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Profile Navigation -->
-    <section class="profile-nav">
-        <div class="nav-container">
-            <button class="profile-tab active" data-tab="nfts">
-                <i class="fas fa-martini-glass-citrus"></i> My NFTs
-            </button>
-            <button class="profile-tab" data-tab="created">
-                <i class="fas fa-plus"></i> Created
-            </button>
-            <button class="profile-tab" data-tab="transactions">
-                <i class="fas fa-exchange-alt"></i> Transactions
-            </button>
-            <button class="profile-tab" data-tab="settings">
-                <i class="fas fa-cog"></i> Settings
-            </button>
-        </div>
-    </section>
-
-    <!-- Profile Content -->
-    <section class="profile-content">
-        <!-- My NFTs Tab -->
-        <div class="tab-content active" id="nfts-tab">
-            <div class="content-header">
-                <h2>My Collection</h2>
-                <div class="view-options">
-                    <button class="view-btn active" data-view="grid">
-                        <i class="fas fa-th"></i>
-                    </button>
-                    <button class="view-btn" data-view="list">
-                        <i class="fas fa-list"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="nft-grid" id="my-nfts-grid">
-                <!-- NFT cards will be dynamically generated -->
+    <!-- Bar Profiles Grid -->
+    <section class="marketplace-grid">
+        <div class="grid-header">
+            <h2>Featured Establishments</h2>
+            <div class="view-options">
+                <button class="view-btn active" data-view="grid">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" data-view="list">
+                    <i class="fas fa-list"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Created Tab -->
-        <div class="tab-content" id="created-tab">
-            <div class="content-header">
-                <h2>My Creations</h2>
-                <a href="create.html" class="btn-primary">
-                    <i class="fas fa-plus"></i> Create New NFT
-                </a>
+        <div class="nft-grid" id="bars-grid">
+            <!-- Bar Profile Card 1 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Blue Moon Lounge">
+                    <div class="nft-rarity verified">Verified</div>
+                </div>
+                <div class="nft-info">
+                    <h3>Blue Moon Lounge</h3>
+                    <p class="nft-creator">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Manhattan, New York
+                    </p>
+                    <div class="nft-price">
+                        <div class="price-section">
+                            <span class="price-label">Recipes Owned</span>
+                            <span class="price-value">24</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-label">ETH Spent</span>
+                            <span class="price-value">3.2</span>
+                        </div>
+                    </div>
+                    <div class="nft-tags">
+                        <span class="tag">Cocktail Lounge</span>
+                        <span class="tag rating">⭐ 4.8</span>
+                    </div>
+                </div>
             </div>
-            <div class="nft-grid" id="created-nfts-grid">
-                <!-- Created NFT cards will be dynamically generated -->
+
+            <!-- Bar Profile Card 2 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Sunset Rooftop">
+                    <div class="nft-rarity premium">Premium</div>
+                </div>
+                <div class="nft-info">
+                    <h3>Sunset Rooftop</h3>
+                    <p class="nft-creator">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Beverly Hills, Los Angeles
+                    </p>
+                    <div class="nft-price">
+                        <div class="price-section">
+                            <span class="price-label">Recipes Owned</span>
+                            <span class="price-value">47</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-label">ETH Spent</span>
+                            <span class="price-value">8.7</span>
+                        </div>
+                    </div>
+                    <div class="nft-tags">
+                        <span class="tag">Rooftop Bar</span>
+                        <span class="tag rating">⭐ 5.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Profile Card 3 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="The Hidden Door">
+                    <div class="nft-rarity new">New</div>
+                </div>
+                <div class="nft-info">
+                    <h3>The Hidden Door</h3>
+                    <p class="nft-creator">
+                        <i class="fas fa-map-marker-alt"></i>
+                        River North, Chicago
+                    </p>
+                    <div class="nft-price">
+                        <div class="price-section">
+                            <span class="price-label">Recipes Owned</span>
+                            <span class="price-value">12</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-label">ETH Spent</span>
+                            <span class="price-value">1.8</span>
+                        </div>
+                    </div>
+                    <div class="nft-tags">
+                        <span class="tag">Speakeasy</span>
+                        <span class="tag rating">⭐ 4.2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Profile Card 4 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Ocean Breeze">
+                </div>
+                <div class="nft-info">
+                    <h3>Ocean Breeze</h3>
+                    <p class="nft-creator">
+                        <i class="fas fa-map-marker-alt"></i>
+                        South Beach, Miami
+                    </p>
+                    <div class="nft-price">
+                        <div class="price-section">
+                            <span class="price-label">Recipes Owned</span>
+                            <span class="price-value">31</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-label">ETH Spent</span>
+                            <span class="price-value">4.5</span>
+                        </div>
+                    </div>
+                    <div class="nft-tags">
+                        <span class="tag">Beach Bar</span>
+                        <span class="tag rating">⭐ 4.9</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Profile Card 5 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Golden Gate Mixology">
+                </div>
+                <div class="nft-info">
+                    <h3>Golden Gate Mixology</h3>
+                    <p class="nft-creator">
+                        <i class="fas fa-map-marker-alt"></i>
+                        San Francisco, California
+                    </p>
+                    <div class="nft-price">
+                        <div class="price-section">
+                            <span class="price-label">Recipes Owned</span>
+                            <span class="price-value">28</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-label">ETH Spent</span>
+                            <span class="price-value">5.1</span>
+                        </div>
+                    </div>
+                    <div class="nft-tags">
+                        <span class="tag">Craft Bar</span>
+                        <span class="tag rating">⭐ 4.6</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Profile Card 6 -->
+            <div class="nft-card">
+                <div class="nft-image">
+                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="The Velvet Room">
+                    <div class="nft-rarity verified">Verified</div>
+                </div>
+                <div class="nft-info">
+                    <h3>The Velvet Room</h3>
+                    <p class="nft-creator">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Downtown, Nashville
+                    </p>
+                    <div class="nft-price">
+                        <div class="price-section">
+                            <span class="price-label">Recipes Owned</span>
+                            <span class="price-value">19</span>
+                        </div>
+                        <div class="price-section">
+                            <span class="price-label">ETH Spent</span>
+                            <span class="price-value">2.9</span>
+                        </div>
+                    </div>
+                    <div class="nft-tags">
+                        <span class="tag">Live Music Bar</span>
+                        <span class="tag rating">⭐ 4.7</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Transactions Tab -->
-        <div class="tab-content" id="transactions-tab">
-            <div class="content-header">
-                <h2>Transaction History</h2>
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="page-btn prev" disabled>
+                <i class="fas fa-chevron-left"></i>
+                Previous
+            </button>
+            <div class="page-numbers">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <span class="page-dots">...</span>
+                <button class="page-btn">10</button>
             </div>
-            <div class="transactions-list">
-                <div class="transaction-row">
-                    <div class="transaction-info">
-                        <div class="transaction-type buy">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Purchase</span>
-                        </div>
-                        <div class="transaction-details">
-                            <h4>The Perfect Manhattan</h4>
-                            <p>Bought from @ClassicMixologist</p>
-                        </div>
-                    </div>
-                    <div class="transaction-amount">
-                        <span class="amount">-0.58 ETH</span>
-                        <span class="date">2 hours ago</span>
-                    </div>
-                </div>
-                <div class="transaction-row">
-                    <div class="transaction-info">
-                        <div class="transaction-type sell">
-                            <i class="fas fa-tag"></i>
-                            <span>Sale</span>
-                        </div>
-                        <div class="transaction-details">
-                            <h4>Neon Dreams</h4>
-                            <p>Sold to @FutureMix</p>
-                        </div>
-                    </div>
-                    <div class="transaction-amount">
-                        <span class="amount">+1.2 ETH</span>
-                        <span class="date">1 day ago</span>
-                    </div>
-                </div>
-                <div class="transaction-row">
-                    <div class="transaction-info">
-                        <div class="transaction-type mint">
-                            <i class="fas fa-mint"></i>
-                            <span>Minted</span>
-                        </div>
-                        <div class="transaction-details">
-                            <h4>Island Paradise</h4>
-                            <p>Created new NFT</p>
-                        </div>
-                    </div>
-                    <div class="transaction-amount">
-                        <span class="amount">-0.02 ETH</span>
-                        <span class="date">3 days ago</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settings-tab">
-            <div class="content-header">
-                <h2>Account Settings</h2>
-            </div>
-            <div class="settings-form">
-                <div class="form-section">
-                    <h3>Profile Information</h3>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" value="@CocktailCreator" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="bio">Bio</label>
-                        <textarea id="bio" rows="3" class="form-input">Passionate mixologist creating unique cocktail experiences</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" value="creator@example.com" class="form-input">
-                    </div>
-                </div>
-                <div class="form-section">
-                    <h3>Wallet Settings</h3>
-                    <div class="wallet-info">
-                        <div class="wallet-address">
-                            <span>Connected Wallet:</span>
-                            <code>0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6</code>
-                        </div>
-                        <button class="btn-secondary">Disconnect Wallet</button>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-primary">Save Changes</button>
-                </div>
-            </div>
+            <button class="page-btn next">
+                Next
+                <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <i class="fas fa-martini-glass-citrus"></i>
-                <span>SipNFT</span>
-            </div>
-            <div class="footer-links">
-                <a href="#">About Us</a>
-                <a href="#">Support</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Privacy Policy</a>
-            </div>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-discord"></i></a>
-                <a href="#"><i class="fab fa-telegram-plane"></i></a>
-            </div>
-            <div class="copyright">
-                © 2024 SipNFT. All rights reserved.
-            </div>
-        </div>
-    </footer>
+    <div id="footer-container"></div>
 
     <script src="../assets/js/profile.js"></script>
+    <script>
+        // Load footer
+        fetch('../components/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+            });
+
+        // Bar profile interactions
+        function viewBarDetails(barId) {
+            console.log('Viewing details for bar:', barId);
+            alert('Bar details coming soon!');
+        }
+
+        function contactBar(barId) {
+            console.log('Contacting bar:', barId);
+            alert('Contact feature coming soon!');
+        }
+    </script>
 </body>
 </html> 
