@@ -6,6 +6,7 @@ from app.models.bar import Bar, Base as BarBase
 from app.models.recipe import Recipe, Base as RecipeBase
 from faker import Faker
 import random
+import json
 
 fake = Faker()
 
@@ -21,6 +22,8 @@ async def create_fake_bars(session, n=100):
             bar_location=fake.address(),
             bar_intro=fake.text(max_nb_chars=200),
             owner_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
+            owned_recipes=json.dumps([fake.word() for _ in range(random.randint(0, 3))]),
+            used_recipes=json.dumps([fake.word() for _ in range(random.randint(0, 3))]),
         )
         bars.append(bar)
     session.add_all(bars)
@@ -36,6 +39,7 @@ async def create_fake_recipes(session, n=100):
             cocktail_recipe=fake.text(max_nb_chars=300),
             recipe_photo=fake.image_url(),
             owner_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
+            user_address=json.dumps(['0x' + ''.join(random.choices('0123456789abcdef', k=40)) for _ in range(random.randint(0, 3))]),
             price=round(random.uniform(5, 100), 2),
             status=random.choice(['listed', 'unlisted', 'sold']),
         )
