@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecipeNFT ERC-4907 测试页面</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.1/ethers.umd.min.js" type="application/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            background: #fafafa;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .wallet-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-info h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .token-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .token-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .token-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .authorization-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍹 RecipeNFT ERC-4907 测试页面</h1>
+            <p>鸡尾酒配方NFT智能合约交互界面 - 支持ERC-4907授权功能</p>
+        </div>
+
+        <div class="content">
+            <!-- 钱包连接区域 -->
+            <div class="section">
+                <h2>🔗 钱包连接</h2>
+                <div id="walletStatus" class="status info">
+                    请连接MetaMask钱包以开始测试
+                </div>
+                <button id="connectWallet" class="btn">连接钱包</button>
+                <div id="walletInfo" class="wallet-info hidden">
+                    <h3>钱包信息</h3>
+                    <p><strong>地址:</strong> <span id="walletAddress"></span></p>
+                    <p><strong>网络:</strong> <span id="networkName"></span></p>
+                    <p><strong>余额:</strong> <span id="walletBalance"></span> ETH</p>
+                </div>
+            </div>
+
+            <!-- 合约配置区域 -->
+            <div class="section">
+                <h2>📋 合约配置</h2>
+                <div class="form-group">
+                    <label for="contractAddress">RecipeNFT合约地址:</label>
+                    <input type="text" id="contractAddress" placeholder="输入部署的RecipeNFT合约地址">
+                </div>
+                <button id="loadContract" class="btn">加载合约</button>
+                <div id="contractStatus" class="status info hidden">
+                    请先连接钱包并输入合约地址
+                </div>
+            </div>
+
+            <!-- NFT铸造区域 -->
+            <div class="section">
+                <h2>🪙 铸造Recipe NFT</h2>
+                <div class="form-group">
+                    <label for="tokenURI">IPFS元数据URI:</label>
+                    <input type="text" id="tokenURI" placeholder="例如: ipfs://QmYourMetadataHash">
+                </div>
+                <button id="mintNFT" class="btn btn-success">铸造NFT</button>
+                <div id="mintStatus" class="status hidden"></div>
+            </div>
+
+            <!-- ERC-4907 授权管理区域 -->
+            <div class="section">
+                <h2>🔐 ERC-4907 授权管理</h2>
+                <div class="authorization-info">
+                    <strong>说明:</strong> 这里可以测试将Recipe NFT授权给ID NFT（或其他地址），实现临时访问权限管理。
+                </div>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3>设置授权用户</h3>
+                        <div class="form-group">
+                            <label for="authTokenId">Recipe NFT Token ID:</label>
+                            <input type="number" id="authTokenId" placeholder="输入Recipe NFT的Token ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="authUserAddress">授权用户地址 (ID NFT地址):</label>
+                            <input type="text" id="authUserAddress" placeholder="输入要授权的地址">
+                        </div>
+                        <div class="form-group">
+                            <label for="authExpires">授权过期时间 (秒):</label>
+                            <input type="number" id="authExpires" placeholder="例如: 3600 (1小时)" value="3600">
+                        </div>
+                        <button id="setUser" class="btn btn-info">设置授权用户</button>
+                        <button id="removeUser" class="btn btn-danger">移除授权用户</button>
+                    </div>
+                    
+                    <div>
+                        <h3>授权状态查询</h3>
+                        <div class="form-group">
+                            <label for="queryTokenId">查询Token ID:</label>
+                            <input type="number" id="queryTokenId" placeholder="输入要查询的Token ID">
+                        </div>
+                        <button id="getUserInfo" class="btn btn-secondary">查询授权用户</button>
+                        <button id="checkAccess" class="btn btn-secondary">检查访问权限</button>
+                        <div id="authQueryResults" class="status hidden"></div>
+                    </div>
+                </div>
+                
+                <div id="authStatus" class="status hidden"></div>
+            </div>
+
+            <!-- 价格和销售状态管理 -->
+            <div class="section">
+                <h2>💰 价格和销售管理</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>设置价格</h3>
+                        <div class="form-group">
+                            <label for="priceTokenId">Token ID:</label>
+                            <input type="number" id="priceTokenId" placeholder="输入Token ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="priceAmount">授权价格 (USDT, wei):</label>
+                            <input type="number" id="priceAmount" placeholder="例如: 1000000000000000000 (1 USDT)">
+                        </div>
+                        <button id="setPrice" class="btn btn-warning">设置价格</button>
+                    </div>
+                    
+                    <div>
+                        <h3>销售状态</h3>
+                        <div class="form-group">
+                            <label for="saleTokenId">Token ID:</label>
+                            <input type="number" id="saleTokenId" placeholder="输入Token ID">
+                        </div>
+                        <button id="setForSale" class="btn btn-success">设置为可授权</button>
+                        <button id="setNotForSale" class="btn btn-danger">设置为不可授权</button>
+                    </div>
+                </div>
+                <div id="saleStatus" class="status hidden"></div>
+            </div>
+
+            <!-- NFT管理区域 -->
+            <div class="section">
+                <h2>🔧 NFT管理</h2>
+                <div class="form-group">
+                    <label for="tokenId">Token ID:</label>
+                    <input type="number" id="tokenId" placeholder="输入要管理的NFT的Token ID">
+                </div>
+                <div class="form-group">
+                    <label for="newTokenURI">新的IPFS URI (用于更新):</label>
+                    <input type="text" id="newTokenURI" placeholder="输入新的IPFS元数据URI">
+                </div>
+                <button id="updateTokenURI" class="btn btn-warning">更新元数据</button>
+                <button id="deactivateNFT" class="btn btn-danger">停用NFT</button>
+                <button id="reactivateNFT" class="btn btn-success">重新激活NFT</button>
+                <button id="getMetadata" class="btn btn-secondary">查询元数据</button>
+                <div id="managementStatus" class="status hidden"></div>
+            </div>
+
+            <!-- 查询区域 -->
+            <div class="section">
+                <h2>🔍 查询功能</h2>
+                <button id="getMyTokens" class="btn btn-secondary">查询我的NFT</button>
+                <button id="getTokenCount" class="btn btn-secondary">查询总数量</button>
+                <button id="getForSaleTokens" class="btn btn-secondary">查询可授权的NFT</button>
+                <button id="getAuthorizedTokens" class="btn btn-secondary">查询我被授权的NFT</button>
+                <div id="queryResults" class="status hidden"></div>
+                <div id="tokenList" class="token-list hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let provider;
+        let signer;
+        let contract;
+        let walletAddress;
+        
+        // 获取合约实例的辅助函数
+        function getContractWithProvider() {
+            if (!contract || !provider) return null;
+            return new ethers.Contract(contract.address, contractABI, provider);
+        }
+        
+        // 获取合约实例的辅助函数（用于write操作）
+        function getContractWithSigner() {
+            if (!contract || !signer) return null;
+            return new ethers.Contract(contract.address, contractABI, signer);
+        }
+
+        // RecipeNFT合约ABI (包含ERC-4907功能)
+        const contractABI = [
+            "function mintRecipeNFT(string uri) external returns (uint256)",
+            "function updateTokenURI(uint256 tokenId, string newURI) external",
+            "function deactivateRecipeNFT(uint256 tokenId) external",
+            "function reactivateRecipeNFT(uint256 tokenId) external",
+            "function getRecipeMetadata(uint256 tokenId) external view returns (string uri, bool isActive, uint256 createdAt, uint256 updatedAt, uint256 price, bool isForSale)",
+            "function getTokenIdsByOwner(address owner) external view returns (uint256[])",
+            "function getAuthorizedTokenIdsByUser(address user) external view returns (uint256[])",
+            "function totalSupply() external view returns (uint256)",
+            "function ownerOf(uint256 tokenId) external view returns (address)",
+            "function tokenURI(uint256 tokenId) external view returns (string)",
+            "function userOf(uint256 tokenId) external view returns (address user, uint64 expires)",
+            "function setUser(uint256 tokenId, address user, uint64 expires) external",
+            "function removeUser(uint256 tokenId) external",
+            "function hasAccess(uint256 tokenId, address user) external view returns (bool)",
+            "function setPrice(uint256 tokenId, uint256 price) external",
+            "function setSaleStatus(uint256 tokenId, bool isForSale) external",
+            "function getForSaleTokens() external view returns (uint256[])",
+            "event RecipeNFTCreated(uint256 indexed tokenId, address indexed owner, string tokenURI)",
+            "event RecipeMetadataUpdated(uint256 indexed tokenId, string newTokenURI)",
+            "event RecipeNFTDeactivated(uint256 indexed tokenId)",
+            "event RecipeNFTReactivated(uint256 indexed tokenId)",
+            "event UserUpdated(uint256 indexed tokenId, address indexed user, uint64 expires)",
+            "event PriceSet(uint256 indexed tokenId, uint256 price)",
+            "event SaleStatusChanged(uint256 indexed tokenId, bool isForSale)"
+        ];
+
+        // 网络配置
+        const networks = {
+            1: "Ethereum Mainnet",
+            5: "Goerli Testnet",
+            11155111: "Sepolia Testnet",
+            137: "Polygon Mainnet",
+            80001: "Mumbai Testnet"
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            checkWalletConnection();
+        });
+
+        // 初始化事件监听器
+        function initializeEventListeners() {
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            document.getElementById('loadContract').addEventListener('click', loadContract);
+            document.getElementById('mintNFT').addEventListener('click', mintNFT);
+            document.getElementById('updateTokenURI').addEventListener('click', updateTokenURI);
+            document.getElementById('deactivateNFT').addEventListener('click', deactivateNFT);
+            document.getElementById('reactivateNFT').addEventListener('click', reactivateNFT);
+            document.getElementById('getMetadata').addEventListener('click', getMetadata);
+            document.getElementById('getMyTokens').addEventListener('click', getMyTokens);
+            document.getElementById('getTokenCount').addEventListener('click', getTokenCount);
+            document.getElementById('getForSaleTokens').addEventListener('click', getForSaleTokens);
+            document.getElementById('getAuthorizedTokens').addEventListener('click', getAuthorizedTokens);
+            
+            // ERC-4907 授权功能
+            document.getElementById('setUser').addEventListener('click', setUser);
+            document.getElementById('removeUser').addEventListener('click', removeUser);
+            document.getElementById('getUserInfo').addEventListener('click', getUserInfo);
+            document.getElementById('checkAccess').addEventListener('click', checkAccess);
+            
+            // 价格和销售管理
+            document.getElementById('setPrice').addEventListener('click', setPrice);
+            document.getElementById('setForSale').addEventListener('click', setForSale);
+            document.getElementById('setNotForSale').addEventListener('click', setNotForSale);
+        }
+
+        // 检查钱包连接状态
+        async function checkWalletConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        await setupWallet(accounts[0]);
+                    }
+                } catch (error) {
+                    console.error('检查钱包连接失败:', error);
+                }
+            }
+        }
+
+        // 连接钱包
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showStatus('walletStatus', '请安装MetaMask钱包', 'error');
+                return;
+            }
+
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                await setupWallet(accounts[0]);
+                showStatus('walletStatus', '钱包连接成功！', 'success');
+            } catch (error) {
+                showStatus('walletStatus', '钱包连接失败: ' + error.message, 'error');
+            }
+        }
+
+        // 设置钱包
+        async function setupWallet(address) {
+            walletAddress = address;
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = provider.getSigner();
+            
+            // 更新UI
+            document.getElementById('walletAddress').textContent = address;
+            document.getElementById('walletInfo').classList.remove('hidden');
+            
+            // 获取网络信息
+            const network = await provider.getNetwork();
+            document.getElementById('networkName').textContent = networks[network.chainId] || `Chain ID: ${network.chainId}`;
+            
+            // 获取余额
+            const balance = await provider.getBalance(address);
+            document.getElementById('walletBalance').textContent = ethers.formatEther(balance);
+
+            // 监听账户变化
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length > 0) {
+                    setupWallet(accounts[0]);
+                } else {
+                    resetWallet();
+                }
+            });
+
+            // 监听网络变化
+            window.ethereum.on('chainChanged', function (chainId) {
+                window.location.reload();
+            });
+        }
+
+        // 重置钱包
+        function resetWallet() {
+            walletAddress = null;
+            provider = null;
+            signer = null;
+            contract = null;
+            document.getElementById('walletInfo').classList.add('hidden');
+            showStatus('walletStatus', '钱包已断开连接', 'info');
+        }
+
+        // 加载合约
+        async function loadContract() {
+            const contractAddress = document.getElementById('contractAddress').value.trim();
+            
+            if (!contractAddress) {
+                showStatus('contractStatus', '请输入合约地址', 'error');
+                return;
+            }
+
+            if (!ethers.isAddress(contractAddress)) {
+                showStatus('contractStatus', '无效的合约地址', 'error');
+                return;
+            }
+
+            if (!signer) {
+                showStatus('contractStatus', '请先连接钱包', 'error');
+                return;
+            }
+
+            try {
+                // 使用provider创建合约实例用于view函数
+                const provider = await signer.provider;
+                contract = new ethers.Contract(contractAddress, contractABI, provider);
+                
+                // 测试合约连接
+                await contract.totalSupply();
+                
+                showStatus('contractStatus', '合约加载成功！', 'success');
+                document.getElementById('contractStatus').classList.remove('hidden');
+            } catch (error) {
+                showStatus('contractStatus', '合约加载失败: ' + error.message, 'error');
+            }
+        }
+
+        // 铸造NFT
+        async function mintNFT() {
+            if (!contract) {
+                showStatus('mintStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenURI = document.getElementById('tokenURI').value.trim();
+            if (!tokenURI) {
+                showStatus('mintStatus', '请输入IPFS URI', 'error');
+                return;
+            }
+
+            try {
+                showStatus('mintStatus', '正在铸造NFT...', 'info');
+                const button = document.getElementById('mintNFT');
+                button.disabled = true;
+                button.innerHTML = '<span class="loading"></span> 铸造中...';
+
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('mintStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.mintRecipeNFT(tokenURI);
+                await tx.wait();
+
+                showStatus('mintStatus', 'NFT铸造成功！交易哈希: ' + tx.hash, 'success');
+                button.disabled = false;
+                button.textContent = '铸造NFT';
+            } catch (error) {
+                showStatus('mintStatus', '铸造失败: ' + error.message, 'error');
+                document.getElementById('mintNFT').disabled = false;
+                document.getElementById('mintNFT').textContent = '铸造NFT';
+            }
+        }
+
+        // ERC-4907 设置授权用户
+        async function setUser() {
+            if (!contract) {
+                showStatus('authStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('authTokenId').value;
+            const userAddress = document.getElementById('authUserAddress').value.trim();
+            const expires = document.getElementById('authExpires').value;
+
+            if (!tokenId || !userAddress || !expires) {
+                showStatus('authStatus', '请填写所有字段', 'error');
+                return;
+            }
+
+            if (!ethers.isAddress(userAddress)) {
+                showStatus('authStatus', '无效的用户地址', 'error');
+                return;
+            }
+
+            try {
+                showStatus('authStatus', '正在设置授权用户...', 'info');
+                const expiresTime = Math.floor(Date.now() / 1000) + parseInt(expires);
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('authStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.setUser(tokenId, userAddress, expiresTime);
+                await tx.wait();
+                showStatus('authStatus', '授权用户设置成功！交易哈希: ' + tx.hash, 'success');
+            } catch (error) {
+                showStatus('authStatus', '设置失败: ' + error.message, 'error');
+            }
+        }
+
+        // ERC-4907 移除授权用户
+        async function removeUser() {
+            if (!contract) {
+                showStatus('authStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('authTokenId').value;
+            if (!tokenId) {
+                showStatus('authStatus', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('authStatus', '正在移除授权用户...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('authStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.removeUser(tokenId);
+                await tx.wait();
+                showStatus('authStatus', '授权用户移除成功！交易哈希: ' + tx.hash, 'success');
+            } catch (error) {
+                showStatus('authStatus', '移除失败: ' + error.message, 'error');
+            }
+        }
+
+        // 查询授权用户信息
+        async function getUserInfo() {
+            if (!contract) {
+                showStatus('authQueryResults', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('queryTokenId').value;
+            if (!tokenId) {
+                showStatus('authQueryResults', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('authQueryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const [user, expires] = await contractWithProvider.userOf(tokenId);
+                if (user === ethers.ZeroAddress) {
+                    showStatus('authQueryResults', '该NFT没有授权用户', 'info');
+                } else {
+                    const expiresDate = new Date(expires * 1000);
+                    const isExpired = expires < Math.floor(Date.now() / 1000);
+                    const result = `
+                        <strong>授权用户:</strong> ${user}<br>
+                        <strong>过期时间:</strong> ${expiresDate.toLocaleString()}<br>
+                        <strong>状态:</strong> ${isExpired ? '已过期' : '有效'}
+                    `;
+                    showStatus('authQueryResults', result, isExpired ? 'error' : 'success');
+                }
+            } catch (error) {
+                showStatus('authQueryResults', '查询失败: ' + error.message, 'error');
+            }
+        }
+
+        // 检查访问权限
+        async function checkAccess() {
+            if (!contract) {
+                showStatus('authQueryResults', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('queryTokenId').value;
+            if (!tokenId) {
+                showStatus('authQueryResults', '请输入Token ID', 'error');
+                return;
+            }
+
+            if (!walletAddress) {
+                showStatus('authQueryResults', '请先连接钱包', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('authQueryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const hasAccess = await contractWithProvider.hasAccess(tokenId, walletAddress);
+                const result = `当前钱包地址 ${walletAddress} ${hasAccess ? '有' : '没有'}访问权限`;
+                showStatus('authQueryResults', result, hasAccess ? 'success' : 'error');
+            } catch (error) {
+                showStatus('authQueryResults', '检查失败: ' + error.message, 'error');
+            }
+        }
+
+        // 设置价格
+        async function setPrice() {
+            if (!contract) {
+                showStatus('saleStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('priceTokenId').value;
+            const price = document.getElementById('priceAmount').value;
+
+            if (!tokenId || !price) {
+                showStatus('saleStatus', '请填写所有字段', 'error');
+                return;
+            }
+
+            try {
+                showStatus('saleStatus', '正在设置价格...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('saleStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.setPrice(tokenId, price);
+                await tx.wait();
+                showStatus('saleStatus', '价格设置成功！交易哈希: ' + tx.hash, 'success');
+            } catch (error) {
+                showStatus('saleStatus', '设置失败: ' + error.message, 'error');
+            }
+        }
+
+        // 设置为可授权
+        async function setForSale() {
+            if (!contract) {
+                showStatus('saleStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('saleTokenId').value;
+            if (!tokenId) {
+                showStatus('saleStatus', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('saleStatus', '正在设置为可授权...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('saleStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.setSaleStatus(tokenId, true);
+                await tx.wait();
+                showStatus('saleStatus', '设置为可授权成功！交易哈希: ' + tx.hash, 'success');
+            } catch (error) {
+                showStatus('saleStatus', '设置失败: ' + error.message, 'error');
+            }
+        }
+
+        // 设置为不可授权
+        async function setNotForSale() {
+            if (!contract) {
+                showStatus('saleStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('saleTokenId').value;
+            if (!tokenId) {
+                showStatus('saleStatus', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('saleStatus', '正在设置为不可授权...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('saleStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.setSaleStatus(tokenId, false);
+                await tx.wait();
+                showStatus('saleStatus', '设置为不可授权成功！交易哈希: ' + tx.hash, 'success');
+            } catch (error) {
+                showStatus('saleStatus', '设置失败: ' + error.message, 'error');
+            }
+        }
+
+        // 更新Token URI
+        async function updateTokenURI() {
+            if (!contract) {
+                showStatus('managementStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('tokenId').value;
+            const newTokenURI = document.getElementById('newTokenURI').value.trim();
+
+            if (!tokenId || !newTokenURI) {
+                showStatus('managementStatus', '请输入Token ID和新的URI', 'error');
+                return;
+            }
+
+            try {
+                showStatus('managementStatus', '正在更新元数据...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('managementStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.updateTokenURI(tokenId, newTokenURI);
+                await tx.wait();
+                showStatus('managementStatus', '元数据更新成功！', 'success');
+            } catch (error) {
+                showStatus('managementStatus', '更新失败: ' + error.message, 'error');
+            }
+        }
+
+        // 停用NFT
+        async function deactivateNFT() {
+            if (!contract) {
+                showStatus('managementStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showStatus('managementStatus', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('managementStatus', '正在停用NFT...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('managementStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.deactivateRecipeNFT(tokenId);
+                await tx.wait();
+                showStatus('managementStatus', 'NFT已停用！', 'success');
+            } catch (error) {
+                showStatus('managementStatus', '停用失败: ' + error.message, 'error');
+            }
+        }
+
+        // 重新激活NFT
+        async function reactivateNFT() {
+            if (!contract) {
+                showStatus('managementStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showStatus('managementStatus', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('managementStatus', '正在重新激活NFT...', 'info');
+                const contractWithSigner = getContractWithSigner();
+                if (!contractWithSigner) {
+                    showStatus('managementStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const tx = await contractWithSigner.reactivateRecipeNFT(tokenId);
+                await tx.wait();
+                showStatus('managementStatus', 'NFT已重新激活！', 'success');
+            } catch (error) {
+                showStatus('managementStatus', '激活失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取元数据
+        async function getMetadata() {
+            if (!contract) {
+                showStatus('managementStatus', '请先加载合约', 'error');
+                return;
+            }
+
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showStatus('managementStatus', '请输入Token ID', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('managementStatus', '合约未正确加载', 'error');
+                    return;
+                }
+                const metadata = await contractWithProvider.getRecipeMetadata(tokenId);
+                const result = `
+                    <strong>Token ID:</strong> ${tokenId}<br>
+                    <strong>URI:</strong> ${metadata.uri}<br>
+                    <strong>激活状态:</strong> ${metadata.isActive ? '激活' : '停用'}<br>
+                    <strong>创建时间:</strong> ${new Date(metadata.createdAt * 1000).toLocaleString()}<br>
+                    <strong>更新时间:</strong> ${new Date(metadata.updatedAt * 1000).toLocaleString()}<br>
+                    <strong>价格:</strong> ${ethers.formatEther(metadata.price)} USDT<br>
+                    <strong>可授权:</strong> ${metadata.isForSale ? '是' : '否'}
+                `;
+                showStatus('managementStatus', result, 'info');
+            } catch (error) {
+                showStatus('managementStatus', '查询失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取我的NFT
+        async function getMyTokens() {
+            if (!contract || !walletAddress) {
+                showStatus('queryResults', '请先连接钱包并加载合约', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('queryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const tokenIds = await contractWithProvider.getTokenIdsByOwner(walletAddress);
+                const tokenList = document.getElementById('tokenList');
+                tokenList.innerHTML = '';
+
+                if (tokenIds.length === 0) {
+                    showStatus('queryResults', '您还没有任何NFT', 'info');
+                    return;
+                }
+
+                showStatus('queryResults', `找到 ${tokenIds.length} 个NFT:`, 'success');
+                tokenList.classList.remove('hidden');
+
+                for (let i = 0; i < tokenIds.length; i++) {
+                    const tokenId = tokenIds[i];
+                    const tokenItem = document.createElement('div');
+                    tokenItem.className = 'token-item';
+                    tokenItem.innerHTML = `
+                        <span>Token ID: ${tokenId.toString()}</span>
+                        <button onclick="getTokenDetails(${tokenId})" class="btn btn-secondary">查看详情</button>
+                    `;
+                    tokenList.appendChild(tokenItem);
+                }
+            } catch (error) {
+                showStatus('queryResults', '查询失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取Token详情
+        async function getTokenDetails(tokenId) {
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('queryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const metadata = await contractWithProvider.getRecipeMetadata(tokenId);
+                const owner = await contractWithProvider.ownerOf(tokenId);
+                const [user, expires] = await contractWithProvider.userOf(tokenId);
+                const result = `
+                    <strong>Token ID:</strong> ${tokenId}<br>
+                    <strong>拥有者:</strong> ${owner}<br>
+                    <strong>URI:</strong> ${metadata.uri}<br>
+                    <strong>激活状态:</strong> ${metadata.isActive ? '激活' : '停用'}<br>
+                    <strong>创建时间:</strong> ${new Date(metadata.createdAt * 1000).toLocaleString()}<br>
+                    <strong>更新时间:</strong> ${new Date(metadata.updatedAt * 1000).toLocaleString()}<br>
+                    <strong>价格:</strong> ${ethers.formatEther(metadata.price)} USDT<br>
+                    <strong>可授权:</strong> ${metadata.isForSale ? '是' : '否'}<br>
+                    <strong>授权用户:</strong> ${user === ethers.ZeroAddress ? '无' : user}<br>
+                    <strong>授权过期:</strong> ${user === ethers.ZeroAddress ? '无' : new Date(expires * 1000).toLocaleString()}
+                `;
+                showStatus('queryResults', result, 'info');
+            } catch (error) {
+                showStatus('queryResults', '获取详情失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取总数量
+        async function getTokenCount() {
+            if (!contract) {
+                showStatus('queryResults', '请先加载合约', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('queryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const totalSupply = await contractWithProvider.totalSupply();
+                showStatus('queryResults', `合约中总共有 ${totalSupply.toString()} 个NFT`, 'success');
+            } catch (error) {
+                showStatus('queryResults', '查询失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取可授权的NFT
+        async function getForSaleTokens() {
+            if (!contract) {
+                showStatus('queryResults', '请先加载合约', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('queryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const forSaleTokens = await contractWithProvider.getForSaleTokens();
+                if (forSaleTokens.length === 0) {
+                    showStatus('queryResults', '当前没有可授权的NFT', 'info');
+                    return;
+                }
+
+                showStatus('queryResults', `找到 ${forSaleTokens.length} 个可授权的NFT:`, 'success');
+                const tokenList = document.getElementById('tokenList');
+                tokenList.innerHTML = '';
+                tokenList.classList.remove('hidden');
+
+                for (let i = 0; i < forSaleTokens.length; i++) {
+                    const tokenId = forSaleTokens[i];
+                    const tokenItem = document.createElement('div');
+                    tokenItem.className = 'token-item';
+                    tokenItem.innerHTML = `
+                        <span>Token ID: ${tokenId.toString()}</span>
+                        <button onclick="getTokenDetails(${tokenId})" class="btn btn-secondary">查看详情</button>
+                    `;
+                    tokenList.appendChild(tokenItem);
+                }
+            } catch (error) {
+                showStatus('queryResults', '查询失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取我被授权的NFT
+        async function getAuthorizedTokens() {
+            if (!contract || !walletAddress) {
+                showStatus('queryResults', '请先连接钱包并加载合约', 'error');
+                return;
+            }
+
+            try {
+                const contractWithProvider = getContractWithProvider();
+                if (!contractWithProvider) {
+                    showStatus('queryResults', '合约未正确加载', 'error');
+                    return;
+                }
+                const authorizedTokens = await contractWithProvider.getAuthorizedTokenIdsByUser(walletAddress);
+                if (authorizedTokens.length === 0) {
+                    showStatus('queryResults', '您没有被授权的NFT', 'info');
+                    return;
+                }
+
+                showStatus('queryResults', `您被授权了 ${authorizedTokens.length} 个NFT:`, 'success');
+                const tokenList = document.getElementById('tokenList');
+                tokenList.innerHTML = '';
+                tokenList.classList.remove('hidden');
+
+                for (let i = 0; i < authorizedTokens.length; i++) {
+                    const tokenId = authorizedTokens[i];
+                    const tokenItem = document.createElement('div');
+                    tokenItem.className = 'token-item';
+                    tokenItem.innerHTML = `
+                        <span>Token ID: ${tokenId.toString()}</span>
+                        <button onclick="getTokenDetails(${tokenId})" class="btn btn-secondary">查看详情</button>
+                    `;
+                    tokenList.appendChild(tokenItem);
+                }
+            } catch (error) {
+                showStatus('queryResults', '查询失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示状态信息
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = `status ${type}`;
+            element.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html> 
