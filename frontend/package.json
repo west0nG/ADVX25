@@ -1,7 +1,7 @@
 {
-  "name": "sipnft-frontend",
+  "name": "barshelpbars-frontend",
   "version": "1.0.0",
-  "description": "SipNFT - The Art of Cocktails, On-Chain - Frontend Application",
+  "description": "BarsHelpBars - The Art of Cocktails, On-Chain - Frontend Application",
   "main": "index.html",
   "scripts": {
     "start": "python -m http.server 8000",
@@ -21,7 +21,7 @@
     "css",
     "javascript"
   ],
-  "author": "SipNFT Team",
+  "author": "BarsHelpBars Team",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/sipnft/frontend/issues"
   },
-  "homepage": "https://sipnft.com",
+  "homepage": "https://barshelpbars.com",
   "devDependencies": {},
   "dependencies": {},
   "engines": {

@@ -1,15 +1,25 @@
 // Application Configuration
 const APP_CONFIG = {
     // App Information
-    name: 'SipNFT',
+    name: 'BarsHelpBars',
     version: '1.0.0',
     description: 'The Art of Cocktails, On-Chain',
     
     // API Configuration
     api: {
-        baseUrl: 'https://api.sipnft.com',
+        baseUrl: 'http://localhost:8080', // Update this to your backend server URL
         timeout: 30000,
-        retries: 3
+        retries: 3,
+        endpoints: {
+            recipes: {
+                uploadIPFS: '/recipes/upload_ipfs',
+                storeRecipe: '/recipes/store_recipe',
+                getTenRecipes: '/recipes/get_ten_recipes',
+                getAllRecipes: '/recipes/get_all_recipes',
+                searchRecipes: '/recipes/search_recipes',
+                getOneRecipe: '/recipes/get_one_recipe'
+            }
+        }
     },
     
     // Blockchain Configuration

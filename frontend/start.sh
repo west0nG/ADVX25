@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# SipNFT Frontend Start Script
-# This script starts a local HTTP server for the SipNFT frontend
+# BarsHelpBars Frontend Start Script
+# This script starts a local HTTP server for the BarsHelpBars frontend
 
-echo "🍸 Starting SipNFT Frontend Server..."
+echo "🍸 Starting BarsHelpBars Frontend Server..."
 echo "======================================"
 
 # Check if Python 3 is available

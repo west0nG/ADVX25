@@ -1,10 +1,10 @@
-# 🍸 SipNFT Frontend
+# 🍸 BarsHelpBars Frontend
 
-A complete, modern frontend for the SipNFT cocktail recipe marketplace. Built with vanilla HTML, CSS, and JavaScript for maximum simplicity and performance.
+A complete, modern frontend for the BarsHelpBars cocktail recipe marketplace. Built with vanilla HTML, CSS, and JavaScript for maximum simplicity and performance.
 
 ## 🎯 What This Is
 
-**SipNFT Frontend** is a fully functional web application that demonstrates the user interface and experience for a Web3 cocktail recipe NFT marketplace. It includes:
+**BarsHelpBars Frontend** is a fully functional web application that demonstrates the user interface and experience for a Web3 cocktail recipe NFT marketplace. It includes:
 
 - **4 Complete Pages**: Home, Marketplace, Create NFT, and Profile
 - **Modern UI/UX**: Dark theme with glassmorphism effects and smooth animations
@@ -131,7 +131,7 @@ This frontend can be deployed to any static hosting service:
 ## 🤝 For Your Team
 
 This frontend provides:
-- **Visual Reference**: Complete UI/UX for the SipNFT concept
+- **Visual Reference**: Complete UI/UX for the BarsHelpBars concept
 - **Development Foundation**: Ready-to-extend codebase
 - **Client Demo**: Professional presentation for stakeholders
 - **Technical Spec**: Clear implementation guide for backend integration

@@ -267,30 +267,81 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Submit form
-    function submitForm() {
+    async function submitForm() {
         const form = document.getElementById('create-form');
         const formData = new FormData(form);
 
         // Show loading state
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Minting...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading to IPFS...';
         submitBtn.disabled = true;
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            // Step 1: Upload image to IPFS
+            const imageFile = document.getElementById('cocktail-image').files[0];
+            if (!imageFile) {
+                throw new Error('No image file selected');
+            }
+
+            const imageCID = await apiService.uploadToIPFS(imageFile);
+            
+            // Update loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Storing recipe...';
+
+            // Step 2: Prepare recipe data
+            const ingredients = Array.from(document.querySelectorAll('input[name="ingredients[]"]'))
+                .map(input => input.value.trim())
+                .filter(value => value);
+
+            const instructions = Array.from(document.querySelectorAll('input[name="instructions[]"]'))
+                .map(input => input.value.trim())
+                .filter(value => value);
+
+            const recipeData = {
+                recipe_name: formData.get('name'),
+                intro: formData.get('description'),
+                category: formData.get('category'),
+                price: formData.get('price'),
+                royalties: formData.get('royalties'),
+                ingredients: ingredients,
+                instructions: instructions,
+                image_cid: imageCID,
+                owner_nft_address: '0x' + Math.random().toString(16).substr(2, 40), // Placeholder - should come from connected wallet
+                nft_id: 'NFT_' + Date.now(),
+                nft_hash: 'HASH_' + Math.random().toString(16).substr(2, 32), // Placeholder - should be generated properly
+                created_at: new Date().toISOString()
+            };
+
+            // Step 3: Store recipe in backend
+            const success = await apiService.storeRecipe(recipeData);
+            
+            if (success) {
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                // Show success message
+                showNotification('NFT created successfully! Redirecting to marketplace...', 'success');
+
+                // Redirect to marketplace after a delay
+                setTimeout(() => {
+                    window.location.href = 'marketplace.html';
+                }, 2000);
+            } else {
+                throw new Error('Failed to store recipe');
+            }
+
+        } catch (error) {
+            console.error('Failed to create NFT:', error);
+            
             // Reset button
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
 
-            // Show success message
-            showNotification('NFT created successfully! Redirecting to your profile...', 'success');
-
-            // Redirect to profile page after a delay
-            setTimeout(() => {
-                window.location.href = 'profile.html';
-            }, 2000);
-        }, 3000);
+            // Show error message
+            showNotification(`Failed to create NFT: ${error.message}`, 'error');
+        }
     }
 
     // Preview NFT functionality

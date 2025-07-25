@@ -688,8 +688,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Carousels now use mouse drag controls instead of arrows
     // Smooth continuous rotation with intuitive drag interaction
     
-    console.log('🍸 SipNFT Drag-Controlled Carousels Initialized!');
+    console.log('🍸 BarsHelpBars Drag-Controlled Carousels Initialized!');
 });
 
-console.log('🍸 SipNFT Enhanced Dynamic Landing Page Loaded Successfully!');
-console.log('🍸 SipNFT Circular Carousel Implemented!');
+console.log('🍸 BarsHelpBars Enhanced Dynamic Landing Page Loaded Successfully!');
+console.log('🍸 BarsHelpBars Circular Carousel Implemented!');
