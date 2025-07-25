@@ -147,17 +147,18 @@
 
 ## 目前的架构
 1. 智能合约（Solidity）
-   * ID NFT（ERC-6551，酒吧身份）
-   * Recipe NFT（ERC-4907，配方知识产权+授权）
-   * 授权/交易逻辑（USDT支付、授权关系）
+   * ID NFT（ERC-6551，酒吧身份）IDNFT.sol
+   * Recipe NFT（ERC-4907，配方知识产权+授权）RecipeNFT.sol
+   * 授权/交易逻辑（USDT支付、授权关系）Marketplace.sol
 2. 前端（React/Vue/Next.js等）
    * 钱包连接（MetaMask）
    * NFT创建/展示/交易页面
    * 授权购买流程
    * 市场浏览（仿OpenSea）
-3. 后端（可选，Node.js/Express/Fastify等）
+3. 后端（可能要）
    * AI Agents
    * IPFS上传代理
    * 统计与分析
+![系统架构图](framework.png)
 4. 去中心化存储
    * IPFS（存储图片、配方等大文件）
