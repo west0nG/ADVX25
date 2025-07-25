@@ -9,7 +9,9 @@
     "test:manual": "hardhat run scripts/test-contract.js",
     "deploy": "hardhat run scripts/deploy.js",
     "deploy:testnet": "hardhat run scripts/deploy.js --network testnet",
-    "deploy:mainnet": "hardhat run scripts/deploy.js --network mainnet"
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network mainnet",
+    "deploy:injective": "hardhat run scripts/deploy-injective.js --network injective_testnet",
+    "test:injective": "hardhat run scripts/test-injective.js --network injective_testnet"
   },
   "keywords": [
     "solidity",

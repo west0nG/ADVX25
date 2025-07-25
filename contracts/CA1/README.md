@@ -42,6 +42,9 @@ npm run deploy:testnet
 
 # 主网
 npm run deploy:mainnet
+
+# Injective 测试网
+npm run deploy:injective
 ```
 
 ## 📝 合约功能
@@ -84,6 +87,10 @@ function updateMetadata(
 WEB3_PROVIDER_URL=http://localhost:8545
 IDNFT_CONTRACT_ADDRESS=0x...  # 部署后的合约地址
 ADMIN_PRIVATE_KEY=0x...       # 管理员私钥
+
+# Injective 测试网配置
+INJECTIVE_TESTNET_URL=https://testnet.sentry.tm.injective.network:26657
+CHAIN_ID=888
 ```
 
 ### API 端点
@@ -149,6 +156,12 @@ npm test
 ```bash
 # 部署到Sepolia测试网
 npm run deploy:testnet
+
+# 部署到Injective测试网
+npm run deploy:injective
+
+# 测试Injective测试网上的合约
+npm run test:injective
 ```
 
 ## 📊 Gas 优化
@@ -184,6 +197,13 @@ npm run deploy:testnet
 ## 🤝 贡献
 
 欢迎提交Issue和Pull Request来改进合约功能。
+
+## 🔗 相关链接
+
+- [Injective 测试网部署指南](./INJECTIVE_DEPLOYMENT_GUIDE.md)
+- [Injective 官方文档](https://docs.injective.network/)
+- [Injective 测试网水龙头](https://testnet.faucet.injective.network/)
+- [Injective 测试网区块浏览器](https://testnet.explorer.injective.network/)
 
 ## �� 许可证
 

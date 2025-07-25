@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "deploy:injective": "hardhat run scripts/deploy-injective.js --network injective_testnet",
+    "test:injective": "hardhat run scripts/test-injective.js --network injective_testnet"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.4.0"

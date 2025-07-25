@@ -1,0 +1,9 @@
+{
+  "network": "injective_testnet",
+  "contract": "RecipeNFT",
+  "address": "0x8035fb3F9387C6c09421f2bE7eA797857Dc9fFc9",
+  "deployer": "0xffEa650e76B756aBAb614CC0143210eEB7813Bea",
+  "timestamp": "2025-07-25T19:18:14.395Z",
+  "chainId": 1439,
+  "testTokenId": "1"
+}
