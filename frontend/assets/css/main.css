@@ -598,9 +598,23 @@ body::after {
 }
 
 .nft-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(37, 242, 242, 0.3);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 8px 25px rgba(37, 242, 242, 0.3),
+        0 0 40px rgba(37, 242, 242, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     border-color: #25f2f2;
+    background: rgba(31, 41, 55, 0.9);
+}
+
+.nft-card:hover .nft-price {
+    background: linear-gradient(135deg, #25f2f2, #ec4899);
+    animation: priceGlow 2s ease-in-out infinite;
+}
+
+@keyframes priceGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(37, 242, 242, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
 }
 
 .nft-image {
@@ -999,9 +1013,14 @@ body::after {
 .nft-grid .nft-card,
 .category-grid .category-card,
 .steps-grid .step {
-    opacity: 0;
+    opacity: 1; /* Start visible, then animate */
     transform: translateY(30px);
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Only hide for animation if visible class is not present */
+.nft-grid:not(.visible) .nft-card {
+    opacity: 0;
 }
 
 .nft-grid.visible .nft-card:nth-child(1) { transition-delay: 0.1s; }
@@ -1042,12 +1061,137 @@ body::after {
 /* Marketplace Specific Styles */
 .marketplace-hero {
     min-height: 60vh;
+    position: relative;
+    background: linear-gradient(135deg, #0a0f1a 0%, #1a202c 50%, #2a1810 100%);
+    overflow: hidden;
+}
+
+.marketplace-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(37, 242, 242, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+.marketplace-hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="cocktail-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1" fill="rgba(37, 242, 242, 0.1)"/><circle cx="15" cy="15" r="0.5" fill="rgba(236, 72, 153, 0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23cocktail-pattern)"/></svg>');
+    opacity: 0.3;
+    animation: patternFloat 20s linear infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes patternFloat {
+    0% { transform: translateX(0) translateY(0); }
+    100% { transform: translateX(-20px) translateY(-20px); }
+}
+
+.marketplace-stats {
+    background: rgba(10, 15, 26, 0.8);
+    padding: 2rem 0;
+    border-bottom: 1px solid rgba(55, 65, 81, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.stats-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(31, 41, 55, 0.5);
+    border-radius: 15px;
+    border: 1px solid rgba(55, 65, 81, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(37, 242, 242, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(37, 242, 242, 0.5);
+    box-shadow: 0 5px 20px rgba(37, 242, 242, 0.2);
+}
+
+.stat-item:hover::before {
+    left: 100%;
+}
+
+.stat-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #25f2f2;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #25f2f2, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-family: 'Inter', sans-serif;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
 }
 
 .filters-section {
-    background: rgba(17, 24, 39, 0.8);
+    background: rgba(17, 24, 39, 0.95);
     padding: 2rem;
     border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+    position: relative;
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(37, 242, 242, 0.1);
+}
+
+.filters-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(37, 242, 242, 0.05) 0%, 
+        transparent 20%, 
+        transparent 80%, 
+        rgba(236, 72, 153, 0.05) 100%);
+    pointer-events: none;
 }
 
 .filters-container {
@@ -1114,6 +1258,21 @@ body::after {
 
 .marketplace-grid {
     padding: 3rem 0;
+    position: relative;
+    background: linear-gradient(135deg, #0a0f1a 0%, #1a202c 100%);
+}
+
+.marketplace-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(37, 242, 242, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 40%);
+    pointer-events: none;
 }
 
 .marketplace-grid .section-content {
@@ -1693,6 +1852,29 @@ body::after {
         flex-direction: column;
         gap: 1rem;
         align-items: stretch;
+    }
+    
+    /* Marketplace Mobile Responsive */
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .marketplace-hero {
+        min-height: 50vh;
+    }
+    
+    .floating-elements .floating-icon {
+        font-size: 1rem !important;
+    }
+    
+    .marketplace-grid .nft-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
     }
 }
 
