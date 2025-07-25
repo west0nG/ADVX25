@@ -3,13 +3,23 @@ const APP_CONFIG = {
     // App Information
     name: 'BarsHelpBars',
     version: '1.0.0',
-    description: '酒吧互助生态系统',
+    description: 'The Art of Cocktails, On-Chain',
     
     // API Configuration
     api: {
-        baseUrl: 'https://api.barshelpbars.com',
+        baseUrl: 'http://localhost:8080', // Update this to your backend server URL
         timeout: 30000,
-        retries: 3
+        retries: 3,
+        endpoints: {
+            recipes: {
+                uploadIPFS: '/recipes/upload_ipfs',
+                storeRecipe: '/recipes/store_recipe',
+                getTenRecipes: '/recipes/get_ten_recipes',
+                getAllRecipes: '/recipes/get_all_recipes',
+                searchRecipes: '/recipes/search_recipes',
+                getOneRecipe: '/recipes/get_one_recipe'
+            }
+        }
     },
     
     // Blockchain Configuration
@@ -17,15 +27,7 @@ const APP_CONFIG = {
         network: 'ethereum',
         chainId: 1,
         rpcUrl: 'https://mainnet.infura.io/v3/YOUR_PROJECT_ID',
-        contractAddress: '0x...',
-        // ID NFT Contract Address (CA1)
-        idnftContractAddress: '0x...', // 请填入部署的ID NFT合约地址
-        // Sepolia Testnet Configuration
-        sepolia: {
-            chainId: '0xaa36a7',
-            rpcUrl: 'https://sepolia.infura.io/v3/YOUR_PROJECT_ID',
-            idnftContractAddress: '0x...' // 请填入Sepolia上的ID NFT合约地址
-        }
+        contractAddress: '0x...'
     },
     
     // UI Configuration

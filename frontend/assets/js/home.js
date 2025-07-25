@@ -84,23 +84,118 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Simple hero animation for minimal design
-function initHeroAnimation() {
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-        heroContent.style.opacity = '0';
-        heroContent.style.transform = 'translateY(30px)';
-        
-        setTimeout(() => {
-            heroContent.style.transition = 'all 0.8s ease';
-            heroContent.style.opacity = '1';
-            heroContent.style.transform = 'translateY(0)';
-        }, 100);
+// Enhanced Three.js background animation
+function initThreeJS() {
+    const canvas = document.getElementById('hero-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+
+    // Create floating particles with enhanced colors
+    const particleCount = 150;
+    const particles = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 25;
+        positions[i + 1] = (Math.random() - 0.5) * 25;
+        positions[i + 2] = (Math.random() - 0.5) * 25;
+
+        // Enhanced color variations with pink accents
+        const colorChoice = Math.random();
+        if (colorChoice < 0.7) {
+            // Cyan variations
+        colors[i] = 0.1 + Math.random() * 0.3;     // R
+        colors[i + 1] = 0.9 + Math.random() * 0.1; // G
+        colors[i + 2] = 0.9 + Math.random() * 0.1; // B
+        } else {
+            // Pink variations
+            colors[i] = 0.9 + Math.random() * 0.1;     // R
+            colors[i + 1] = 0.2 + Math.random() * 0.3; // G
+            colors[i + 2] = 0.6 + Math.random() * 0.4; // B
+        }
     }
+
+    particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+        size: 0.06,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending
+    });
+
+    const particleSystem = new THREE.Points(particles, particleMaterial);
+    scene.add(particleSystem);
+
+    // Create floating cocktail glass shapes with enhanced materials
+    const glassGeometry = new THREE.ConeGeometry(0.2, 0.6, 8);
+    const glassMaterial = new THREE.MeshBasicMaterial({
+        color: 0x25f2f2,
+        transparent: true,
+        opacity: 0.4,
+        wireframe: true
+    });
+
+    const glasses = [];
+    for (let i = 0; i < 10; i++) {
+        const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+        glass.position.set(
+            (Math.random() - 0.5) * 18,
+            (Math.random() - 0.5) * 12,
+            (Math.random() - 0.5) * 12
+        );
+        glass.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+        );
+        glasses.push(glass);
+        scene.add(glass);
+    }
+
+    camera.position.z = 5;
+
+    // Enhanced animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // Rotate particles with varying speeds
+        particleSystem.rotation.y += 0.001;
+        particleSystem.rotation.x += 0.0005;
+
+        // Animate glasses with more complex movements
+        glasses.forEach((glass, index) => {
+            glass.rotation.y += 0.01 + index * 0.001;
+            glass.rotation.x += 0.005;
+            glass.position.y += Math.sin(Date.now() * 0.001 + index) * 0.002;
+            glass.position.x += Math.cos(Date.now() * 0.0008 + index) * 0.001;
+            
+            // Pulse opacity
+            glass.material.opacity = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.2;
+        });
+
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 }
 
-// Initialize hero animation when page loads
-initHeroAnimation();
+// Initialize Three.js when page loads
+initThreeJS();
 
 // Enhanced smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -133,7 +228,7 @@ document.querySelectorAll('.nft-card').forEach(card => {
         ripple.style.width = ripple.style.height = size + 'px';
         ripple.style.left = x + 'px';
         ripple.style.top = y + 'px';
-        ripple.style.background = 'rgba(16, 185, 129, 0.3)';
+        ripple.style.background = 'rgba(37, 242, 242, 0.3)';
         ripple.style.borderRadius = '50%';
         ripple.style.transform = 'scale(0)';
         ripple.style.animation = 'ripple 0.6s linear';
@@ -169,7 +264,7 @@ document.querySelectorAll('.category-card').forEach(card => {
         ripple.style.width = ripple.style.height = size + 'px';
         ripple.style.left = x + 'px';
         ripple.style.top = y + 'px';
-        ripple.style.background = 'rgba(16, 185, 129, 0.3)';
+        ripple.style.background = 'rgba(37, 242, 242, 0.3)';
         ripple.style.borderRadius = '50%';
         ripple.style.transform = 'scale(0)';
         ripple.style.animation = 'ripple 0.6s linear';
@@ -200,7 +295,7 @@ document.querySelectorAll('.step').forEach((step, index) => {
                 position: absolute;
                 width: 4px;
                 height: 4px;
-                background: linear-gradient(45deg, #10b981, #059669);
+                background: linear-gradient(45deg, #25f2f2, #ec4899);
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 1;
@@ -247,7 +342,7 @@ document.querySelectorAll('.step').forEach((step, index) => {
             left: 50%;
             width: 0;
             height: 0;
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(37, 242, 242, 0.1);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
@@ -272,7 +367,7 @@ document.querySelectorAll('.step').forEach((step, index) => {
 const searchInput = document.querySelector('.search-box input');
 searchInput.addEventListener('focus', function() {
     this.parentElement.style.transform = 'scale(1.05)';
-                this.parentElement.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
+    this.parentElement.style.boxShadow = '0 0 20px rgba(37, 242, 242, 0.4)';
 });
 
 searchInput.addEventListener('blur', function() {
@@ -314,14 +409,6 @@ document.querySelector('.connect-btn').addEventListener('click', function(e) {
     setTimeout(() => {
         this.style.transform = 'translateY(-2px) scale(1.02)';
     }, 200);
-    
-    // Trigger ID NFT modal if available
-    if (window.idnftModal) {
-        window.idnftModal.handleConnectWallet();
-    } else {
-        // Fallback to auth page
-        window.location.href = 'pages/auth.html';
-    }
 });
 
 // Enhanced mouse movement parallax
@@ -343,7 +430,7 @@ setInterval(() => {
     const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
     buttons.forEach((button, index) => {
         setTimeout(() => {
-            button.style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.8)';
+            button.style.boxShadow = '0 0 30px rgba(37, 242, 242, 0.8)';
             button.style.transform = 'translateY(-2px) scale(1.02)';
             setTimeout(() => {
                 button.style.boxShadow = '';
@@ -367,7 +454,7 @@ function typewriterEffect() {
     // Create a cursor span first
     const cursorSpan = document.createElement('span');
     cursorSpan.textContent = '|';
-                cursorSpan.style.color = '#10b981'; // Cool green color
+    cursorSpan.style.color = '#25f2f2'; // Cool cyan color
     cursorSpan.style.fontWeight = 'normal';
     cursorSpan.style.fontSize = '3.5rem';
     // No shadows, no effects - just a clean cursor
