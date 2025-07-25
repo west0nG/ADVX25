@@ -13,7 +13,11 @@
 
 ### 2. 数据结构定义
 
-#### 2.1 ID NFT 数据结构 (ERC 6551)
+#### 2.1 NFT系列说明
+- **ID NFT系列**: 所有ID NFT属于同一个NFT系列，用于统一管理酒吧身份认证
+- **Recipe NFT系列**: 每个ID NFT所创建的Recipe NFT属于同一个系列，便于配方知识产权的统一管理
+
+#### 2.2 ID NFT 数据结构 (ERC 6551)
 ```json
 {
   "metadata": {
@@ -26,7 +30,7 @@
 }
 ```
 
-#### 2.2 Recipe NFT 数据结构 (ERC 4907)
+#### 2.3 Recipe NFT 数据结构 (ERC 4907)
 ```json
 {
   "metadata": {
