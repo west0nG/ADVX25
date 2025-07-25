@@ -25,6 +25,6 @@ def upload_ipfs_test(file: UploadFile = File(...)):
     temp_path = f"/tmp/{file.filename}"
     with open(temp_path, "wb") as f:
         f.write(file.file.read())
-    result = upload_to_nft_storage(temp_path)
+    result = upload_to_pinata(temp_path)
     return result
 
