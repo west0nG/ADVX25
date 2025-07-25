@@ -1,0 +1,31 @@
+{
+  "name": "bars-help-bars-ca4",
+  "version": "1.0.0",
+  "description": "Recipe NFT Authorization Marketplace Contract",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy-sepolia": "hardhat run scripts/deploy-sepolia.js",
+    "verify": "hardhat verify"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "dotenv": "^16.3.1",
+    "hardhat": "^2.19.0"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart-contracts",
+    "nft",
+    "marketplace",
+    "authorization"
+  ],
+  "author": "Bars Help Bars Team",
+  "license": "MIT"
+}
