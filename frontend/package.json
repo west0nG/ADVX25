@@ -1,11 +1,11 @@
 {
   "name": "barshelpbars-frontend",
   "version": "1.0.0",
-  "description": "BarsHelpBars - 酒吧互助生态系统 - 前端应用",
+  "description": "BarsHelpBars - The Art of Cocktails, On-Chain - Frontend Application",
   "main": "index.html",
   "scripts": {
     "start": "python -m http.server 8000",
-    "dev": "live-server --port=8000 --host=localhost --open=/index.html --watch=.",
+    "dev": "python -m http.server 8000",
     "serve": "python -m http.server 8000",
     "build": "echo 'No build process needed for static HTML/CSS/JS'",
     "test": "echo 'No tests specified'"
@@ -25,15 +25,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/barshelpbars/frontend.git"
+    "url": "https://github.com/sipnft/frontend.git"
   },
   "bugs": {
-    "url": "https://github.com/barshelpbars/frontend/issues"
+    "url": "https://github.com/sipnft/frontend/issues"
   },
   "homepage": "https://barshelpbars.com",
-  "devDependencies": {
-    "live-server": "^1.2.2"
-  },
+  "devDependencies": {},
   "dependencies": {},
   "engines": {
     "node": ">=14.0.0"

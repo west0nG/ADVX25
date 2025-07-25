@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BarsHelpBars - 酒吧互助生态系统</title>
-
+    <title>BarsHelpBars - The Art of Cocktails, On-Chain</title>
+    <meta name="description" content="The premier marketplace for cocktail recipe NFTs. Discover, collect, and trade unique digital cocktail cards.">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -17,150 +18,146 @@
                 <span>BarsHelpBars</span>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html" class="active">首页</a></li>
-                <li><a href="pages/marketplace.html">市场</a></li>
-                <li><a href="pages/profile.html">酒吧档案</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="pages/marketplace.html">Marketplace</a></li>
+                <li><a href="pages/profile.html">Bar Profiles</a></li>
+                <li><a href="pages/main.html">Dashboard</a></li>
             </ul>
             <div class="header-actions">
                 <div class="search-box">
-                    <input type="text" placeholder="搜索配方...">
+                    <input type="text" placeholder="Search recipes...">
                     <i class="fas fa-search"></i>
                 </div>
-                <a href="pages/auth.html" class="connect-btn">连接钱包</a>
+                <a href="pages/auth.html" class="connect-btn">Connect Wallet</a>
             </div>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-overlay"></div>
+        <div class="floating-elements">
+            <i class="floating-icon fas fa-cocktail" style="top: 20%; left: 10%; font-size: 2rem; animation-delay: 0s;"></i>
+            <i class="floating-icon fas fa-wine-glass" style="top: 60%; right: 15%; font-size: 1.5rem; animation-delay: 2s;"></i>
+            <i class="floating-icon fas fa-glass-whiskey" style="bottom: 30%; left: 20%; font-size: 1.8rem; animation-delay: 4s;"></i>
+        </div>
         <div class="hero-content">
-            <h1>BarsHelpBars</h1>
-            <p>酒吧互助生态系统 - 通过NFT技术连接全球调酒师，分享独特的鸡尾酒配方，共同创造调酒艺术的未来。</p>
+                            <h1></h1>
+            <p>Discover, collect, and mint exclusive cocktail recipes as unique NFTs. Own a piece of mixology history or create your own liquid legacy.</p>
             <div class="hero-buttons">
-                <a href="pages/marketplace.html" class="btn-primary">探索市场</a>
-                <a href="pages/create.html" class="btn-secondary">创建配方</a>
+                <a href="pages/marketplace.html" class="btn-primary">Explore Marketplace</a>
+                <a href="pages/create.html" class="btn-secondary">Mint Your Recipe</a>
             </div>
         </div>
     </section>
 
     <!-- Featured NFTs -->
-    <section class="section fade-in section-transition" id="featured">
-        <div class="section-content">
-            <h2 class="section-title">精选推荐</h2>
-            <div class="carousel-container">
-                <div class="carousel-wrapper">
-                    <div class="carousel-track" id="carouselTrack">
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/313ff143-3da0-4108-b181-bbddce950b8f.jpeg" alt="The Perfect Manhattan" class="nft-image">
-                                <div class="nft-price">0.58 ETH</div>
+    <section class="features-section" id="featured">
+        <div class="features-container">
+            <h2 class="section-title">Featured & Trending</h2>
+            <div class="nft-grid">
+                <div class="nft-card">
+                    <div class="nft-image">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/313ff143-3da0-4108-b181-bbddce950b8f.jpeg" alt="The Perfect Manhattan">
+                        <div class="nft-rarity premium">Trending</div>
+                    </div>
+                    <div class="nft-info">
+                        <h3>The Perfect Manhattan</h3>
+                        <div class="nft-creator">
+                            <i class="fas fa-user-circle"></i>
+                            <span>@ClassicMixologist</span>
+                        </div>
+                        <div class="nft-price">
+                            <div class="price-section">
+                                <span class="price-label">Price</span>
+                                <span class="price-value">0.58 ETH</span>
                             </div>
-                            <div class="nft-info">
-                                <h3>The Perfect Manhattan</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@ClassicMixologist</span>
-                                    <span style="margin-left: auto; color: #6b7280;">#024</span>
-                                </div>
+                            <div class="price-section">
+                                <span class="price-label">Rating</span>
+                                <span class="price-value">4.9/5</span>
                             </div>
                         </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/e54f339e-235e-4246-a4f7-6cb0f21d2ca6.jpeg" alt="Neon Dreams" class="nft-image">
-                                <div class="nft-price">1.2 ETH</div>
+                        <div class="nft-actions">
+                            <a href="#" class="btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="nft-card">
+                    <div class="nft-image">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/e54f339e-235e-4246-a4f7-6cb0f21d2ca6.jpeg" alt="Neon Dreams">
+                        <div class="nft-rarity new">New</div>
+                    </div>
+                    <div class="nft-info">
+                        <h3>Neon Dreams</h3>
+                        <div class="nft-creator">
+                             <i class="fas fa-user-circle"></i>
+                            <span>@FutureMix</span>
+                        </div>
+                        <div class="nft-price">
+                            <div class="price-section">
+                                <span class="price-label">Price</span>
+                                <span class="price-value">1.2 ETH</span>
                             </div>
-                            <div class="nft-info">
-                                <h3>Neon Dreams</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/92eb35ba-c295-406e-ba06-3ff38ef83dc8.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@FutureMix</span>
-                                    <span style="margin-left: auto; color: #6b7280;">#107</span>
-                                </div>
+                            <div class="price-section">
+                                <span class="price-label">Rating</span>
+                                <span class="price-value">4.7/5</span>
                             </div>
                         </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/48343c70-7eb5-4fa2-9816-f4ef4e162411.jpeg" alt="Island Paradise" class="nft-image">
-                                <div class="nft-price">0.75 ETH</div>
+                        <div class="nft-actions">
+                            <a href="#" class="btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="nft-card">
+                    <div class="nft-image">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/48343c70-7eb5-4fa2-9816-f4ef4e162411.jpeg" alt="Island Paradise">
+                        <div class="nft-rarity premium">Popular</div>
+                    </div>
+                    <div class="nft-info">
+                        <h3>Island Paradise</h3>
+                        <div class="nft-creator">
+                            <i class="fas fa-user-circle"></i>
+                            <span>@TikiMaster</span>
+                        </div>
+                        <div class="nft-price">
+                            <div class="price-section">
+                                <span class="price-label">Price</span>
+                                <span class="price-value">0.75 ETH</span>
                             </div>
-                            <div class="nft-info">
-                                <h3>Island Paradise</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/d5298df2-1d97-499a-b761-38a5a9db07ac.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@TikiMaster</span>
-                                    <span style="margin-left: auto; color: #6b7280;">#089</span>
-                                </div>
+                            <div class="price-section">
+                                <span class="price-label">Rating</span>
+                                <span class="price-value">4.8/5</span>
                             </div>
                         </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/8b4a2f6c-1823-4d9e-b547-2f8e9c4a6b7f.jpeg" alt="Smoky Whisper" class="nft-image">
-                                <div class="nft-price">0.92 ETH</div>
+                        <div class="nft-actions">
+                            <a href="#" class="btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="nft-card">
+                    <div class="nft-image">
+                        <img src="https://static.paraflowcontent.com/public/resource/image/8b4a2f6c-1823-4d9e-b547-2f8e9c4a6b7f.jpeg" alt="Smoky Whisper">
+                        <div class="nft-rarity">Classic</div>
+                    </div>
+                    <div class="nft-info">
+                        <h3>Smoky Whisper</h3>
+                        <div class="nft-creator">
+                            <i class="fas fa-user-circle"></i>
+                            <span>@WhiskeyMaster</span>
+                        </div>
+                        <div class="nft-price">
+                            <div class="price-section">
+                                <span class="price-label">Price</span>
+                                <span class="price-value">0.92 ETH</span>
                             </div>
-                            <div class="nft-info">
-                                <h3>Smoky Whisper</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/3c7b1d9e-4f2a-6c8d-a9b1-5e3f7g9h1i2j.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@WhiskeyMaster</span>
-                                    <span style="margin-left: auto; color: #6b7280;">#156</span>
-                                </div>
+                            <div class="price-section">
+                                <span class="price-label">Rating</span>
+                                <span class="price-value">4.9/5</span>
                             </div>
                         </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/7a9c3e5f-2b1d-4c8a-9e6f-1a2b3c4d5e6f.jpeg" alt="Golden Sunset" class="nft-image">
-                                <div class="nft-price">1.45 ETH</div>
-                            </div>
-                            <div class="nft-info">
-                                <h3>Golden Sunset</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/5e7f9a1b-3c4d-6e8f-a1b2-7c8d9e0f1a2b.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@SunsetBartender</span>
-                                    <span style="margin-left: auto; color: #6b7280;">#203</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/9d1f3a5c-7e2b-4c6d-8f0a-3b5c7d9e1f2a.jpeg" alt="Midnight Martini" class="nft-image">
-                                <div class="nft-price">0.84 ETH</div>
-                            </div>
-                            <div class="nft-info">
-                                <h3>Midnight Martini</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/1c3e5g7i-9k2l-4m6n-8o0p-5q7r9s1t3u5v.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@NightMixer</span>
-                                    <span style="margin-left: auto; color: #6b7280;">#078</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/2b4d6f8h-0j1k-3l5m-7n9o-1p3q5r7s9t1u.jpeg" alt="Crystal Clarity" class="nft-image">
-                                <div class="nft-price">2.1 ETH</div>
-                            </div>
-                            <div class="nft-info">
-                                <h3>Crystal Clarity</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/4f6h8j0l-2m4n-6o8p-0q2r-4s6t8u0v2w4x.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@CrystalCraft</span>
-                                    <span style="margin-left: auto; color: #9ca3af;">#301</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="nft-card">
-                            <div style="position: relative;">
-                                <img src="https://static.paraflowcontent.com/public/resource/image/6h8j0l2n-4o6p-8q0r-2s4t-6u8v0w2x4y6z.jpeg" alt="Ruby Fizz" class="nft-image">
-                                <div class="nft-price">0.67 ETH</div>
-                            </div>
-                            <div class="nft-info">
-                                <h3>Ruby Fizz</h3>
-                                <div class="nft-creator">
-                                    <img src="https://static.paraflowcontent.com/public/resource/image/8j0l2n4p-6q8r-0s2t-4u6v-8w0x2y4z6a8b.jpeg" alt="Creator" class="creator-avatar">
-                                    <span>@RubyMixologist</span>
-                                    <span style="margin-left: auto; color: #9ca3af;">#145</span>
-                                </div>
-                            </div>
+                        <div class="nft-actions">
+                            <a href="#" class="btn-primary">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -169,99 +166,53 @@
     </section>
 
     <!-- Categories -->
-    <section class="section fade-in section-transition" id="categories">
-        <div class="section-content">
+    <section class="features-section" id="categories">
+        <div class="features-container">
             <h2 class="section-title">Explore Categories</h2>
-            <div class="carousel-container">
-                <div class="carousel-wrapper">
-                    <div class="carousel-track category-carousel-track" id="categoryCarouselTrack">
-            <div class="category-card">
-                <img src="https://static.paraflowcontent.com/public/resource/image/332d64f2-579a-484c-995b-1079a0f9ca5f.jpeg" alt="Classic Cocktails" class="category-bg">
-                <div class="category-overlay">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-glass-martini"></i></div>
                     <h3>Classic</h3>
-                    <p>Timeless recipes that defined mixology</p>
+                    <p>Timeless recipes that defined mixology.</p>
                 </div>
-            </div>
-            <div class="category-card">
-                <img src="https://static.paraflowcontent.com/public/resource/image/ba8d3a63-545f-4315-84ed-cdec7398b05c.jpeg" alt="Modern Cocktails" class="category-bg">
-                <div class="category-overlay">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-flask"></i></div>
                     <h3>Modern</h3>
-                    <p>Contemporary twists and molecular innovations</p>
+                    <p>Contemporary twists and innovations.</p>
                 </div>
-            </div>
-            <div class="category-card">
-                <img src="https://static.paraflowcontent.com/public/resource/image/7f49f0a0-2563-4404-b3af-ed545f45f183.jpeg" alt="Tropical Cocktails" class="category-bg">
-                <div class="category-overlay">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-umbrella-beach"></i></div>
                     <h3>Tropical</h3>
-                    <p>Exotic flavors from island paradises</p>
+                    <p>Exotic flavors from island paradises.</p>
                 </div>
-            </div>
-            <div class="category-card">
-                <img src="https://static.paraflowcontent.com/public/resource/image/adb33f79-cb60-4d94-937a-67e8f83b0768.jpeg" alt="Non-Alcoholic" class="category-bg">
-                <div class="category-overlay">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-leaf"></i></div>
                     <h3>Non-Alcoholic</h3>
-                    <p>Sophisticated zero-proof concoctions</p>
-                </div>
-                        </div>
-                        <div class="category-card">
-                            <img src="https://static.paraflowcontent.com/public/resource/image/vintage-whiskey-bar.jpeg" alt="Vintage & Aged" class="category-bg">
-                            <div class="category-overlay">
-                                <h3>Vintage & Aged</h3>
-                                <p>Premium aged spirits and vintage techniques</p>
-                            </div>
-                        </div>
-                        <div class="category-card">
-                            <img src="https://static.paraflowcontent.com/public/resource/image/craft-cocktails.jpeg" alt="Craft & Artisan" class="category-bg">
-                            <div class="category-overlay">
-                                <h3>Craft & Artisan</h3>
-                                <p>Small-batch creations and artisanal ingredients</p>
-                            </div>
-                        </div>
-                        <div class="category-card">
-                            <img src="https://static.paraflowcontent.com/public/resource/image/seasonal-cocktails.jpeg" alt="Seasonal Specials" class="category-bg">
-                            <div class="category-overlay">
-                                <h3>Seasonal Specials</h3>
-                                <p>Limited edition recipes for each season</p>
-                            </div>
-                        </div>
-                        <div class="category-card">
-                            <img src="https://static.paraflowcontent.com/public/resource/image/experimental-mixology.jpeg" alt="Experimental" class="category-bg">
-                            <div class="category-overlay">
-                                <h3>Experimental</h3>
-                                <p>Cutting-edge techniques and unusual ingredients</p>
-                            </div>
-                        </div>
-                    </div>
+                    <p>Sophisticated zero-proof concoctions.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- How it Works -->
-    <section class="section fade-in section-transition" id="how-it-works">
-        <div class="section-content">
-            <h2 class="section-title">如何使用</h2>
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h3>发现</h3>
-                    <p>探索来自全球知名调酒师和爱好者的独家鸡尾酒配方市场。</p>
+    <section class="features-section" id="how-it-works">
+        <div class="features-container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-search"></i></div>
+                    <h3>Discover</h3>
+                    <p>Explore our marketplace of exclusive cocktail recipes from renowned mixologists and enthusiasts worldwide.</p>
                 </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                    <h3>收藏</h3>
-                    <p>购买并拥有鸡尾酒配方的数字版权，获得完整的配料和制作方法。</p>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+                    <h3>Collect</h3>
+                    <p>Purchase and own digital rights to cocktail recipes as NFTs, with full access to ingredients and preparation methods.</p>
                 </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-martini-glass-citrus"></i>
-                    </div>
-                    <h3>铸造</h3>
-                    <p>创建并代币化您自己的签名鸡尾酒配方，在市场上销售或交易。</p>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-martini-glass-citrus"></i></div>
+                    <h3>Mint</h3>
+                    <p>Create and tokenize your own signature cocktail recipes to sell or trade on the marketplace.</p>
                 </div>
             </div>
         </div>
@@ -275,10 +226,10 @@
                 <span>BarsHelpBars</span>
             </div>
             <div class="footer-links">
-                <a href="#">关于我们</a>
-                <a href="#">支持</a>
-                <a href="#">服务条款</a>
-                <a href="#">隐私政策</a>
+                <a href="#">About Us</a>
+                <a href="#">Support</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
             </div>
             <div class="social-links">
                 <a href="#"><i class="fab fa-twitter"></i></a>
@@ -287,21 +238,13 @@
                 <a href="#"><i class="fab fa-telegram-plane"></i></a>
             </div>
             <div class="copyright">
-                © 2024 BarsHelpBars. 保留所有权利。
+                © 2024 BarsHelpBars. All rights reserved.
             </div>
         </div>
     </footer>
 
-    <!-- Ethers.js for blockchain interaction -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
-    
-    <!-- ID NFT Service -->
-    <script src="assets/js/idnft-service.js"></script>
-    
-    <!-- ID NFT Modal Handler -->
-    <script src="assets/js/idnft-modal.js"></script>
-    
-    <!-- Home Script -->
+    <script src="config/app.config.js"></script>
+    <script src="assets/js/api-service.js"></script>
     <script src="assets/js/home.js"></script>
 </body>
 </html> 

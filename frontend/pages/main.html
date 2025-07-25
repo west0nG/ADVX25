@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Dashboard - BarsHelpBars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="logo">
+                <i class="fas fa-martini-glass-citrus"></i>
+                <span>BarsHelpBars</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="profile.html">Bar Network</a></li>
+                <li><a href="main.html" class="active">My Bar Dashboard</a></li>
+            </ul>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" placeholder="Search recipes...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="auth.html" class="connect-btn">Connect Wallet</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="main-dashboard">
+        <div class="dashboard-container">
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <div class="welcome-section">
+                    <h1>Welcome to Your Bar Dashboard</h1>
+                    <p>Manage your establishment, cocktail recipes, and customer experience</p>
+                    <div class="wallet-status">
+                        <div class="wallet-info">
+                            <i class="fas fa-building"></i>
+                            <span>Bar ID: </span>
+                            <span id="bar-address">0x1234...5678</span>
+                        </div>
+                        <button class="btn-secondary disconnect-btn" onclick="disconnectWallet()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Disconnect Wallet
+                        </button>
+                    </div>
+                </div>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-cocktail"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number">24</span>
+                            <span class="stat-label">Recipes Owned</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number">456</span>
+                            <span class="stat-label">Monthly Customers</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number">4.8</span>
+                            <span class="stat-label">Bar Rating</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Panels -->
+            <section class="action-panels">
+                <div class="panel-grid">
+                    <!-- Bar Profile Management -->
+                    <div class="action-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-store"></i>
+                            <h3>Bar Profile</h3>
+                        </div>
+                        <div class="panel-content">
+                            <p>Update your bar information, photos, and description</p>
+                            <div class="panel-actions">
+                                <button class="btn-primary" onclick="editBarProfile()">
+                                    <i class="fas fa-edit"></i>
+                                    Edit Profile
+                                </button>
+                                <button class="btn-secondary" onclick="managePhotos()">
+                                    <i class="fas fa-camera"></i>
+                                    Manage Photos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recipe Collection -->
+                    <div class="action-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-book"></i>
+                            <h3>Recipe Collection</h3>
+                        </div>
+                        <div class="panel-content">
+                            <p>Browse and purchase new cocktail recipes for your menu</p>
+                            <div class="panel-actions">
+                                <button class="btn-primary" onclick="browseRecipes()">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Browse Recipes
+                                </button>
+                                <button class="btn-secondary" onclick="viewMyRecipes()">
+                                    <i class="fas fa-list"></i>
+                                    My Recipes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Management -->
+                    <div class="action-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>Menu Management</h3>
+                        </div>
+                        <div class="panel-content">
+                            <p>Organize your cocktail menu and track popular drinks</p>
+                            <div class="panel-actions">
+                                <button class="btn-primary" onclick="manageMenu()">
+                                    <i class="fas fa-utensils"></i>
+                                    Edit Menu
+                                </button>
+                                <button class="btn-secondary" onclick="viewAnalytics()">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Drink Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Engagement -->
+                    <div class="action-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-heart"></i>
+                            <h3>Customer Engagement</h3>
+                        </div>
+                        <div class="panel-content">
+                            <p>Track customer favorites and manage loyalty programs</p>
+                            <div class="panel-actions">
+                                <button class="btn-primary" onclick="viewCustomerData()">
+                                    <i class="fas fa-users"></i>
+                                    Customer Data
+                                </button>
+                                <button class="btn-secondary" onclick="manageLoyalty()">
+                                    <i class="fas fa-gift"></i>
+                                    Loyalty Program
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <div class="section-header">
+                    <h2>Recent Bar Activity</h2>
+                    <button class="view-all-btn">View All</button>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-shopping-cart text-success"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>New Recipe Purchased:</strong> "Smoky Manhattan Twist"</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                        <div class="activity-value">
+                            <span class="success">-0.5 ETH</span>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-cocktail text-primary"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>Popular Drink:</strong> "Classic Mojito" ordered 25 times today</p>
+                            <span class="activity-time">1 day ago</span>
+                        </div>
+                        <div class="activity-value">
+                            <span class="primary">+25 orders</span>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-star text-info"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>New Review:</strong> 5-star rating from customer</p>
+                            <span class="activity-time">3 days ago</span>
+                        </div>
+                        <div class="activity-value">
+                            <span class="info">+5⭐</span>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-users text-danger"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>Busy Night:</strong> 120 customers served last weekend</p>
+                            <span class="activity-time">5 days ago</span>
+                        </div>
+                        <div class="activity-value">
+                            <span class="danger">+120 👥</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Recipe Collection Preview -->
+            <section class="collection-preview">
+                <div class="section-header">
+                    <h2>My Recipe Collection</h2>
+                    <button class="view-all-btn" onclick="viewFullCollection()">View All Recipes</button>
+                </div>
+                <div class="nft-grid">
+                    <div class="nft-card-preview">
+                        <div class="nft-image">
+                            <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Cocktail Recipe">
+                        </div>
+                        <h4>Smoky Manhattan</h4>
+                        <p>★★★★★ Customer Favorite</p>
+                    </div>
+                    <div class="nft-card-preview">
+                        <div class="nft-image">
+                            <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Cocktail Recipe">
+                        </div>
+                        <h4>Classic Mojito</h4>
+                        <p>★★★★☆ Summer Special</p>
+                    </div>
+                    <div class="nft-card-preview">
+                        <div class="nft-image">
+                            <img src="https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg" alt="Cocktail Recipe">
+                        </div>
+                        <h4>Tropical Paradise</h4>
+                        <p>★★★★★ Signature Drink</p>
+                    </div>
+                    <div class="add-more-card" onclick="browseRecipes()">
+                        <i class="fas fa-plus"></i>
+                        <p>Browse New Recipes</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="../assets/js/main.js"></script>
+    <script>
+        // Load footer
+        fetch('../components/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+            });
+
+        // Bar dashboard functionality
+        function editBarProfile() {
+            alert('Edit Bar Profile functionality would open here');
+        }
+
+        function managePhotos() {
+            alert('Photo management functionality would open here');
+        }
+
+        function browseRecipes() {
+            window.location.href = 'marketplace.html';
+        }
+
+        function viewMyRecipes() {
+            alert('My Recipes view would open here');
+        }
+
+        function manageMenu() {
+            alert('Menu management functionality would open here');
+        }
+
+        function viewAnalytics() {
+            alert('Analytics dashboard would open here');
+        }
+
+        function viewCustomerData() {
+            alert('Customer data dashboard would open here');
+        }
+
+        function manageLoyalty() {
+            alert('Loyalty program management would open here');
+        }
+
+        function viewFullCollection() {
+            alert('Full recipe collection view would open here');
+        }
+
+        function disconnectWallet() {
+            alert('Disconnect wallet functionality');
+        }
+    </script>
+</body>
+</html> 

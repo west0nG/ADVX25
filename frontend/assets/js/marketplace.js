@@ -10,20 +10,96 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Enhanced NFT data with more alcohol/cocktail varieties
-    const nftData = [
-        {
-            id: 1,
-            name: "The Perfect Manhattan",
-            image: "https://static.paraflowcontent.com/public/resource/image/313ff143-3da0-4108-b181-bbddce950b8f.jpeg",
-            price: "0.58",
-            creator: "@ClassicMixologist",
-            creatorAvatar: "https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg",
-            category: "classic",
-            tokenId: "024"
-        },
-        {
-            id: 2,
+    // Variables for storing recipe data
+    let nftData = [];
+    let allRecipes = [];
+    let currentPage = 1;
+    let itemsPerPage = 12;
+    let filteredNFTs = [];
+    let isLoading = false;
+
+    // Load recipes from backend
+    async function loadRecipes() {
+        try {
+            isLoading = true;
+            showLoadingState();
+            
+            // Try to get all recipes, fallback to ten recipes if all recipes fails
+            let recipes;
+            try {
+                recipes = await apiService.getAllRecipes();
+            } catch (error) {
+                console.warn('Failed to get all recipes, trying to get ten recipes:', error);
+                recipes = await apiService.getTenRecipes();
+            }
+            
+            // Convert backend data format to frontend format
+            allRecipes = recipes;
+            nftData = transformRecipeData(recipes);
+            filteredNFTs = [...nftData];
+            
+            hideLoadingState();
+            renderNFTs();
+            
+        } catch (error) {
+            console.error('Failed to load recipes:', error);
+            showErrorState('Failed to load recipes. Using fallback data.');
+            // Fallback to minimal mock data if API fails
+            nftData = getFallbackData();
+            filteredNFTs = [...nftData];
+            hideLoadingState();
+            renderNFTs();
+        }
+    }
+
+    // Transform backend recipe data to frontend NFT format
+    function transformRecipeData(recipes) {
+        return recipes.map((recipe, index) => ({
+            id: index + 1,
+            name: recipe.recipe_name || recipe.name || 'Unnamed Recipe',
+            image: recipe.image_cid ? `https://ipfs.io/ipfs/${recipe.image_cid}` : recipe.image || getDefaultImage(),
+            price: recipe.price || "0.5",
+            creator: recipe.owner_nft_address || recipe.creator || "@Unknown",
+            creatorAvatar: getDefaultAvatar(),
+            category: recipe.category || "classic",
+            tokenId: recipe.nft_id || recipe.token_id || String(index + 1).padStart(3, '0'),
+            intro: recipe.intro || recipe.description || '',
+            nft_address: recipe.owner_nft_address,
+            nft_hash: recipe.nft_hash,
+            cid: recipe.image_cid
+        }));
+    }
+
+    // Get default image for recipes without images
+    function getDefaultImage() {
+        const defaultImages = [
+            "https://static.paraflowcontent.com/public/resource/image/313ff143-3da0-4108-b181-bbddce950b8f.jpeg",
+            "https://static.paraflowcontent.com/public/resource/image/e54f339e-235e-4246-a4f7-6cb0f21d2ca6.jpeg",
+            "https://static.paraflowcontent.com/public/resource/image/48343c70-7eb5-4fa2-9816-f4ef4e162411.jpeg"
+        ];
+        return defaultImages[Math.floor(Math.random() * defaultImages.length)];
+    }
+
+    // Get default creator avatar
+    function getDefaultAvatar() {
+        return "https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg";
+    }
+
+    // Fallback data if API completely fails
+    function getFallbackData() {
+        return [
+            {
+                id: 1,
+                name: "The Perfect Manhattan",
+                image: "https://static.paraflowcontent.com/public/resource/image/313ff143-3da0-4108-b181-bbddce950b8f.jpeg",
+                price: "0.58",
+                creator: "@ClassicMixologist",
+                creatorAvatar: "https://static.paraflowcontent.com/public/resource/image/9ffa451d-8264-4d87-aad6-ae32c8965066.jpeg",
+                category: "classic",
+                tokenId: "024"
+            },
+            {
+                id: 2,
             name: "Neon Dreams",
             image: "https://static.paraflowcontent.com/public/resource/image/e54f339e-235e-4246-a4f7-6cb0f21d2ca6.jpeg",
             price: "1.2",
@@ -252,15 +328,31 @@ document.addEventListener('DOMContentLoaded', function() {
             category: "tropical",
             tokenId: "222"
         }
-    ];
+        ];
+    }
 
-    let currentPage = 1;
-    let itemsPerPage = 12; // Increased to show more items per page
-    let filteredNFTs = [...nftData];
+    // Loading and error state functions
+    function showLoadingState() {
+        const nftGrid = document.getElementById('nft-grid');
+        if (nftGrid) {
+            nftGrid.innerHTML = '<div class="loading-message">Loading recipes...</div>';
+        }
+    }
+
+    function hideLoadingState() {
+        // This will be handled by renderNFTs()
+    }
+
+    function showErrorState(message) {
+        const nftGrid = document.getElementById('nft-grid');
+        if (nftGrid) {
+            nftGrid.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+         }
 
     // Initialize marketplace
-    function initMarketplace() {
-        renderNFTs();
+    async function initMarketplace() {
+        await loadRecipes();
         setupFilters();
         setupSearch();
         setupPagination();
@@ -327,8 +419,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Show NFT details modal
-    function showNFTDetails(nft) {
-        // Create modal
+    async function showNFTDetails(nft) {
+        // Create modal with loading state
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
@@ -339,21 +431,83 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <img src="${nft.image}" alt="${nft.name}" style="width: 100%; border-radius: 10px; margin-bottom: 1rem;">
-                    <div class="nft-details">
-                        <p><strong>Creator:</strong> ${nft.creator}</p>
-                        <p><strong>Token ID:</strong> #${nft.tokenId}</p>
-                        <p><strong>Category:</strong> ${nft.category}</p>
-                        <p><strong>Price:</strong> ${nft.price} ETH</p>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn-secondary">View Recipe</button>
-                        <button class="btn-primary">Buy Now</button>
-                    </div>
+                    <div class="loading-message">Loading recipe details...</div>
                 </div>
             </div>
         `;
 
+        document.body.appendChild(modal);
+
+        // Load detailed recipe data from backend
+        try {
+            let detailedRecipe = nft;
+            
+            // If we have NFT address, fetch detailed data
+            if (nft.nft_address) {
+                detailedRecipe = await apiService.getOneRecipe(nft.nft_address);
+                // Merge with existing display data
+                detailedRecipe = { ...nft, ...detailedRecipe };
+            }
+
+            // Update modal with full recipe details
+            const modalBody = modal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <img src="${detailedRecipe.image}" alt="${detailedRecipe.name}" style="width: 100%; border-radius: 10px; margin-bottom: 1rem;">
+                <div class="nft-details">
+                    <p><strong>Creator:</strong> ${detailedRecipe.creator}</p>
+                    <p><strong>Token ID:</strong> #${detailedRecipe.tokenId}</p>
+                    <p><strong>Category:</strong> ${detailedRecipe.category}</p>
+                    <p><strong>Price:</strong> ${detailedRecipe.price} ETH</p>
+                    ${detailedRecipe.intro ? `<p><strong>Description:</strong> ${detailedRecipe.intro}</p>` : ''}
+                    ${detailedRecipe.ingredients ? `
+                        <div class="recipe-section">
+                            <h4>Ingredients:</h4>
+                            <ul>
+                                ${Array.isArray(detailedRecipe.ingredients) 
+                                    ? detailedRecipe.ingredients.map(ing => `<li>${ing}</li>`).join('')
+                                    : '<li>Ingredients not available</li>'
+                                }
+                            </ul>
+                        </div>
+                    ` : ''}
+                    ${detailedRecipe.instructions ? `
+                        <div class="recipe-section">
+                            <h4>Instructions:</h4>
+                            <ol>
+                                ${Array.isArray(detailedRecipe.instructions) 
+                                    ? detailedRecipe.instructions.map(inst => `<li>${inst}</li>`).join('')
+                                    : '<li>Instructions not available</li>'
+                                }
+                            </ol>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="window.open('${detailedRecipe.image}', '_blank')">View Full Image</button>
+                    <button class="btn-primary">Buy Now</button>
+                </div>
+            `;
+
+        } catch (error) {
+            console.error('Failed to load recipe details:', error);
+            const modalBody = modal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <img src="${nft.image}" alt="${nft.name}" style="width: 100%; border-radius: 10px; margin-bottom: 1rem;">
+                <div class="nft-details">
+                    <p><strong>Creator:</strong> ${nft.creator}</p>
+                    <p><strong>Token ID:</strong> #${nft.tokenId}</p>
+                    <p><strong>Category:</strong> ${nft.category}</p>
+                    <p><strong>Price:</strong> ${nft.price} ETH</p>
+                    <p class="error-message">Could not load detailed recipe information</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="window.open('${nft.image}', '_blank')">View Full Image</button>
+                    <button class="btn-primary">Buy Now</button>
+                </div>
+            `;
+                 }
+
+        // Add modal to page
         document.body.appendChild(modal);
 
         // Close modal functionality
@@ -503,15 +657,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         searchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchTerm = e.target.value.toLowerCase();
+            searchTimeout = setTimeout(async () => {
+                const searchTerm = e.target.value.trim();
                 
                 if (searchTerm) {
-                    filteredNFTs = nftData.filter(nft => 
-                        nft.name.toLowerCase().includes(searchTerm) ||
-                        nft.creator.toLowerCase().includes(searchTerm) ||
-                        nft.category.toLowerCase().includes(searchTerm)
-                    );
+                    try {
+                        showLoadingState();
+                        const searchResults = await apiService.searchRecipes(searchTerm);
+                        filteredNFTs = transformRecipeData(searchResults);
+                        hideLoadingState();
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                        // Fallback to client-side search
+                        filteredNFTs = nftData.filter(nft => 
+                            nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            nft.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            nft.category.toLowerCase().includes(searchTerm.toLowerCase())
+                        );
+                        hideLoadingState();
+                    }
                 } else {
                     filteredNFTs = [...nftData];
                 }
