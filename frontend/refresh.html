@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>强制刷新 - BarsHelpBars</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #374151;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+        h1 {
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+        p {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .btn {
+            background: #10b981;
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .refresh-btn {
+            background: #ef4444;
+        }
+        .refresh-btn:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 强制刷新页面</h1>
+        <p>如果页面布局仍然有问题，请点击下面的按钮强制刷新：</p>
+        
+        <a href="index.html" class="btn refresh-btn" onclick="clearCache()">强制刷新主页</a>
+        <a href="index.html" class="btn">返回主页</a>
+        
+        <p style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">
+            或者手动按 Ctrl+Shift+R (Windows) 或 Cmd+Shift+R (Mac)
+        </p>
+    </div>
+
+    <script>
+        function clearCache() {
+            // 清除缓存
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            
+            // 强制重新加载
+            setTimeout(() => {
+                window.location.href = 'index.html?v=' + Date.now();
+            }, 100);
+        }
+    </script>
+</body>
+</html> 
