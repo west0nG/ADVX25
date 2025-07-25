@@ -1,0 +1,515 @@
+/* Wallet UI Styles */
+
+/* Error Toast Styles */
+.wallet-error-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    max-width: 400px;
+    background: rgba(220, 38, 38, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.wallet-error-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.wallet-error-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.wallet-error-icon {
+    color: #fbbf24;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.wallet-error-text {
+    flex: 1;
+}
+
+.wallet-error-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.wallet-error-message {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+}
+
+.wallet-error-retry {
+    margin-top: 12px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.wallet-error-retry:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.wallet-error-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+}
+
+.wallet-error-close:hover {
+    color: white;
+}
+
+/* Network Warning Banner */
+.network-warning-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, #f59e0b, #ef4444);
+    color: white;
+    padding: 12px 20px;
+    z-index: 9999;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.network-warning-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.network-warning-content i {
+    font-size: 20px;
+}
+
+.network-warning-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.network-warning-actions button {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: white;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.network-warning-actions button:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
+}
+
+/* ==================== LIGHT MODERN HEADER DESIGN ==================== */
+
+/* Header Container */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(37, 242, 242, 0.1);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.header.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Navigation Container */
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 75px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Logo Styling */
+.logo {
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.logo a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.logo a:hover {
+    color: #25f2f2;
+    transform: translateY(-1px);
+}
+
+.logo i {
+    font-size: 26px;
+    background: linear-gradient(135deg, #25f2f2, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Navigation Links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-links li {
+    margin: 0;
+}
+
+.nav-links a {
+    position: relative;
+    padding: 8px 16px;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #25f2f2;
+    background: rgba(37, 242, 242, 0.08);
+    transform: translateY(-1px);
+}
+
+/* Header Actions Container */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+/* ==================== WALLET UI COMPONENTS ==================== */
+
+/* Wallet Container */
+.wallet-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.wallet-state-initialized .wallet-container {
+    opacity: 1;
+}
+
+/* Connect Button */
+.connect-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #25f2f2, #1cb5c4);
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(37, 242, 242, 0.25);
+    border: none;
+    cursor: pointer;
+}
+
+.connect-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(37, 242, 242, 0.35);
+    background: linear-gradient(135deg, #1cb5c4, #25f2f2);
+}
+
+.connect-btn:active {
+    transform: translateY(0);
+}
+
+.connect-btn i {
+    font-size: 16px;
+}
+
+/* Wallet Info Display */
+.wallet-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 25px;
+    padding: 6px 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.wallet-info:hover {
+    border-color: #25f2f2;
+    box-shadow: 0 4px 20px rgba(37, 242, 242, 0.15);
+}
+
+/* Wallet Address */
+.wallet-address {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    color: #25f2f2;
+    font-weight: 600;
+    padding: 4px 10px;
+    background: rgba(37, 242, 242, 0.1);
+    border-radius: 12px;
+}
+
+/* Network Display */
+.wallet-network {
+    font-size: 12px;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* Disconnect Button */
+.disconnect-btn {
+    background: transparent;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+}
+
+.disconnect-btn:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* UI State Management */
+[data-wallet-connect]:not([style*="display: none"]) ~ .wallet-info {
+    display: none !important;
+}
+
+/* ==================== TYPEWRITER ANIMATION ==================== */
+
+@keyframes blinkSlow {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 1024px) {
+    .nav {
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav {
+        padding: 0 1rem;
+        height: 65px;
+    }
+    
+    .nav-links {
+        display: none; /* Will be replaced with mobile menu */
+    }
+    
+    .logo a {
+        font-size: 20px;
+    }
+    
+    .logo i {
+        font-size: 24px;
+    }
+    
+    .connect-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+    
+    .wallet-address {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav {
+        padding: 0 0.75rem;
+    }
+    
+    .header-actions {
+        gap: 0.5rem;
+    }
+    
+    .wallet-info {
+        padding: 4px 12px;
+    }
+    
+    .wallet-error-toast {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+    
+    .network-warning-content {
+        flex-wrap: wrap;
+        text-align: center;
+    }
+    
+    .network-warning-actions {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .wallet-error-toast {
+        background: rgba(220, 38, 38, 0.95);
+    }
+    
+    .network-warning-actions button {
+        background: #1f2937;
+        color: white;
+    }
+    
+    .network-warning-actions button:hover {
+        background: #374151;
+    }
+}
+
+/* Loading States */
+.wallet-connecting {
+    position: relative;
+    overflow: hidden;
+}
+
+.wallet-connecting::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(37, 242, 242, 0.2), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ==================== LAYOUT ADJUSTMENTS FOR FIXED HEADER ==================== */
+
+/* Add top padding to body to account for fixed header */
+body {
+    padding-top: 75px;
+}
+
+/* Ensure main content starts below the header */
+.main-content-wrapper,
+.hero,
+.create-hero,
+.profile-hero,
+.marketplace-hero,
+main {
+    position: relative;
+    z-index: 1;
+}
+
+/* Additional spacing for hero sections that might need more room */
+.hero,
+.create-hero,
+.profile-hero,
+.marketplace-hero {
+    margin-top: 0;
+    padding-top: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding-top: 65px;
+    }
+} 

@@ -1,123 +1,205 @@
-// Authentication JavaScript for MetaMask connection
+/**
+ * Authentication Page Controller
+ * Uses centralized WalletService for all MetaMask interactions
+ * Focuses on auth page UI state management
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    initializeAuth();
+    initializeAuthPage();
 });
 
-// Initialize authentication page
-function initializeAuth() {
-    checkMetaMaskAvailability();
-    checkExistingConnection();
-    setupEventListeners();
+/**
+ * Initialize authentication page
+ */
+async function initializeAuthPage() {
+    // Wait for wallet service to be ready
+    if (window.walletService) {
+        await window.walletService.ensureReady();
 }
 
-// Check if MetaMask is available
-function checkMetaMaskAvailability() {
-    if (!isMetaMaskAvailable()) {
+    // Check MetaMask availability
+    if (!window.walletService.isMetaMaskAvailable()) {
         showInstallMetaMaskOption();
     }
+    
+    // Check existing connection
+    checkExistingConnection();
+    
+    // Setup auth page event listeners
+    setupAuthPageListeners();
 }
 
-// Show install MetaMask option
+/**
+ * Show install MetaMask option
+ */
 function showInstallMetaMaskOption() {
     const installSection = document.getElementById('install-metamask');
     if (installSection) {
         installSection.style.display = 'block';
     }
-}
-
-// Setup event listeners
-function setupEventListeners() {
-    // Add any additional event listeners if needed
-    console.log('Auth page event listeners set up');
-}
-
-// Check if wallet is already connected
-function checkExistingConnection() {
-    if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.request({ method: 'eth_accounts' })
-        .then(accounts => {
-            if (accounts.length > 0) {
-                // User is already connected, redirect to profile
-                showConnectionSuccess('Already connected! Redirecting to profile...');
-                setTimeout(() => {
-                    window.location.href = 'profile.html';
-                }, 2000);
-            }
-        })
-        .catch(error => {
-            console.error('Error checking existing connection:', error);
-        });
-    }
-}
-
-// MetaMask connection - main function
-async function connectMetaMask() {
-    console.log('Attempting to connect to MetaMask...');
     
-    if (!isMetaMaskAvailable()) {
-        showConnectionError('MetaMask not found', 'Please install MetaMask browser extension to continue.');
-        showInstallMetaMaskOption();
-        return;
-    }
+    // Hide connect button
+    const connectButton = document.getElementById('connect-metamask');
+    if (connectButton) {
+        connectButton.style.display = 'none';
+}
+}
 
-    // Show connecting status
-    showConnectionStatus('Connecting to MetaMask...', 'Please check your MetaMask extension and approve the connection request.');
+/**
+ * Check if wallet is already connected
+ */
+function checkExistingConnection() {
+    const connectionInfo = window.walletService.getConnectionInfo();
+    
+    if (connectionInfo.isConnected) {
+        // Already connected, show success and redirect
+        showConnectionSuccess('Already connected! Redirecting...');
+                setTimeout(() => {
+            window.authManager.redirectToIntendedDestination();
+        }, 1500);
+            }
+}
+
+/**
+ * Setup auth page specific event listeners
+ */
+function setupAuthPageListeners() {
+    // Connect button click handler
+    const connectButton = document.getElementById('connect-metamask');
+    if (connectButton) {
+        connectButton.addEventListener('click', handleConnectClick);
+    }
+    
+    // Listen for wallet connection events
+    window.addEventListener('walletConnected', handleWalletConnected);
+    window.addEventListener('walletDisconnected', handleWalletDisconnected);
+    window.addEventListener('unsupportedNetwork', handleUnsupportedNetwork);
+}
+
+/**
+ * Handle connect button click
+ */
+async function handleConnectClick(event) {
+    event.preventDefault();
+    
+    const button = event.target.closest('#connect-metamask');
+    const originalContent = button.innerHTML;
     
     try {
-        // Request account access
-        const accounts = await window.ethereum.request({
-            method: 'eth_requestAccounts'
-        });
-        
-        if (accounts.length > 0) {
-            const walletAddress = accounts[0];
-            console.log('Connected to wallet:', walletAddress);
+        // Update button state
+    showConnectionStatus('Connecting to MetaMask...', 'Please check your MetaMask extension and approve the connection request.');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
             
-            // Store connection info
-            localStorage.setItem('walletConnected', 'true');
-            localStorage.setItem('walletAddress', walletAddress);
-            localStorage.setItem('walletType', 'metamask');
-            localStorage.setItem('connectionTime', new Date().toISOString());
+        // Connect via WalletService
+        const result = await window.walletService.connect();
             
-            // Show success
-            showConnectionSuccess('Connected successfully!', `Connected to ${getShortAddress(walletAddress)}`);
-            
-            // Redirect to profile after delay
-            setTimeout(() => {
-                window.location.href = 'profile.html';
-            }, 2000);
-            
-            return walletAddress;
-        } else {
-            throw new Error('No accounts returned');
-        }
+        // Success is handled by walletConnected event
     } catch (error) {
-        console.error('Error connecting to MetaMask:', error);
+        console.error('Connection error:', error);
+        
+        // Reset button
+        button.disabled = false;
+        button.innerHTML = originalContent;
+        
+        // Show appropriate error
         handleConnectionError(error);
     }
 }
 
-// Handle connection errors
+/**
+ * Handle successful wallet connection
+ */
+function handleWalletConnected(event) {
+    const { account, chainId } = event.detail;
+    const network = window.walletService.SUPPORTED_CHAINS[chainId];
+    
+    showConnectionSuccess(
+        'Connected successfully!', 
+        `Connected to ${getShortAddress(account)} on ${network ? network.name : 'Unknown Network'}`
+    );
+}
+
+/**
+ * Handle wallet disconnection
+ */
+function handleWalletDisconnected() {
+    hideConnectionStatus();
+    
+    // Reset connect button
+    const connectButton = document.getElementById('connect-metamask');
+    if (connectButton) {
+        connectButton.disabled = false;
+        connectButton.innerHTML = '<i class="fab fa-ethereum"></i> Connect MetaMask';
+        connectButton.classList.remove('btn-success');
+        connectButton.classList.add('btn-primary');
+    }
+}
+
+/**
+ * Handle unsupported network
+ */
+function handleUnsupportedNetwork(event) {
+    const { chainId } = event.detail;
+    showConnectionError(
+        'Unsupported Network',
+        'Please switch to Ethereum Mainnet, Polygon, or Sepolia testnet in MetaMask.'
+    );
+}
+
+/**
+ * Handle connection errors with enhanced messaging
+ */
 function handleConnectionError(error) {
-    if (error.code === 4001) {
-        // User rejected the request
-        showConnectionError('Connection rejected', 'You rejected the connection request. Click "Connect MetaMask" to try again.');
-    } else if (error.code === -32002) {
-        // Request pending
-        showConnectionError('Request pending', 'A connection request is already pending. Please check your MetaMask extension.');
-    } else if (error.message && error.message.includes('User rejected')) {
-        showConnectionError('Connection rejected', 'Connection was rejected. Please try again and approve the request in MetaMask.');
-    } else {
-        showConnectionError('Connection failed', 'Failed to connect to MetaMask. Please make sure MetaMask is unlocked and try again.');
+    let title = 'Connection Failed';
+    let message = error.message || 'Failed to connect to MetaMask';
+    let showRetry = true;
+    
+    // Customize message based on error type
+    switch (error.type) {
+        case 'NOT_INSTALLED':
+            showInstallMetaMaskOption();
+            hideConnectionStatus();
+            return;
+            
+        case 'USER_REJECTED':
+            title = 'Connection Rejected';
+            message = 'You rejected the connection request. Click "Connect MetaMask" to try again.';
+            break;
+            
+        case 'REQUEST_PENDING':
+            title = 'Request Pending';
+            message = 'A connection request is already pending. Please check your MetaMask extension.';
+            break;
+            
+        case 'WRONG_NETWORK':
+            title = 'Wrong Network';
+            message = 'Please switch to a supported network (Ethereum, Polygon, or Sepolia).';
+            break;
+            
+        case 'TIMEOUT':
+            title = 'Connection Timeout';
+            message = 'The connection request timed out. Please try again.';
+            break;
+            
+        case 'NO_ACCOUNTS':
+            title = 'No Accounts Found';
+            message = 'Please create or unlock your MetaMask wallet.';
+            break;
     }
     
-    // Hide status after delay
+    showConnectionError(title, message);
+    
+    // Auto-hide after delay if recoverable
+    if (error.recoverable !== false) {
     setTimeout(() => {
         hideConnectionStatus();
     }, 5000);
+    }
 }
 
-// Show connection status (connecting)
+/**
+ * Show connection status (connecting)
+ */
 function showConnectionStatus(title, message) {
     const statusCard = document.getElementById('connection-status');
     const statusTitle = document.getElementById('status-title');
@@ -128,18 +210,14 @@ function showConnectionStatus(title, message) {
         statusTitle.textContent = title;
         statusMessage.textContent = message;
         statusIcon.className = 'fas fa-spinner fa-spin';
+        statusIcon.style.color = '#25f2f2';
         statusCard.style.display = 'block';
-        
-        // Hide the connect button temporarily
-        const connectButton = document.getElementById('connect-metamask');
-        if (connectButton) {
-            connectButton.disabled = true;
-            connectButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-        }
     }
 }
 
-// Show connection success
+/**
+ * Show connection success
+ */
 function showConnectionSuccess(title, message = '') {
     const statusCard = document.getElementById('connection-status');
     const statusTitle = document.getElementById('status-title');
@@ -148,7 +226,7 @@ function showConnectionSuccess(title, message = '') {
     
     if (statusCard && statusTitle && statusMessage && statusIcon) {
         statusTitle.textContent = title;
-        statusMessage.textContent = message || 'Redirecting to your profile...';
+        statusMessage.textContent = message || 'Redirecting to your destination...';
         statusIcon.className = 'fas fa-check-circle';
         statusIcon.style.color = '#10b981';
         statusCard.style.display = 'block';
@@ -164,7 +242,9 @@ function showConnectionSuccess(title, message = '') {
     }
 }
 
-// Show connection error
+/**
+ * Show connection error
+ */
 function showConnectionError(title, message) {
     const statusCard = document.getElementById('connection-status');
     const statusTitle = document.getElementById('status-title');
@@ -177,121 +257,23 @@ function showConnectionError(title, message) {
         statusIcon.className = 'fas fa-exclamation-triangle';
         statusIcon.style.color = '#ef4444';
         statusCard.style.display = 'block';
-        
-        // Reset button
-        const connectButton = document.getElementById('connect-metamask');
-        if (connectButton) {
-            connectButton.disabled = false;
-            connectButton.innerHTML = '<i class="fab fa-ethereum"></i> Try Again';
-        }
     }
 }
 
-// Hide connection status
+/**
+ * Hide connection status
+ */
 function hideConnectionStatus() {
     const statusCard = document.getElementById('connection-status');
     if (statusCard) {
         statusCard.style.display = 'none';
     }
-    
-    // Reset button
-    const connectButton = document.getElementById('connect-metamask');
-    if (connectButton) {
-        connectButton.disabled = false;
-        connectButton.innerHTML = '<i class="fab fa-ethereum"></i> Connect MetaMask';
-        connectButton.classList.remove('btn-success');
-        connectButton.classList.add('btn-primary');
-    }
 }
 
-// Network change handlers
-if (typeof window.ethereum !== 'undefined') {
-    window.ethereum.on('accountsChanged', function (accounts) {
-        if (accounts.length === 0) {
-            // User disconnected their wallet
-            localStorage.removeItem('walletConnected');
-            localStorage.removeItem('walletAddress');
-            localStorage.removeItem('walletType');
-            localStorage.removeItem('connectionTime');
-            console.log('Wallet disconnected');
-            hideConnectionStatus();
-        } else {
-            // User switched accounts
-            localStorage.setItem('walletAddress', accounts[0]);
-            console.log('Account switched to:', accounts[0]);
-        }
-    });
-
-    window.ethereum.on('chainChanged', function (chainId) {
-        console.log('Chain changed to:', chainId);
-        checkNetwork(chainId);
-    });
-
-    window.ethereum.on('connect', function (connectInfo) {
-        console.log('MetaMask connected:', connectInfo);
-    });
-
-    window.ethereum.on('disconnect', function (error) {
-        console.log('MetaMask disconnected:', error);
-        hideConnectionStatus();
-    });
-}
-
-// Check if connected to supported network
-function checkNetwork(chainId) {
-    // Ethereum Mainnet: 0x1
-    // Polygon: 0x89  
-    // Sepolia Testnet: 0xaa36a7
-    // Goerli Testnet: 0x5
-    
-    const supportedChains = ['0x1', '0x89', '0xaa36a7', '0x5'];
-    
-    if (!supportedChains.includes(chainId)) {
-        console.warn('Unsupported network detected:', chainId);
-        showConnectionError('Unsupported Network', 'Please switch to Ethereum Mainnet, Polygon, or a supported testnet.');
-    }
-}
-
-// Utility function to get short address format
+/**
+ * Utility function to get short address format
+ */
 function getShortAddress(address) {
     if (!address) return '';
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 }
-
-// Check MetaMask availability
-function isMetaMaskAvailable() {
-    return typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask;
-}
-
-// Get current network name
-function getNetworkName(chainId) {
-    const networks = {
-        '0x1': 'Ethereum Mainnet',
-        '0x89': 'Polygon',
-        '0xaa36a7': 'Sepolia Testnet',
-        '0x5': 'Goerli Testnet'
-    };
-    return networks[chainId] || 'Unknown Network';
-}
-
-// Auto-hide error messages after delay
-setInterval(() => {
-    const statusCard = document.getElementById('connection-status');
-    if (statusCard && statusCard.style.display === 'block') {
-        const statusIcon = document.getElementById('status-icon');
-        if (statusIcon && statusIcon.classList.contains('fa-exclamation-triangle')) {
-            // Auto-hide errors after 10 seconds
-            const cardAge = Date.now() - (window.lastErrorTime || 0);
-            if (cardAge > 10000) {
-                hideConnectionStatus();
-            }
-        }
-    }
-}, 1000);
-
-// Track error timing
-const originalShowConnectionError = showConnectionError;
-showConnectionError = function(title, message) {
-    window.lastErrorTime = Date.now();
-    originalShowConnectionError(title, message);
-}; 

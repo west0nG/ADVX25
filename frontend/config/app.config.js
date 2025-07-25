@@ -22,12 +22,27 @@ const APP_CONFIG = {
         }
     },
     
+    // Authentication Configuration
+    auth: {
+        protectedRoutes: ['main.html', 'create.html', 'profile.html', 'marketplace.html'],
+        authPage: 'auth.html',
+        defaultRedirect: 'profile.html',
+        sessionTimeout: 7200000, // 2 hours
+        stateValidationInterval: 30000 // 30 seconds
+    },
+    
     // Blockchain Configuration
     blockchain: {
         network: 'sepolia',
         chainId: 11155111,
         rpcUrl: 'https://sepolia.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7',
         contractAddress: '0x...',
+        supportedNetworks: {
+            '0x1': { name: 'Ethereum Mainnet', id: 1, rpcUrl: 'https://mainnet.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' },
+            '0x89': { name: 'Polygon', id: 137, rpcUrl: 'https://polygon-rpc.com' },
+            '0xaa36a7': { name: 'Sepolia Testnet', id: 11155111, rpcUrl: 'https://sepolia.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' },
+            '0x5': { name: 'Goerli Testnet', id: 5, rpcUrl: 'https://goerli.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' }
+        },
         recipeNft: {
             address: '0x7C25cdC826C467B6b3856B48F54BD14cF3202411', // Example address, should be updated
             abi: [

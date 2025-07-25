@@ -6,33 +6,14 @@
     <title>Bar Dashboard - BarsHelpBars</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/wallet-ui.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header" id="header">
-        <nav class="nav">
-            <div class="logo">
-                <i class="fas fa-martini-glass-citrus"></i>
-                <span>BarsHelpBars</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="marketplace.html">Marketplace</a></li>
-                <li><a href="profile.html">Bar Network</a></li>
-                <li><a href="main.html" class="active">My Bar Dashboard</a></li>
-            </ul>
-            <div class="header-actions">
-                <div class="search-box">
-                    <input type="text" placeholder="Search recipes...">
-                    <i class="fas fa-search"></i>
-                </div>
-                <a href="auth.html" class="connect-btn">Connect Wallet</a>
-            </div>
-        </nav>
-    </header>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
 
-    <!-- Main Dashboard -->
-    <main class="main-dashboard">
+    <!-- Main Content Wrapper -->
+    <main class="main-content-wrapper">
         <div class="dashboard-container">
             <!-- Dashboard Header -->
             <section class="dashboard-header">
@@ -289,7 +270,13 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
+    <!-- Wallet Services -->
+    <script src="../assets/js/wallet-service.js"></script>
+    <script src="../assets/js/auth-manager.js"></script>
+    
+    <!-- Page Scripts -->
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header-loader.js"></script>
     <script>
         // Load footer
         fetch('../components/footer.html')
@@ -336,7 +323,8 @@
         }
 
         function disconnectWallet() {
-            alert('Disconnect wallet functionality');
+            // Use the centralized wallet service to disconnect
+            window.walletService.disconnect();
         }
     </script>
 </body>
