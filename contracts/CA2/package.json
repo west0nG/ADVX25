@@ -1,0 +1,18 @@
+{
+  "name": "bars-help-bars-recipenft",
+  "version": "1.0.0",
+  "description": "RecipeNFT contract for Bars Help Bars project (CA2)",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.20.0",
+    "ethers": "^6.7.0",
+    "chai": "^4.3.7"
+  }
+} 
