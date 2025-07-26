@@ -2,7 +2,7 @@
   "network": "injective_testnet",
   "contracts": {
     "mockUSDT": "0x81DDAf3D421BD54EdeBdE08C00EF59dA2464b927",
-    "idnft": "0xc4971cd7ef0fC14bd3b3Af97ECC85A298475B4Ff",
+    "idnft": "0x5e08cEF902655b2485208b8c72bf5961E3deF0d5",
     "recipeNFT": "0x2AF8d627E7767411093163a8a2bCfEd581f8E98b",
     "marketplace": "0x03bEdd3242b625a8Ce602137314901D77Bc26503"
   },

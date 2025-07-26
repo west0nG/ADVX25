@@ -418,8 +418,38 @@ document.addEventListener('DOMContentLoaded', function() {
             const contractABI = APP_CONFIG.blockchain.recipeNft.abi;
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
+            // Call mintRecipeNFT which returns the token ID directly
             const transaction = await contract.mintRecipeNFT(metadataURI);
-            await transaction.wait();
+            const receipt = await transaction.wait();
+            
+            // Extract token ID from the transaction receipt events (more reliable method)
+            let tokenId = null;
+            if (receipt.events) {
+                // Look for Transfer event which should contain the token ID
+                const transferEvent = receipt.events.find(event => 
+                    event.event === 'Transfer' && event.args && event.args.tokenId
+                );
+                if (transferEvent) {
+                    tokenId = transferEvent.args.tokenId.toString();
+                    console.log('Successfully minted NFT with Token ID:', tokenId);
+                } else {
+                    // Fallback: look for RecipeNFTCreated event
+                    const createdEvent = receipt.events.find(event => 
+                        event.event === 'RecipeNFTCreated' && event.args && event.args.tokenId
+                    );
+                    if (createdEvent) {
+                        tokenId = createdEvent.args.tokenId.toString();
+                        console.log('Successfully minted NFT with Token ID (from RecipeNFTCreated):', tokenId);
+                    }
+                }
+            }
+            
+            if (!tokenId) {
+                console.warn('Could not extract token ID from transaction receipt. Transaction hash:', transaction.hash);
+                // In this case, we'll still have the transaction hash for backend storage
+            } else {
+                console.log(`NFT successfully minted! Token ID: ${tokenId}, Transaction: ${transaction.hash}`);
+            }
             
             // Step 6: Store recipe in backend (optional, if still needed)
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing...';
@@ -429,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const priceValue = parseFloat(formData.get('price') || '0');
             
             const success = await apiService.storeRecipe(
-                transaction.hash,  // recipeAddress (string)
+                tokenId || transaction.hash,  // recipeAddress (use tokenId if available, fallback to transaction hash)
                 finalCID,         // metadataCid (string)
                 walletAddress,    // ownerAddress (string)
                 priceValue        // price (float/number)
@@ -438,10 +468,28 @@ document.addEventListener('DOMContentLoaded', function() {
             if (success) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
-                showNotification('NFT created successfully! Redirecting to marketplace...', 'success');
+                
+                // Show success message with token ID if available
+                const successMessage = tokenId 
+                    ? `NFT created successfully! Token ID: ${tokenId}. Redirecting to marketplace...`
+                    : 'NFT created successfully! Redirecting to marketplace...';
+                    
+                showNotification(successMessage, 'success');
+                
+                // Also log for debugging
+                if (tokenId) {
+                    console.log('=== NFT CREATION SUCCESS ===');
+                    console.log('Token ID:', tokenId);
+                    console.log('Transaction Hash:', transaction.hash);
+                    console.log('Contract Address:', contractAddress);
+                    console.log('Metadata URI:', metadataURI);
+                    console.log('Owner Address:', walletAddress);
+                    console.log('========================');
+                }
+                
                 setTimeout(() => {
                     window.location.href = 'marketplace.html';
-                }, 2000);
+                }, 3000);
             } else {
                 throw new Error('Failed to store recipe in backend');
             }

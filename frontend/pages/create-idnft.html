@@ -269,11 +269,11 @@
                         this.showStatus('Creating Identity NFT on blockchain...', 'loading');
                         
                         try {
-                            await this.createIDNFTOnBlockchain(uploadResult.ipfs_cid);
+                            const mintResult = await this.createIDNFTOnBlockchain(uploadResult.ipfs_cid);
                             this.showStatus('✅ Bar Identity NFT created successfully!', 'success');
                             
-                            // Call backend to sync the bar data
-                            await this.syncBarToBackend(uploadResult.ipfs_cid, barName);
+                            // Call backend to sync the bar data with ERC-6551 tokenId
+                            await this.syncBarToBackend(uploadResult.ipfs_cid, barName, mintResult.tokenId);
                             
                         } catch (mintError) {
                             console.error('IDNFT minting failed:', mintError);
@@ -538,14 +538,8 @@
                         throw new Error('Contract not initialized');
                     }
                     
-                    // Check if current user is the contract owner (only owner can mint)
-                    const contractOwner = await contract.owner();
-                    console.log('Contract owner:', contractOwner);
-                    console.log('Current user:', this.userAddress);
-                    
-                    if (contractOwner.toLowerCase() !== this.userAddress.toLowerCase()) {
-                        throw new Error(`Only the contract owner (${contractOwner}) can create IDNFTs. Please contact support or use a different account.`);
-                    }
+                    // The CA4 IDNFT contract allows anyone to create IDNFTs
+                    console.log('Creating IDNFT for user:', this.userAddress);
                     
                     // Create IPFS URI
                     const tokenURI = `ipfs://${ipfsCid}`;
@@ -573,22 +567,20 @@
                 }
             }
             
-            async syncBarToBackend(ipfsCid, barName) {
+            async syncBarToBackend(ipfsCid, barName, tokenId) {
                 try {
                     // This calls the /api/bars/set endpoint to sync the bar data to backend
                     const config = window.APP_CONFIG || APP_CONFIG;
-                    const endpoint = config.api.endpoints.bars.setBar;
                     const baseUrl = config.api.baseUrl;
                     
                     const payload = {
-                        bar_address: this.userAddress,
-                        metadata_cid: ipfsCid,
-                        bar_name: barName
+                        bar_address: tokenId || this.userAddress, // Use ERC-6551 tokenId if available
+                        meta_cid: ipfsCid
                     };
                     
                     console.log('Syncing bar to backend:', payload);
                     
-                    const response = await fetch(`${baseUrl}${endpoint}`, {
+                    const response = await fetch(`${baseUrl}/api/bars/set`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

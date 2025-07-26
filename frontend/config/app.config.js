@@ -64,7 +64,7 @@ const APP_CONFIG = {
             '0x59f': { name: 'Injective Testnet', id: 1439, rpcUrl: 'https://clean-cool-dust.injective-testnet.quiknode.pro/f2dcf86a3537602a3470aa71713305c63797504d', currency: 'INJ', explorer: 'https://testnet.explorer.injective.network' }
         },
         idNft: {
-            address: '0x496F4DaaA04FAd0f62e06a8a2F9202431b1a5EC4', // CA1 IDNFT contract on Injective testnet (correct address)
+            address: '0x5e08cEF902655b2485208b8c72bf5961E3deF0d5', // CA4 IDNFT contract on Injective testnet (public version)
             abi: [
                 {
                     "inputs": [
@@ -261,7 +261,7 @@ const APP_CONFIG = {
             ]
         },
         recipeNft: {
-            address: '0xf9C4A1C157330918568b11C4121ab8bBcBc4131c', // CA2 RecipeNFT contract on Injective testnet (correct address)
+            address: '0x20905929f91B1EC943B95A7998dE65a9661065f1', // CA4 RecipeNFT contract on Injective testnet (public version)
             abi: [
                 {
                     "inputs": [
@@ -1363,15 +1363,53 @@ const APP_CONFIG = {
                     ],
                     "stateMutability": "view",
                     "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "user",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "getRecipeTokensByUser",
+                    "outputs": [
+                        {
+                            "internalType": "uint256[]",
+                            "name": "",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getTokenURI",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
                 }
             ]
         },
         marketplace: {
-            address: '0x57B96760a11a38a34cC2389a4857129B8345523F', // CA4 RecipeMarketplace contract on Injective testnet
+            address: '0xB2949598fe711D1B2Db8EE2812ba66658954a5b1', // CA4 RecipeMarketplace contract on Injective testnet (public version)
             abi: [] // Add marketplace ABI here if needed
         },
         mockUsdt: {
-            address: '0x8F77C9DD44E4A50F3e0bdefCB1DdA948cE3A543e', // CA4 MockUSDT contract on Injective testnet
+            address: '0x410d3382d859bc7351A7233e5C5c128D551cE61d', // CA4 MockUSDT contract on Injective testnet (public version)
             abi: [] // Add USDT ABI here if needed
         }
     },

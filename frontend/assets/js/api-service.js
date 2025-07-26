@@ -433,6 +433,78 @@ class APIService {
             return false;
         }
     }
+
+    // ===============================
+    // SMART CONTRACT INTEGRATION
+    // ===============================
+
+    // Get user's Recipe NFTs from smart contract
+    async getUserRecipeNFTs(userAddress) {
+        try {
+            if (typeof ethers === 'undefined') {
+                throw new Error('Ethers library not loaded');
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contractAddress = APP_CONFIG.blockchain.recipeNft.address;
+            const contractABI = APP_CONFIG.blockchain.recipeNft.abi;
+            const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+            // Get Recipe NFT token IDs owned by the user
+            const tokenIds = await contract.getRecipeTokensByUser(userAddress);
+            
+            const recipeNFTs = [];
+            for (const tokenId of tokenIds) {
+                try {
+                    // Get metadata for each token
+                    const metadata = await contract.getRecipeMetadata(tokenId);
+                    const tokenURI = await contract.getTokenURI(tokenId);
+                    
+                    recipeNFTs.push({
+                        tokenId: tokenId.toString(),
+                        tokenURI: tokenURI,
+                        isActive: metadata.isActive,
+                        createdAt: metadata.createdAt.toString(),
+                        updatedAt: metadata.updatedAt.toString(),
+                        price: metadata.price.toString(),
+                        isForSale: metadata.isForSale,
+                        idNFTTokenId: metadata.idNFTTokenId.toString(),
+                        idNFTAccount: metadata.idNFTAccount
+                    });
+                } catch (error) {
+                    console.warn(`Failed to get metadata for token ${tokenId}:`, error);
+                }
+            }
+
+            return recipeNFTs;
+        } catch (error) {
+            console.error('Failed to get user Recipe NFTs:', error);
+            throw error;
+        }
+    }
+
+    // Get IPFS metadata for a Recipe NFT
+    async getRecipeNFTMetadata(tokenURI) {
+        try {
+            if (tokenURI.startsWith('ipfs://')) {
+                const cid = tokenURI.replace('ipfs://', '');
+                const response = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch IPFS metadata: ${response.status}`);
+                }
+                return await response.json();
+            } else {
+                const response = await fetch(tokenURI);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch metadata: ${response.status}`);
+                }
+                return await response.json();
+            }
+        } catch (error) {
+            console.error('Failed to get Recipe NFT metadata:', error);
+            throw error;
+        }
+    }
 }
 
 // Create global instance
