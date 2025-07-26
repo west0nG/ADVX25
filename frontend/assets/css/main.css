@@ -2234,3 +2234,132 @@ select.form-input {
         --text-muted: #64748b;
     }
 }
+
+/* ===== LEGAL DOCUMENT STYLES ===== */
+.legal-document {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.document-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.document-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.last-updated {
+    color: var(--text-medium);
+    font-size: 1rem;
+    font-style: italic;
+}
+
+.document-content {
+    line-height: 1.8;
+    color: var(--text-medium);
+}
+
+.legal-section {
+    margin-bottom: 2.5rem;
+}
+
+.legal-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.legal-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 1.5rem 0 0.8rem 0;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.legal-section p {
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.legal-section ul {
+    margin: 1rem 0 1rem 2rem;
+    list-style-type: disc;
+}
+
+.legal-section li {
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.contact-info {
+    background: var(--light-gray);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-blue);
+    margin: 1rem 0;
+}
+
+.contact-info p {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.contact-info p:last-child {
+    margin-bottom: 0;
+}
+
+.document-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e2e8f0;
+    text-align: center;
+    background: var(--very-light-blue);
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.document-footer p {
+    font-weight: 500;
+    color: var(--text-dark);
+    font-style: italic;
+}
+
+/* Responsive design for legal documents */
+@media (max-width: 768px) {
+    .legal-document {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .document-header h1 {
+        font-size: 2rem;
+    }
+    
+    .legal-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .legal-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .legal-section ul {
+        margin-left: 1.5rem;
+    }
+    
+    .contact-info {
+        padding: 1rem;
+    }
+}

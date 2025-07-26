@@ -5,27 +5,33 @@ const APP_CONFIG = {
     version: '1.0.0',
     description: 'The Art of Cocktails, On-Chain',
     
-    // API Configuration
+    // API Configuration  
     api: {
-        baseUrl: 'http://localhost:8080/api',   // <- was 8080
+        baseUrl: 'https://bars-help-bars.onrender.com',   // Backend base URL (without /api since it's in endpoints)
         timeout: 30000,
         retries: 3,
         endpoints: {
             bars: {
-                uploadBarIPFS: '/bars/upload_bar_ipfs',
-                getBar: '/bars/get',  // /{bar_address}
-                updateBar: '/bars/update',
-                setBar: '/bars/set',
-                getOwnedRecipes: '/bars/owned_recipes',  // /{bar_address}
-                getUsedRecipes: '/bars/used_recipes'     // /{bar_address}
+                uploadBarIPFS: '/api/bars/upload_bar_ipfs',
+                getBar: '/api/bars/get',  // /{bar_address}
+                updateBar: '/api/bars/update',  
+                setBar: '/api/bars/set',
+                getOwnedRecipes: '/api/bars/owned_recipes',  // /{bar_address}
+                getUsedRecipes: '/api/bars/used_recipes'     // /{bar_address}
             },
             recipes: {
-                uploadIPFS: '/recipes/upload_ipfs',
-                storeRecipe: '/recipes/store_recipe',    // /{recipe_address}/{metadata_cid}/{owner_address}/{price}
-                getTenRecipes: '/recipes/get_ten_recipes',
-                getAllRecipes: '/recipes/get_all_recipes',
-                searchRecipes: '/recipes/search_recipes',
-                getOneRecipe: '/recipes/get_one_recipe'  // /{nft_address}/{user_address}
+                uploadIPFS: '/api/recipes/upload_ipfs',
+                storeRecipe: '/api/recipes/store_recipe',    // /{recipe_address}/{metadata_cid}/{owner_address}/{price}
+                getTenRecipes: '/api/recipes/get_ten_recipes',
+                getAllRecipes: '/api/recipes/get_all_recipes',
+                searchRecipes: '/api/recipes/search_recipes',
+                getOneRecipe: '/api/recipes/get_one_recipe'  // /{nft_address}/{user_address}
+            },
+            transactions: {
+                uploadPicToIPFS: '/api/trans/upload_pic_to_ipfs',
+                completeTransaction: '/api/trans/complete_transaction',
+                completeRecipeMint: '/api/trans/complete_recipe_mint',
+                getTransactionHistory: '/api/trans/transaction_history'  // /{address}
             }
         }
     },
@@ -44,18 +50,218 @@ const APP_CONFIG = {
     
     // Blockchain Configuration
     blockchain: {
-        network: 'sepolia',
-        chainId: 11155111,
-        rpcUrl: 'https://sepolia.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7',
+        network: 'injective_testnet',
+        chainId: 1439,
+        rpcUrl: 'https://clean-cool-dust.injective-testnet.quiknode.pro/f2dcf86a3537602a3470aa71713305c63797504d',
         contractAddress: '0x...',
         supportedNetworks: {
             '0x1': { name: 'Ethereum Mainnet', id: 1, rpcUrl: 'https://mainnet.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' },
             '0x89': { name: 'Polygon', id: 137, rpcUrl: 'https://polygon-rpc.com' },
             '0xaa36a7': { name: 'Sepolia Testnet', id: 11155111, rpcUrl: 'https://sepolia.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' },
-            '0x5': { name: 'Goerli Testnet', id: 5, rpcUrl: 'https://goerli.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' }
+            '0x5': { name: 'Goerli Testnet', id: 5, rpcUrl: 'https://goerli.infura.io/v3/9b8412c7df3d413e88588c06aa3188b7' },
+            '0x9dd': { name: 'inEVM Mainnet', id: 2525, rpcUrl: 'https://mainnet.rpc.inevm.com/http', currency: 'INJ', explorer: 'https://explorer.inevm.com' },
+            '0x978': { name: 'inEVM Testnet', id: 2424, rpcUrl: 'https://testnet.rpc.inevm.com/http', currency: 'INJ', explorer: 'https://testnet.explorer.inevm.com' },
+            '0x59f': { name: 'Injective Testnet', id: 1439, rpcUrl: 'https://clean-cool-dust.injective-testnet.quiknode.pro/f2dcf86a3537602a3470aa71713305c63797504d', currency: 'INJ', explorer: 'https://testnet.explorer.injective.network' }
+        },
+        idNft: {
+            address: '0x5e08cEF902655b2485208b8c72bf5961E3deF0d5', // CA4 IDNFT contract on Injective testnet (public version)
+            abi: [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "uri",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "createIDNFT",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "user",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "hasActiveIDNFT",
+                    "outputs": [
+                        {
+                            "internalType": "bool",
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "user",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "getTokenIdByAddress",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getBarMetadata",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "string",
+                                    "name": "tokenURI",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "bool",
+                                    "name": "isActive",
+                                    "type": "bool"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "createdAt",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "updatedAt",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "internalType": "struct IDNFT.BarMetadata",
+                            "name": "",
+                            "type": "tuple"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "ownerOf",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "balanceOf",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getAddressByTokenId",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getAccountAddress",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "owner",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ]
         },
         recipeNft: {
-            address: '0x7C25cdC826C467B6b3856B48F54BD14cF3202411', // Example address, should be updated
+            address: '0x20905929f91B1EC943B95A7998dE65a9661065f1', // CA4 RecipeNFT contract on Injective testnet (public version)
             abi: [
                 {
                     "inputs": [
@@ -605,6 +811,30 @@ const APP_CONFIG = {
                 {
                     "inputs": [
                         {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getRecipeIDNFTInfo",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "idNFTTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "idNFTAccount",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
                             "internalType": "address",
                             "name": "owner",
                             "type": "address"
@@ -1133,8 +1363,54 @@ const APP_CONFIG = {
                     ],
                     "stateMutability": "view",
                     "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "user",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "getRecipeTokensByUser",
+                    "outputs": [
+                        {
+                            "internalType": "uint256[]",
+                            "name": "",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getTokenURI",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
                 }
             ]
+        },
+        marketplace: {
+            address: '0xB2949598fe711D1B2Db8EE2812ba66658954a5b1', // CA4 RecipeMarketplace contract on Injective testnet (public version)
+            abi: [] // Add marketplace ABI here if needed
+        },
+        mockUsdt: {
+            address: '0x410d3382d859bc7351A7233e5C5c128D551cE61d', // CA4 MockUSDT contract on Injective testnet (public version)
+            abi: [] // Add USDT ABI here if needed
         }
     },
     

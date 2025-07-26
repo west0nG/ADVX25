@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title MockUSDT - 模拟USDT代币合约（用于测试）
  * @dev 实现ERC20标准，用于测试RecipeMarketplace合约
+ * @dev 修改：所有用户都可以铸造和销毁代币
  * @author Bars Help Bars Team
  */
 contract MockUSDT is ERC20, Ownable {
@@ -30,20 +31,20 @@ contract MockUSDT is ERC20, Ownable {
     }
 
     /**
-     * @dev 铸造代币（仅所有者）
+     * @dev 铸造代币（所有用户都可以调用）
      * @param to 接收地址
      * @param amount 铸造金额
      */
-    function mint(address to, uint256 amount) external onlyOwner {
+    function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }
 
     /**
-     * @dev 销毁代币（仅所有者）
+     * @dev 销毁代币（所有用户都可以调用）
      * @param from 销毁地址
      * @param amount 销毁金额
      */
-    function burn(address from, uint256 amount) external onlyOwner {
+    function burn(address from, uint256 amount) external {
         _burn(from, amount);
     }
 } 

@@ -86,12 +86,27 @@ async function handleConnectClick(event) {
     
     try {
         // Update button state
-    showConnectionStatus('Connecting to MetaMask...', 'Please check your MetaMask extension and approve the connection request.');
+        showConnectionStatus('Connecting to MetaMask...', 'Please check your MetaMask extension and approve the connection request.');
         button.disabled = true;
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
             
         // Connect via WalletService
         const result = await window.walletService.connect();
+        
+        // Check if we need to switch to Injective testnet
+        const targetChainId = '0x59f'; // Injective testnet
+        if (result.chainId !== targetChainId) {
+            showConnectionStatus('Switching to Injective Testnet...', 'Please approve the network switch in MetaMask.');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Switching Network...';
+            
+            try {
+                await window.walletService.switchNetwork(targetChainId);
+                console.log('Successfully switched to Injective testnet');
+            } catch (switchError) {
+                console.warn('Failed to switch network:', switchError);
+                showConnectionError('Network Switch Required', 'Please manually switch to Injective testnet in MetaMask.');
+            }
+        }
             
         // Success is handled by walletConnected event
     } catch (error) {
@@ -142,7 +157,7 @@ function handleUnsupportedNetwork(event) {
     const { chainId } = event.detail;
     showConnectionError(
         'Unsupported Network',
-        'Please switch to Ethereum Mainnet, Polygon, or Sepolia testnet in MetaMask.'
+                                'Please switch to Ethereum Mainnet, Polygon, Sepolia testnet, or Injective in MetaMask.'
     );
 }
 
@@ -173,7 +188,7 @@ function handleConnectionError(error) {
             
         case 'WRONG_NETWORK':
             title = 'Wrong Network';
-            message = 'Please switch to a supported network (Ethereum, Polygon, or Sepolia).';
+                                message = 'Please switch to a supported network (Ethereum, Polygon, Sepolia, or Injective).';
             break;
             
         case 'TIMEOUT':

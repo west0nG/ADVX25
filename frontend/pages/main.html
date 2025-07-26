@@ -264,8 +264,40 @@
                     </div>
                 </div>
             </section>
+
+            <!-- User's Recipe NFTs Section -->
+            <section class="user-recipes-section">
+                <div class="section-header">
+                    <h2>Your Recipe NFTs</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary" onclick="refreshUserRecipes()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                        <button class="btn btn-primary" onclick="window.location.href='create.html'">
+                            <i class="fas fa-plus"></i>
+                            Create New Recipe
+                        </button>
+                    </div>
+                </div>
+                <div class="user-recipes-container" id="user-recipes-container">
+                    <!-- User recipes will be loaded here -->
+                </div>
+            </section>
         </div>
     </main>
+
+    <!-- Load required libraries -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    
+    <!-- App Configuration -->
+    <script src="../config/app.config.js"></script>
+    
+    <!-- API Services -->
+    <script src="../assets/js/api-service.js"></script>
+    
+    <!-- User Recipe Manager -->
+    <script src="../assets/js/user-recipes.js"></script>
 
     <!-- Wallet Services -->
     <script src="../assets/js/wallet-service.js"></script>
@@ -289,8 +321,52 @@
         }
 
         function viewMyRecipes() {
-            alert('My Recipes view would open here');
+            // Navigate to dedicated my recipes page
+            window.location.href = 'my-recipes.html';
         }
+
+        // Load user's Recipe NFTs
+        async function loadUserRecipes() {
+            try {
+                const container = document.getElementById('user-recipes-container');
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading your Recipe NFTs...</p>
+                    </div>
+                `;
+
+                await userRecipeManager.loadUserRecipes();
+                userRecipeManager.displayUserRecipes('user-recipes-container');
+            } catch (error) {
+                console.error('Failed to load user recipes:', error);
+                const container = document.getElementById('user-recipes-container');
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h3>Failed to Load Recipe NFTs</h3>
+                        <p>Error: ${error.message}</p>
+                        <button class="btn btn-primary" onclick="refreshUserRecipes()">
+                            <i class="fas fa-retry"></i>
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Refresh user recipes
+        async function refreshUserRecipes() {
+            await loadUserRecipes();
+        }
+
+        // Load user recipes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit for all scripts to load
+            setTimeout(() => {
+                loadUserRecipes();
+            }, 1000);
+        });
 
         function manageMenu() {
             alert('Menu management functionality would open here');

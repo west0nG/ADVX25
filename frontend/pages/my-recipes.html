@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipe NFTs - BarsHelpBars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/wallet-ui.css">
+</head>
+<body>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-content-wrapper">
+        <!-- Hero Section -->
+        <section class="recipe-hero">
+            <div class="floating-elements">
+                <i class="floating-icon fas fa-cocktail" style="top: 15%; left: 8%; font-size: 1.5rem; animation-delay: 0s; color: rgba(37, 242, 242, 0.4);"></i>
+                <i class="floating-icon fas fa-certificate" style="top: 70%; right: 12%; font-size: 1.2rem; animation-delay: 1s; color: rgba(236, 72, 153, 0.4);"></i>
+                <i class="floating-icon fas fa-gem" style="bottom: 20%; left: 15%; font-size: 1.8rem; animation-delay: 2s; color: rgba(168, 85, 247, 0.4);"></i>
+                <i class="floating-icon fas fa-star" style="top: 25%; right: 20%; font-size: 1.3rem; animation-delay: 3s; color: rgba(37, 242, 242, 0.3);"></i>
+                <i class="floating-icon fas fa-wine-glass" style="bottom: 40%; right: 8%; font-size: 1.6rem; animation-delay: 4s; color: rgba(236, 72, 153, 0.3);"></i>
+            </div>
+            <div class="hero-content">
+                <h1>My Recipe NFTs</h1>
+                <p>View and manage all your Recipe NFTs owned by your ID NFT's ERC-6551 account</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-recipes">0</span>
+                        <span class="stat-label">Total Recipes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="active-recipes">0</span>
+                        <span class="stat-label">Active</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="for-sale-recipes">0</span>
+                        <span class="stat-label">For Sale</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wallet Connection Section -->
+        <section class="wallet-section">
+            <div class="wallet-container">
+                <div class="wallet-info">
+                    <div class="wallet-status" id="wallet-status">
+                        <i class="fas fa-wallet"></i>
+                        <span>Connect wallet to view your Recipe NFTs</span>
+                    </div>
+                    <button class="btn btn-primary" id="connect-wallet-btn" onclick="connectWallet()">
+                        <i class="fas fa-link"></i>
+                        Connect Wallet
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls Section -->
+        <section class="controls-section" id="controls-section" style="display: none;">
+            <div class="controls-container">
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all" onclick="filterRecipes('all')">
+                        <i class="fas fa-list"></i>
+                        All Recipes
+                    </button>
+                    <button class="filter-btn" data-filter="active" onclick="filterRecipes('active')">
+                        <i class="fas fa-check-circle"></i>
+                        Active Only
+                    </button>
+                    <button class="filter-btn" data-filter="for-sale" onclick="filterRecipes('for-sale')">
+                        <i class="fas fa-dollar-sign"></i>
+                        For Sale
+                    </button>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="refreshRecipes()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="window.location.href='create.html'">
+                        <i class="fas fa-plus"></i>
+                        Create New Recipe
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recipe NFTs Grid -->
+        <section class="recipes-grid-section">
+            <div class="recipes-container" id="recipes-container">
+                <!-- Recipes will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Load required libraries -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    
+    <!-- App Configuration -->
+    <script src="../config/app.config.js"></script>
+    
+    <!-- API Services -->
+    <script src="../assets/js/api-service.js"></script>
+    
+    <!-- User Recipe Manager -->
+    <script src="../assets/js/user-recipes.js"></script>
+
+    <!-- Wallet Services -->
+    <script src="../assets/js/wallet-service.js"></script>
+    <script src="../assets/js/auth-manager.js"></script>
+    
+    <!-- Page Scripts -->
+    <script src="../assets/js/header-loader.js"></script>
+
+    <script>
+        let currentFilter = 'all';
+        let allRecipes = [];
+
+        // Connect wallet
+        async function connectWallet() {
+            try {
+                const connectBtn = document.getElementById('connect-wallet-btn');
+                const statusDiv = document.getElementById('wallet-status');
+                
+                connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+                connectBtn.disabled = true;
+
+                await userRecipeManager.initialize();
+                
+                statusDiv.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                    <span>Connected: ${userRecipeManager.userAddress.substring(0, 6)}...${userRecipeManager.userAddress.substring(-4)}</span>
+                `;
+                
+                connectBtn.style.display = 'none';
+                document.getElementById('controls-section').style.display = 'block';
+                
+                // Load recipes
+                await loadRecipes();
+                
+            } catch (error) {
+                console.error('Failed to connect wallet:', error);
+                
+                const connectBtn = document.getElementById('connect-wallet-btn');
+                const statusDiv = document.getElementById('wallet-status');
+                
+                connectBtn.innerHTML = '<i class="fas fa-link"></i> Connect Wallet';
+                connectBtn.disabled = false;
+                
+                statusDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    <span>Failed to connect: ${error.message}</span>
+                `;
+            }
+        }
+
+        // Load recipes
+        async function loadRecipes() {
+            try {
+                const container = document.getElementById('recipes-container');
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading your Recipe NFTs...</p>
+                    </div>
+                `;
+
+                allRecipes = await userRecipeManager.loadUserRecipes();
+                updateStats();
+                displayRecipes();
+                
+            } catch (error) {
+                console.error('Failed to load recipes:', error);
+                
+                const container = document.getElementById('recipes-container');
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h3>Failed to Load Recipe NFTs</h3>
+                        <p>Error: ${error.message}</p>
+                        <button class="btn btn-primary" onclick="refreshRecipes()">
+                            <i class="fas fa-redo"></i>
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = allRecipes.length;
+            const active = allRecipes.filter(r => r.isActive).length;
+            const forSale = allRecipes.filter(r => r.isForSale).length;
+
+            document.getElementById('total-recipes').textContent = total;
+            document.getElementById('active-recipes').textContent = active;
+            document.getElementById('for-sale-recipes').textContent = forSale;
+        }
+
+        // Display recipes based on current filter
+        function displayRecipes() {
+            let filteredRecipes = allRecipes;
+
+            if (currentFilter === 'active') {
+                filteredRecipes = allRecipes.filter(r => r.isActive);
+            } else if (currentFilter === 'for-sale') {
+                filteredRecipes = allRecipes.filter(r => r.isForSale);
+            }
+
+            userRecipeManager.userRecipes = filteredRecipes;
+            userRecipeManager.displayUserRecipes('recipes-container');
+        }
+
+        // Filter recipes
+        function filterRecipes(filter) {
+            currentFilter = filter;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            displayRecipes();
+        }
+
+        // Refresh recipes
+        async function refreshRecipes() {
+            await loadRecipes();
+        }
+
+        // Check if wallet is already connected on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        // Wallet already connected
+                        await connectWallet();
+                    }
+                } catch (error) {
+                    console.log('No wallet connected yet');
+                }
+            }
+        });
+    </script>
+
+    <!-- Additional styles for this page -->
+    <style>
+        .recipe-hero {
+            background: linear-gradient(135deg, rgba(37, 242, 242, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .hero-stats .stat-item {
+            text-align: center;
+        }
+
+        .hero-stats .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #25f2f2;
+        }
+
+        .hero-stats .stat-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .wallet-section {
+            padding: 2rem;
+            background: rgba(31, 41, 55, 0.5);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+        }
+
+        .wallet-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .controls-section {
+            padding: 2rem;
+            background: rgba(31, 41, 55, 0.3);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+        }
+
+        .controls-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-btn {
+            background: rgba(55, 65, 81, 0.5);
+            color: #9ca3af;
+            border: 1px solid rgba(55, 65, 81, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-btn:hover {
+            background: rgba(37, 242, 242, 0.1);
+            border-color: #25f2f2;
+            color: #25f2f2;
+        }
+
+        .filter-btn.active {
+            background: rgba(37, 242, 242, 0.2);
+            border-color: #25f2f2;
+            color: #25f2f2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .recipes-grid-section {
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        .recipes-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .loading-state, .error-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+
+        .loading-state i {
+            font-size: 2rem;
+            color: #25f2f2;
+            margin-bottom: 1rem;
+        }
+
+        .error-state i {
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .error-state h3 {
+            color: #f9fafb;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .wallet-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .controls-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filters {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script src="../assets/js/footer-loader.js"></script>
+</body>
+</html>

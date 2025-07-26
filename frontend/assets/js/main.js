@@ -244,3 +244,66 @@ function manageLoyalty() {
 function viewFullCollection() {
     window.location.href = 'profile.html';
 } 
+
+// Additional dashboard functions for main.html onclick handlers
+async function disconnectWallet() {
+    try {
+        if (window.walletService) {
+            await window.walletService.disconnect();
+            showNotification('Wallet disconnected successfully', 'success');
+            // Redirect to home or auth page
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 1000);
+        }
+    } catch (error) {
+        console.error('Error disconnecting wallet:', error);
+        showNotification('Error disconnecting wallet', 'error');
+    }
+}
+
+function editBarProfile() {
+    // For now, show a modal or redirect to profile editing
+    showNotification('Bar profile editing feature coming soon!', 'info');
+    // TODO: Implement actual profile editing modal or page
+}
+
+function managePhotos() {
+    showNotification('Photo management feature coming soon!', 'info');
+    // TODO: Implement photo upload/management interface
+}
+
+function browseRecipes() {
+    window.location.href = 'marketplace.html';
+}
+
+function viewMyRecipes() {
+    window.location.href = 'profile.html#my-recipes';
+}
+
+function manageMenu() {
+    showNotification('Menu management feature coming soon!', 'info');
+    // TODO: Implement menu management interface
+}
+
+function viewAnalytics() {
+    showNotification('Analytics dashboard coming soon!', 'info');
+    // TODO: Implement analytics dashboard
+}
+
+function viewCustomerData() {
+    showNotification('Customer data insights coming soon!', 'info');
+    // TODO: Implement customer data visualization
+}
+
+// Make functions globally available
+window.disconnectWallet = disconnectWallet;
+window.editBarProfile = editBarProfile;
+window.managePhotos = managePhotos;
+window.browseRecipes = browseRecipes;
+window.viewMyRecipes = viewMyRecipes;
+window.manageMenu = manageMenu;
+window.viewAnalytics = viewAnalytics;
+window.viewCustomerData = viewCustomerData;
+window.manageLoyalty = manageLoyalty;
+window.viewFullCollection = viewFullCollection; 

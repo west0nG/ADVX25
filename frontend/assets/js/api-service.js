@@ -65,7 +65,27 @@ class APIService {
                 clearTimeout(timeoutId);
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    let errorMessage = `HTTP error! status: ${response.status}`;
+                    try {
+                        const errorBody = await response.text();
+                        console.error(`FormData API Error ${response.status}:`, errorBody);
+                        
+                        // Try to parse JSON error response
+                        try {
+                            const errorJson = JSON.parse(errorBody);
+                            if (errorJson.detail) {
+                                errorMessage += ` - ${errorJson.detail}`;
+                            }
+                        } catch (e) {
+                            // If not JSON, use the raw text
+                            if (errorBody) {
+                                errorMessage += ` - ${errorBody}`;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to read error response:', e);
+                    }
+                    throw new Error(errorMessage);
                 }
 
                 return await response.json();
@@ -178,20 +198,103 @@ class APIService {
         }
     }
 
+    // Upload bar image to IPFS
+    async uploadBarImage(imageFile) {
+        try {
+            // Try the new endpoint first
+            try {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+
+                const url = `${this.baseUrl}/bars/upload_image`;
+                const result = await this.makeFormDataRequest(url, formData);
+                
+                return result;
+            } catch (error) {
+                // If 404, try fallback to existing bar IPFS endpoint
+                if (error.message.includes('404')) {
+                    console.warn('New image endpoint not available, using fallback');
+                    return await this.uploadBarToIPFS(imageFile);
+                }
+                throw error;
+            }
+        } catch (error) {
+            console.error('Failed to upload bar image:', error);
+            throw error;
+        }
+    }
+
+    // Upload bar metadata to IPFS
+    async uploadBarMetadata(metadata) {
+        try {
+            // Try the new endpoint first
+            try {
+                const url = `${this.baseUrl}/bars/upload_metadata`;
+                const result = await this.makeRequest(url, {
+                    method: 'POST',
+                    body: JSON.stringify(metadata)
+                });
+                
+                return result;
+            } catch (error) {
+                // If 404, try fallback to existing bar IPFS endpoint
+                if (error.message.includes('404')) {
+                    console.warn('New metadata endpoint not available, using fallback');
+                    return await this.uploadBarToIPFS(metadata);
+                }
+                throw error;
+            }
+        } catch (error) {
+            console.error('Failed to upload bar metadata:', error);
+            throw error;
+        }
+    }
+
+    // Note: IDNFT creation should be handled by the CA1 contract directly
+    // or integrated into the /api/bars/upload_bar_ipfs endpoint
+    // No separate create_idnft endpoint exists in the API
+
     // ===============================
     // RECIPES API METHODS
     // ===============================
 
     // Upload image to IPFS: jpg -> CID
-    async uploadToIPFS(imageFile) {
+    async uploadToIPFS(imageFile, metadata = {}) {
         try {
+            // Validate file extension (backend requires .jpg)
+            if (!imageFile.name.toLowerCase().endsWith('.jpg') && !imageFile.name.toLowerCase().endsWith('.jpeg')) {
+                throw new Error('File must be a JPG image. Please select a .jpg or .jpeg file.');
+            }
+            
             const formData = new FormData();
-            formData.append('image', imageFile);
+            
+            // The backend expects the file field to be named 'jpg_file'
+            // Create a new file with .jpg extension if it's .jpeg
+            let fileToUpload = imageFile;
+            if (imageFile.name.toLowerCase().endsWith('.jpeg')) {
+                const newName = imageFile.name.replace(/\.jpeg$/i, '.jpg');
+                fileToUpload = new File([imageFile], newName, { type: imageFile.type });
+            }
+            
+            formData.append('jpg_file', fileToUpload);
+            
+            // Add required metadata fields (with defaults if not provided)
+            formData.append('cocktail_name', metadata.cocktail_name || 'Untitled Cocktail');
+            formData.append('cocktail_intro', metadata.cocktail_intro || 'No description provided');
+            formData.append('cocktail_recipe', metadata.cocktail_recipe || 'Recipe details not provided');
+
+            console.log('Uploading to IPFS with data:', {
+                fileName: fileToUpload.name,
+                fileSize: fileToUpload.size,
+                cocktail_name: metadata.cocktail_name,
+                cocktail_intro: metadata.cocktail_intro,
+                cocktail_recipe: metadata.cocktail_recipe?.substring(0, 100) + '...'
+            });
 
             const url = `${this.baseUrl}${this.recipeEndpoints.uploadIPFS}`;
             const result = await this.makeFormDataRequest(url, formData);
             
-            return result.cid; // Assuming backend returns { cid: "..." }
+            return result; // Return the full result object
         } catch (error) {
             console.error('Failed to upload to IPFS:', error);
             throw error;
@@ -218,6 +321,7 @@ class APIService {
     async storeRecipe(recipeAddress, metadataCid, ownerAddress, price) {
         try {
             const url = `${this.baseUrl}${this.recipeEndpoints.storeRecipe}/${recipeAddress}/${metadataCid}/${ownerAddress}/${price}`;
+            
             const result = await this.makeRequest(url, {
                 method: 'POST'
             });
@@ -327,6 +431,78 @@ class APIService {
         } catch (error) {
             console.warn('Backend health check failed:', error);
             return false;
+        }
+    }
+
+    // ===============================
+    // SMART CONTRACT INTEGRATION
+    // ===============================
+
+    // Get user's Recipe NFTs from smart contract
+    async getUserRecipeNFTs(userAddress) {
+        try {
+            if (typeof ethers === 'undefined') {
+                throw new Error('Ethers library not loaded');
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contractAddress = APP_CONFIG.blockchain.recipeNft.address;
+            const contractABI = APP_CONFIG.blockchain.recipeNft.abi;
+            const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+            // Get Recipe NFT token IDs owned by the user
+            const tokenIds = await contract.getRecipeTokensByUser(userAddress);
+            
+            const recipeNFTs = [];
+            for (const tokenId of tokenIds) {
+                try {
+                    // Get metadata for each token
+                    const metadata = await contract.getRecipeMetadata(tokenId);
+                    const tokenURI = await contract.getTokenURI(tokenId);
+                    
+                    recipeNFTs.push({
+                        tokenId: tokenId.toString(),
+                        tokenURI: tokenURI,
+                        isActive: metadata.isActive,
+                        createdAt: metadata.createdAt.toString(),
+                        updatedAt: metadata.updatedAt.toString(),
+                        price: metadata.price.toString(),
+                        isForSale: metadata.isForSale,
+                        idNFTTokenId: metadata.idNFTTokenId.toString(),
+                        idNFTAccount: metadata.idNFTAccount
+                    });
+                } catch (error) {
+                    console.warn(`Failed to get metadata for token ${tokenId}:`, error);
+                }
+            }
+
+            return recipeNFTs;
+        } catch (error) {
+            console.error('Failed to get user Recipe NFTs:', error);
+            throw error;
+        }
+    }
+
+    // Get IPFS metadata for a Recipe NFT
+    async getRecipeNFTMetadata(tokenURI) {
+        try {
+            if (tokenURI.startsWith('ipfs://')) {
+                const cid = tokenURI.replace('ipfs://', '');
+                const response = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch IPFS metadata: ${response.status}`);
+                }
+                return await response.json();
+            } else {
+                const response = await fetch(tokenURI);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch metadata: ${response.status}`);
+                }
+                return await response.json();
+            }
+        } catch (error) {
+            console.error('Failed to get Recipe NFT metadata:', error);
+            throw error;
         }
     }
 }

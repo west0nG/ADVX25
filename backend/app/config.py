@@ -1,8 +1,16 @@
 import os
 from dotenv import load_dotenv
 
-# 加载 .env 文件
-load_dotenv()
+# 根据环境变量加载对应的配置文件
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+
+if ENVIRONMENT == "production":
+    load_dotenv("env.deploy")
+elif ENVIRONMENT == "test":
+    load_dotenv("env.test")
+else:
+    # 开发环境默认加载 .env 文件
+    load_dotenv()
 
 # 数据库配置
 POSTGRES_USER = os.getenv("POSTGRES_USER")
@@ -22,3 +30,8 @@ PINATA_API_SECRET = os.getenv("PINATA_API_SECRET")
 
 # 其他配置
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+
+# 环境信息
+print(f"当前环境: {ENVIRONMENT}")
+print(f"数据库连接: {POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}")
+print(f"调试模式: {DEBUG}")

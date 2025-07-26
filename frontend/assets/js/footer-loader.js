@@ -188,7 +188,7 @@ class FooterLoader {
                     <div class="footer-bottom">
                         <div class="footer-bottom-content">
                             <div class="footer-copyright">
-                                <p>© 2024 BarsHelpBars. All rights reserved.</p>
+                                <p>© 2025 BarsHelpBars. All rights reserved.</p>
                             </div>
                             <div class="footer-badges">
                                 <span class="footer-badge">

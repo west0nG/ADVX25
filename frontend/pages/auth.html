@@ -129,6 +129,16 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Additional Links -->
+                <div class="form-section" style="text-align: center; margin-top: 1rem;">
+                    <p style="color: #9ca3af; margin-bottom: 0.5rem;">
+                        Need to create a Bar Identity NFT? 
+                        <a href="create-idnft.html" style="color: #25f2f2; text-decoration: none;">
+                            <i class="fas fa-id-card"></i> Create Identity NFT
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </section>
@@ -136,6 +146,19 @@
     <!-- Footer -->
     <div id="footer-container"></div>
 
+    <!-- Configuration -->
+    <script src="../config/app.config.js"></script>
+    
+    <!-- Ethers Library -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    
+    <!-- API Services -->
+    <script src="../assets/js/api-service.js"></script>
+    
+    <!-- ID NFT Services -->
+    <script src="../assets/js/idnft-service.js"></script>
+    <script src="../assets/js/idnft-modal.js"></script>
+    
     <!-- Wallet Service Scripts -->
     <script src="../assets/js/wallet-service.js"></script>
     <script src="../assets/js/auth-manager.js"></script>
@@ -144,5 +167,23 @@
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/header-loader.js"></script>
     <script src="../assets/js/footer-loader.js"></script>
+    
+    <!-- Add missing global connectMetaMask function -->
+    <script>
+        async function connectMetaMask() {
+            try {
+                if (window.walletService) {
+                    await window.walletService.ensureReady();
+                    const result = await window.walletService.connect();
+                    console.log('connectMetaMask called successfully');
+                } else {
+                    console.error('WalletService not available');
+                }
+            } catch (error) {
+                console.error('connectMetaMask error:', error);
+            }
+        }
+        window.connectMetaMask = connectMetaMask;
+    </script>
 </body>
 </html> 

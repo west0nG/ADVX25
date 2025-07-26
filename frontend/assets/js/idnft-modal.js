@@ -5,6 +5,7 @@ class IDNFTModal {
         this.selectedImage = null;
         this.contractAddress = null;
         this.userAddress = null;
+        this.modalReady = false;
         this.init();
     }
 
@@ -13,26 +14,17 @@ class IDNFTModal {
         this.loadModalHTML();
     }
 
-    // 加载弹窗HTML
+    // Load modal HTML (deprecated - now redirects to dedicated page)
     async loadModalHTML() {
-        try {
-            const response = await fetch('../components/idnft-modal.html');
-            const html = await response.text();
-            
-            // 将弹窗HTML添加到页面
-            const modalContainer = document.createElement('div');
-            modalContainer.innerHTML = html;
-            document.body.appendChild(modalContainer.firstElementChild);
-            
-            this.setupModalEventListeners();
-        } catch (error) {
-            console.error('Failed to load modal HTML:', error);
-        }
+        // Modal HTML loading is no longer needed since we redirect to dedicated page
+        console.log('loadModalHTML called - but now using dedicated page instead');
+        this.modalReady = true;
+        return;
     }
 
-    // 设置事件监听器
+    // Setup event listeners
     setupEventListeners() {
-        // 监听连接钱包按钮点击
+        // Listen for wallet connect button clicks
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('connect-btn') || 
                 e.target.closest('.connect-btn')) {
@@ -42,19 +34,19 @@ class IDNFTModal {
         });
     }
 
-    // 设置弹窗事件监听器
+    // Setup modal event listeners (deprecated)
     setupModalEventListeners() {
         const modal = document.getElementById('idnft-modal');
         if (!modal) return;
 
-        // 关闭弹窗
+        // Close modal on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 this.closeModal();
             }
         });
 
-        // 图片上传
+        // Image upload (deprecated)
         const imageUploadArea = document.getElementById('image-upload-area');
         const imageInput = document.getElementById('bar-image');
         
@@ -68,7 +60,7 @@ class IDNFTModal {
             });
         }
 
-        // 表单提交
+        // Form submission (deprecated - redirects to dedicated page)
         const form = document.getElementById('idnft-form');
         if (form) {
             form.addEventListener('submit', (e) => {
@@ -78,44 +70,42 @@ class IDNFTModal {
         }
     }
 
-    // 处理连接钱包
+    // Handle wallet connection
     async handleConnectWallet() {
         try {
-            // 首先连接MetaMask
+            // First connect MetaMask
             const walletAddress = await this.connectMetaMask();
             if (!walletAddress) return;
 
             this.userAddress = walletAddress;
             
-            // 检查是否有ID NFT合约地址配置
-            this.contractAddress = this.getContractAddress();
-            if (!this.contractAddress) {
-                if (confirm('检测到您还没有配置ID NFT合约地址。是否前往配置页面进行设置？')) {
-                    window.location.href = 'config.html';
-                }
+            // Initialize ID NFT service - using contract address from config
+            try {
+                await window.idnftService.initialize();
+                this.contractAddress = window.idnftService.contractAddress;
+            } catch (error) {
+                console.error('Failed to initialize ID NFT service:', error);
+                this.showError('Initialization failed', 'Unable to connect to ID NFT contract, please check network connection.');
                 return;
             }
-
-            // 初始化ID NFT服务
-            await window.idnftService.initialize(this.contractAddress);
             
-            // 检查用户是否已有ID NFT
+            // Check if user already has an ID NFT
             const idnftStatus = await window.idnftService.checkUserIDNFT(walletAddress);
             
             if (idnftStatus.hasActive) {
-                // 用户已有活跃的ID NFT，直接登录成功
+                // User already has an active ID NFT, login success
                 this.handleLoginSuccess(walletAddress);
             } else {
-                // 用户没有ID NFT，显示创建表单
+                // User doesn't have ID NFT, show creation form
                 this.showModal();
             }
         } catch (error) {
             console.error('Error handling wallet connection:', error);
-            this.showError('连接钱包失败', error.message);
+            this.showError('Wallet connection failed', error.message);
         }
     }
 
-    // 连接MetaMask - 使用集中化的WalletService
+    // Connect MetaMask - using centralized WalletService
     async connectMetaMask() {
         try {
             // 使用WalletService连接
@@ -167,7 +157,55 @@ class IDNFTModal {
         }
     }
 
-    // 关闭弹窗
+    // Public method to open modal - redirects to dedicated page
+    async openModal() {
+        try {
+            // If user hasn't connected wallet, connect first
+            if (!this.userAddress) {
+                const walletAddress = await this.connectMetaMask();
+                if (!walletAddress) return;
+                this.userAddress = walletAddress;
+            }
+
+            // Check if user already has an ID NFT
+            try {
+                if (window.idnftService && window.idnftService.isInitialized) {
+                    const idnftStatus = await window.idnftService.checkUserIDNFT(this.userAddress);
+                    
+                    if (idnftStatus.hasActive) {
+                        alert('You already have an active Identity NFT. No need to create another one.');
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not check IDNFT status:', error);
+                // Continue with creation
+            }
+
+            // Redirect to dedicated IDNFT creation page - improved path resolution
+            const currentPath = window.location.pathname;
+            let createIDNFTPath;
+            
+            if (currentPath.includes('/pages/')) {
+                // If we're already in pages directory
+                createIDNFTPath = 'create-idnft.html';
+            } else if (currentPath.endsWith('/') || currentPath.endsWith('/index.html')) {
+                // If we're in root directory
+                createIDNFTPath = 'pages/create-idnft.html';
+            } else {
+                // Default fallback - try relative path
+                createIDNFTPath = './pages/create-idnft.html';
+            }
+            
+            console.log('Redirecting to IDNFT creation page:', createIDNFTPath);
+            window.location.href = createIDNFTPath;
+        } catch (error) {
+            console.error('Error redirecting to IDNFT creation:', error);
+            this.showError('Failed to open IDNFT creation page', error.message);
+        }
+    }
+
+    // Close modal
     closeModal() {
         const modal = document.getElementById('idnft-modal');
         if (modal) {
@@ -177,14 +215,14 @@ class IDNFTModal {
         }
     }
 
-    // 处理图片上传
+    // Handle image upload (deprecated)
     handleImageUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
 
-        // 验证文件类型
+        // Validate file type
         if (!file.type.startsWith('image/')) {
-            this.showError('文件类型错误', '请选择图片文件');
+            this.showError('Invalid file type', 'Please select an image file');
             return;
         }
 
@@ -217,45 +255,9 @@ class IDNFTModal {
 
     // 提交表单
     async submitForm() {
-        try {
-            this.showFormStatus('正在处理...', '正在创建您的ID NFT...');
-            
-            // 获取表单数据
-            const formData = this.getFormData();
-            
-            // 验证必填字段
-            if (!formData.barName) {
-                throw new Error('酒吧名称是必填项');
-            }
-
-            // 上传图片到IPFS（如果有）
-            let imageURI = '';
-            if (this.selectedImage) {
-                imageURI = await this.uploadImageToIPFS(this.selectedImage);
-            }
-
-            // 创建metadata
-            const metadata = this.createMetadata(formData, imageURI);
-            
-            // 上传metadata到IPFS
-            const metadataURI = await this.uploadMetadataToIPFS(metadata);
-            
-            // 创建ID NFT
-            await this.createIDNFT(metadataURI);
-            
-            // 显示成功消息
-            this.showFormStatus('创建成功！', '您的ID NFT已创建成功，正在跳转...');
-            
-            // 延迟后关闭弹窗并跳转
-            setTimeout(() => {
-                this.closeModal();
-                this.handleLoginSuccess(this.userAddress);
-            }, 2000);
-            
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            this.showFormStatus('创建失败', error.message);
-        }
+        // This method is deprecated - form submission now happens on dedicated page
+        console.warn('submitForm called on modal - redirecting to dedicated page');
+        await this.openModal();
     }
 
     // 获取表单数据
@@ -322,30 +324,80 @@ class IDNFTModal {
         };
     }
 
-    // 上传图片到IPFS（模拟）
+    // 上传图片到IPFS - 使用后端API
     async uploadImageToIPFS(file) {
-        // 这里应该实现真正的IPFS上传
-        // 目前返回一个模拟的URI
-        return `ipfs://mock_image_${Date.now()}.jpg`;
+        try {
+            // 使用bars API端点上传酒吧图片
+            const formData = new FormData();
+            formData.append('bar_image', file);
+            
+            const response = await fetch(`${window.apiService.baseUrl}/bars/upload_bar_ipfs`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Upload failed: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            return result.ipfs_url || result.cid || result.url;
+        } catch (error) {
+            console.error('Failed to upload image to IPFS:', error);
+            // Fallback to mock for development
+            return `ipfs://mock_bar_image_${Date.now()}.jpg`;
+        }
     }
 
-    // 上传metadata到IPFS（模拟）
+    // 上传metadata到IPFS - 使用后端API
     async uploadMetadataToIPFS(metadata) {
-        // 这里应该实现真正的IPFS上传
-        // 目前返回一个模拟的URI
-        return `ipfs://mock_metadata_${Date.now()}.json`;
+        try {
+            const response = await fetch(`${window.apiService.baseUrl}/bars/upload_bar_ipfs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ metadata: metadata })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Metadata upload failed: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            return result.ipfs_url || result.cid || `ipfs://${result.cid}`;
+        } catch (error) {
+            console.error('Failed to upload metadata to IPFS:', error);
+            // Fallback to mock for development
+            return `ipfs://mock_bar_metadata_${Date.now()}.json`;
+        }
     }
 
-    // 创建ID NFT
+    // 创建ID NFT - 通过后端API
     async createIDNFT(metadataURI) {
         try {
-            // 注意：在实际应用中，这个操作通常通过后端API来完成
-            // 因为createIDNFT函数只能由合约所有者调用
-            const receipt = await window.idnftService.createIDNFT(this.userAddress, metadataURI);
-            return receipt;
+            // ID NFT创建需要通过后端API，因为只有合约所有者可以调用createIDNFT
+            const response = await fetch(`${window.apiService.baseUrl}/bars/create_id_nft`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_address: this.userAddress,
+                    token_uri: metadataURI
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Creation failed: ${response.status} - ${errorText}`);
+            }
+            
+            const result = await response.json();
+            return result;
         } catch (error) {
             console.error('Error creating ID NFT:', error);
-            throw new Error('创建ID NFT失败，请稍后重试');
+            throw new Error(`Failed to create ID NFT: ${error.message}`);
         }
     }
 
@@ -405,6 +457,112 @@ class IDNFTModal {
     showSuccess(title, message) {
         // 这里可以实现更美观的成功提示
         console.log(`${title}: ${message}`);
+    }
+
+    // Wait for modal to be ready
+    async waitForModalReady() {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max
+        
+        while (!this.modalReady && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (!this.modalReady) {
+            throw new Error('Modal failed to load');
+        }
+    }
+
+    // Create fallback modal HTML directly
+    createModalHTML() {
+        return `
+            <div id="idnft-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
+                <div class="modal-container" style="background: rgba(31, 41, 55, 0.95); padding: 2rem; border-radius: 20px; border: 1px solid rgba(55, 65, 81, 0.3); max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="color: #25f2f2; margin: 0;"><i class="fas fa-id-card"></i> Create Bar Identity NFT</h3>
+                        <button class="modal-close" onclick="closeIDNFTModal()" style="background: none; border: none; color: #9ca3af; font-size: 1.5rem; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="form-section">
+                            <p style="color: #9ca3af; margin-bottom: 1.5rem;">
+                                Welcome to BarsHelpBars! To gain full platform access, you need to create a Bar Identity NFT. Please fill out the information below to create your unique identity.
+                            </p>
+                            
+                            <form id="idnft-form" class="idnft-form">
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label for="bar-name" style="display: block; color: #f9fafb; margin-bottom: 0.5rem;">Bar Name *</label>
+                                    <input type="text" id="bar-name" name="barName" required 
+                                           placeholder="e.g., The Golden Bar"
+                                           style="width: 100%; padding: 0.75rem; border: 1px solid rgba(55, 65, 81, 0.3); border-radius: 8px; background: rgba(0, 0, 0, 0.3); color: #f9fafb;">
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label for="bar-description" style="display: block; color: #f9fafb; margin-bottom: 0.5rem;">Bar Description</label>
+                                    <textarea id="bar-description" name="barDescription" rows="3"
+                                              placeholder="Describe your bar's specialties, style, or philosophy..."
+                                              style="width: 100%; padding: 0.75rem; border: 1px solid rgba(55, 65, 81, 0.3); border-radius: 8px; background: rgba(0, 0, 0, 0.3); color: #f9fafb;"></textarea>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label for="bar-city" style="display: block; color: #f9fafb; margin-bottom: 0.5rem;">City</label>
+                                    <input type="text" id="bar-city" name="barCity" 
+                                           placeholder="e.g., New York"
+                                           style="width: 100%; padding: 0.75rem; border: 1px solid rgba(55, 65, 81, 0.3); border-radius: 8px; background: rgba(0, 0, 0, 0.3); color: #f9fafb;">
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label for="bar-image" style="display: block; color: #f9fafb; margin-bottom: 0.5rem;">Bar Image</label>
+                                    <input type="file" id="bar-image" name="barImage" accept="image/*"
+                                           style="width: 100%; padding: 0.75rem; border: 1px solid rgba(55, 65, 81, 0.3); border-radius: 8px; background: rgba(0, 0, 0, 0.3); color: #f9fafb;">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer" style="margin-top: 1.5rem;">
+                        <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" onclick="closeIDNFTModal()" 
+                                    style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="button" onclick="submitIDNFTForm()" id="submit-idnft-btn"
+                                    style="background: rgba(37, 242, 242, 0.1); color: #25f2f2; border: 1px solid rgba(37, 242, 242, 0.3); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-magic"></i> Create ID NFT
+                            </button>
+                        </div>
+                        
+                        <div class="form-status" id="form-status" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+                            <div class="status-content" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-spinner fa-spin" id="status-icon" style="color: #3b82f6;"></i>
+                                <span id="status-text" style="color: #3b82f6;">Processing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Create fallback modal when HTML loading fails
+    createFallbackModal() {
+        const html = this.createModalHTML();
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = html;
+        document.body.appendChild(modalContainer.firstElementChild);
+        this.setupModalEventListeners();
+        this.modalReady = true;
+    }
+
+    // Show simple form for IDNFT creation
+    showSimpleForm() {
+        if (!this.modalReady) {
+            this.createFallbackModal();
+        }
+        this.showModal();
     }
 }
 
