@@ -21,7 +21,7 @@ async def create_fake_bars(session, n=100):
             bar_name=fake.company(),
             bar_location=fake.address(),
             bar_intro=fake.text(max_nb_chars=200),
-            owner_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
+            bar_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
             owned_recipes=json.dumps([fake.word() for _ in range(random.randint(0, 3))]),
             used_recipes=json.dumps([fake.word() for _ in range(random.randint(0, 3))]),
         )
@@ -42,6 +42,7 @@ async def create_fake_recipes(session, n=100):
             user_address=json.dumps(['0x' + ''.join(random.choices('0123456789abcdef', k=40)) for _ in range(random.randint(0, 3))]),
             price=round(random.uniform(5, 100), 2),
             status=random.choice(['listed', 'unlisted', 'sold']),
+            recipe_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
         )
         recipes.append(recipe)
     session.add_all(recipes)
