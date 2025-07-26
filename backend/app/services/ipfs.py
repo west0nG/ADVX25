@@ -59,14 +59,12 @@ def upload_recipe_to_pinata(
     # 构建Recipe NFT元数据
     recipe_metadata = {
         "metadata": {
-            "mutable": False,
-            "cocktailName": cocktail_name,
-            "cocktailIntro": cocktail_intro,
-            "cocktailPhoto": f"ipfs://{cocktail_photo_cid}",
-            "private": {
-                "cocktailRecipe": cocktail_recipe,
-                "recipePhoto": f"ipfs://{recipe_photo_cid}"
-            }
+            "mutable": True,
+            "cocktail_name": cocktail_name,
+            "cocktail_intro": cocktail_intro,
+            "cocktail_photo": f"ipfs://{cocktail_photo_cid}",
+            "cocktail_recipe": cocktail_recipe,
+            "recipe_photo": f"ipfs://{recipe_photo_cid}"
         }
     }
     
