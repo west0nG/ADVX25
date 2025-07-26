@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Suite - Bars & Recipes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #fafbfc;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .file-input {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-input input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover .file-input-label {
+            background: #f8f9ff;
+            border-color: #5a6fd8;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .status.show {
+            transform: translateX(0);
+        }
+
+        .status.success {
+            background: #28a745;
+        }
+
+        .status.error {
+            background: #dc3545;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍹 API Test Suite</h1>
+            <p>Comprehensive testing for Bars & Recipes APIs</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('bars')">Bars API</button>
+            <button class="tab" onclick="showTab('recipes')">Recipes API</button>
+        </div>
+
+        <div class="content">
+            <!-- Bars API Tab -->
+            <div id="bars-tab" class="tab-content">
+                <div class="section">
+                    <h3>📤 Upload Bar to IPFS</h3>
+                    <div class="form-group">
+                        <label>Bar Name:</label>
+                        <input type="text" id="bar-name" placeholder="Enter bar name">
+                    </div>
+                    <div class="form-group">
+                        <label>Bar Location:</label>
+                        <input type="text" id="bar-location" placeholder="Enter bar location">
+                    </div>
+                    <div class="form-group">
+                        <label>Bar Introduction:</label>
+                        <textarea id="bar-intro" placeholder="Enter bar introduction"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Bar Photo (JPG):</label>
+                        <div class="file-input">
+                            <input type="file" id="bar-photo" accept=".jpg,.jpeg">
+                            <div class="file-input-label">Choose JPG file</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="uploadBarIPFS()">Upload to IPFS</button>
+                    <div id="upload-bar-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>🏪 Bar Management</h3>
+                    <div class="grid">
+                        <div>
+                            <h4>Get Bar Info</h4>
+                            <div class="form-group">
+                                <label>Bar Address:</label>
+                                <input type="text" id="get-bar-address" placeholder="Enter bar address">
+                            </div>
+                            <button class="btn" onclick="getBar()">Get Bar</button>
+                            <div id="get-bar-result" class="result hidden"></div>
+                        </div>
+
+                        <div>
+                            <h4>Create New Bar</h4>
+                            <div class="form-group">
+                                <label>Bar Address:</label>
+                                <input type="text" id="set-bar-address" placeholder="Enter bar address">
+                            </div>
+                            <div class="form-group">
+                                <label>Metadata CID:</label>
+                                <input type="text" id="set-bar-meta-cid" placeholder="Enter metadata CID">
+                            </div>
+                            <button class="btn" onclick="setBar()">Create Bar</button>
+                            <div id="set-bar-result" class="result hidden"></div>
+                        </div>
+
+                        <div>
+                            <h4>Update Bar</h4>
+                            <div class="form-group">
+                                <label>Bar Address:</label>
+                                <input type="text" id="update-bar-address" placeholder="Enter bar address">
+                            </div>
+                            <div class="form-group">
+                                <label>Bar Name:</label>
+                                <input type="text" id="update-bar-name" placeholder="Enter new bar name">
+                            </div>
+                            <div class="form-group">
+                                <label>Bar Photo CID:</label>
+                                <input type="text" id="update-bar-photo-cid" placeholder="Enter photo CID">
+                            </div>
+                            <div class="form-group">
+                                <label>Bar Location:</label>
+                                <input type="text" id="update-bar-location" placeholder="Enter new location">
+                            </div>
+                            <div class="form-group">
+                                <label>Bar Introduction:</label>
+                                <textarea id="update-bar-intro" placeholder="Enter new introduction"></textarea>
+                            </div>
+                            <button class="btn" onclick="updateBar()">Update Bar</button>
+                            <div id="update-bar-result" class="result hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>📋 Bar Recipes</h3>
+                    <div class="grid">
+                        <div>
+                            <h4>Get Owned Recipes</h4>
+                            <div class="form-group">
+                                <label>Bar Address:</label>
+                                <input type="text" id="owned-recipes-address" placeholder="Enter bar address">
+                            </div>
+                            <button class="btn" onclick="getOwnedRecipes()">Get Owned Recipes</button>
+                            <div id="owned-recipes-result" class="result hidden"></div>
+                        </div>
+
+                        <div>
+                            <h4>Get Used Recipes</h4>
+                            <div class="form-group">
+                                <label>Bar Address:</label>
+                                <input type="text" id="used-recipes-address" placeholder="Enter bar address">
+                            </div>
+                            <button class="btn" onclick="getUsedRecipes()">Get Used Recipes</button>
+                            <div id="used-recipes-result" class="result hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipes API Tab -->
+            <div id="recipes-tab" class="tab-content hidden">
+                <div class="section">
+                    <h3>📤 Upload Recipe to IPFS</h3>
+                    <div class="form-group">
+                        <label>Cocktail Name:</label>
+                        <input type="text" id="cocktail-name" placeholder="Enter cocktail name">
+                    </div>
+                    <div class="form-group">
+                        <label>Cocktail Introduction:</label>
+                        <textarea id="cocktail-intro" placeholder="Enter cocktail introduction"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Cocktail Recipe:</label>
+                        <textarea id="cocktail-recipe" placeholder="Enter cocktail recipe instructions"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Recipe Photo (JPG):</label>
+                        <div class="file-input">
+                            <input type="file" id="recipe-photo" accept=".jpg,.jpeg">
+                            <div class="file-input-label">Choose JPG file</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="uploadRecipeIPFS()">Upload to IPFS</button>
+                    <div id="upload-recipe-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>💾 Store Recipe</h3>
+                    <div class="form-group">
+                        <label>Recipe Address:</label>
+                        <input type="text" id="store-recipe-address" placeholder="Enter recipe address">
+                    </div>
+                    <div class="form-group">
+                        <label>Metadata CID:</label>
+                        <input type="text" id="store-metadata-cid" placeholder="Enter metadata CID">
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Address:</label>
+                        <input type="text" id="store-owner-address" placeholder="Enter owner address">
+                    </div>
+                    <div class="form-group">
+                        <label>Price:</label>
+                        <input type="number" id="store-price" placeholder="Enter price" step="0.01">
+                    </div>
+                    <button class="btn" onclick="storeRecipe()">Store Recipe</button>
+                    <div id="store-recipe-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>📖 Recipe Retrieval</h3>
+                    <div class="grid">
+                        <div>
+                            <h4>Get 10 Recipes</h4>
+                            <button class="btn" onclick="getTenRecipes()">Get 10 Recipes</button>
+                            <div id="get-ten-recipes-result" class="result hidden"></div>
+                        </div>
+
+                        <div>
+                            <h4>Get All Recipes</h4>
+                            <button class="btn" onclick="getAllRecipes()">Get All Recipes</button>
+                            <div id="get-all-recipes-result" class="result hidden"></div>
+                        </div>
+
+                        <div>
+                            <h4>Search Recipes</h4>
+                            <div class="form-group">
+                                <label>Search Query:</label>
+                                <input type="text" id="search-query" placeholder="Enter search term">
+                            </div>
+                            <button class="btn" onclick="searchRecipes()">Search</button>
+                            <div id="search-recipes-result" class="result hidden"></div>
+                        </div>
+
+                        <div>
+                            <h4>Get Single Recipe</h4>
+                            <div class="form-group">
+                                <label>NFT Address:</label>
+                                <input type="text" id="nft-address" placeholder="Enter NFT address">
+                            </div>
+                            <div class="form-group">
+                                <label>User Address:</label>
+                                <input type="text" id="user-address" placeholder="Enter user address">
+                            </div>
+                            <button class="btn" onclick="getOneRecipe()">Get Recipe</button>
+                            <div id="get-one-recipe-result" class="result hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:8080/api';
+        
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+        }
+
+        // Utility functions
+        function showStatus(message, type = 'success') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type} show`;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 3000);
+        }
+
+        function showResult(elementId, data, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+            element.classList.remove('hidden');
+        }
+
+        function showLoading(button) {
+            const originalText = button.textContent;
+            button.innerHTML = '<span class="loading"></span>Loading...';
+            button.disabled = true;
+            return originalText;
+        }
+
+        function hideLoading(button, originalText) {
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+
+        // Bars API Functions
+        async function uploadBarIPFS() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const formData = new FormData();
+                formData.append('bar_name', document.getElementById('bar-name').value);
+                formData.append('bar_location', document.getElementById('bar-location').value);
+                formData.append('bar_intro', document.getElementById('bar-intro').value);
+                
+                const fileInput = document.getElementById('bar-photo');
+                if (fileInput.files.length > 0) {
+                    formData.append('jpg_file', fileInput.files[0]);
+                }
+
+                const response = await fetch(`${API_BASE_URL}/bars/upload_bar_ipfs`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('upload-bar-result', result, 'success');
+                    showStatus('Bar uploaded to IPFS successfully!');
+                } else {
+                    showResult('upload-bar-result', result, 'error');
+                    showStatus('Failed to upload bar to IPFS', 'error');
+                }
+            } catch (error) {
+                showResult('upload-bar-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getBar() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const barAddress = document.getElementById('get-bar-address').value;
+                const response = await fetch(`${API_BASE_URL}/bars/get/${barAddress}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('get-bar-result', result, 'success');
+                    showStatus('Bar retrieved successfully!');
+                } else {
+                    showResult('get-bar-result', result, 'error');
+                    showStatus('Failed to get bar', 'error');
+                }
+            } catch (error) {
+                showResult('get-bar-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function setBar() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const data = {
+                    bar_address: document.getElementById('set-bar-address').value,
+                    meta_cid: document.getElementById('set-bar-meta-cid').value
+                };
+
+                const response = await fetch(`${API_BASE_URL}/bars/set`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('set-bar-result', result, 'success');
+                    showStatus('Bar created successfully!');
+                } else {
+                    showResult('set-bar-result', result, 'error');
+                    showStatus('Failed to create bar', 'error');
+                }
+            } catch (error) {
+                showResult('set-bar-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function updateBar() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const data = {
+                    bar_address: document.getElementById('update-bar-address').value,
+                    bar_name: document.getElementById('update-bar-name').value,
+                    bar_photo_cid: document.getElementById('update-bar-photo-cid').value,
+                    bar_location: document.getElementById('update-bar-location').value,
+                    bar_intro: document.getElementById('update-bar-intro').value
+                };
+
+                const response = await fetch(`${API_BASE_URL}/bars/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('update-bar-result', result, 'success');
+                    showStatus('Bar updated successfully!');
+                } else {
+                    showResult('update-bar-result', result, 'error');
+                    showStatus('Failed to update bar', 'error');
+                }
+            } catch (error) {
+                showResult('update-bar-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getOwnedRecipes() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const barAddress = document.getElementById('owned-recipes-address').value;
+                const response = await fetch(`${API_BASE_URL}/bars/owned_recipes/${barAddress}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('owned-recipes-result', result, 'success');
+                    showStatus('Owned recipes retrieved successfully!');
+                } else {
+                    showResult('owned-recipes-result', result, 'error');
+                    showStatus('Failed to get owned recipes', 'error');
+                }
+            } catch (error) {
+                showResult('owned-recipes-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getUsedRecipes() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const barAddress = document.getElementById('used-recipes-address').value;
+                const response = await fetch(`${API_BASE_URL}/bars/used_recipes/${barAddress}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('used-recipes-result', result, 'success');
+                    showStatus('Used recipes retrieved successfully!');
+                } else {
+                    showResult('used-recipes-result', result, 'error');
+                    showStatus('Failed to get used recipes', 'error');
+                }
+            } catch (error) {
+                showResult('used-recipes-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        // Recipes API Functions
+        async function uploadRecipeIPFS() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const formData = new FormData();
+                formData.append('cocktail_name', document.getElementById('cocktail-name').value);
+                formData.append('cocktail_intro', document.getElementById('cocktail-intro').value);
+                formData.append('cocktail_recipe', document.getElementById('cocktail-recipe').value);
+                
+                const fileInput = document.getElementById('recipe-photo');
+                if (fileInput.files.length > 0) {
+                    formData.append('jpg_file', fileInput.files[0]);
+                }
+
+                const response = await fetch(`${API_BASE_URL}/recipes/upload_ipfs`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('upload-recipe-result', result, 'success');
+                    showStatus('Recipe uploaded to IPFS successfully!');
+                } else {
+                    showResult('upload-recipe-result', result, 'error');
+                    showStatus('Failed to upload recipe to IPFS', 'error');
+                }
+            } catch (error) {
+                showResult('upload-recipe-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function storeRecipe() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const recipeAddress = document.getElementById('store-recipe-address').value;
+                const metadataCid = document.getElementById('store-metadata-cid').value;
+                const ownerAddress = document.getElementById('store-owner-address').value;
+                const price = document.getElementById('store-price').value;
+
+                const response = await fetch(`${API_BASE_URL}/recipes/store_recipe/${recipeAddress}/${metadataCid}/${ownerAddress}/${price}`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('store-recipe-result', result, 'success');
+                    showStatus('Recipe stored successfully!');
+                } else {
+                    showResult('store-recipe-result', result, 'error');
+                    showStatus('Failed to store recipe', 'error');
+                }
+            } catch (error) {
+                showResult('store-recipe-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getTenRecipes() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/recipes/get_ten_recipes`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('get-ten-recipes-result', result, 'success');
+                    showStatus('10 recipes retrieved successfully!');
+                } else {
+                    showResult('get-ten-recipes-result', result, 'error');
+                    showStatus('Failed to get recipes', 'error');
+                }
+            } catch (error) {
+                showResult('get-ten-recipes-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getAllRecipes() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/recipes/get_all_recipes`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('get-all-recipes-result', result, 'success');
+                    showStatus('All recipes retrieved successfully!');
+                } else {
+                    showResult('get-all-recipes-result', result, 'error');
+                    showStatus('Failed to get all recipes', 'error');
+                }
+            } catch (error) {
+                showResult('get-all-recipes-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function searchRecipes() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const query = document.getElementById('search-query').value;
+                const response = await fetch(`${API_BASE_URL}/recipes/search_recipes?query=${encodeURIComponent(query)}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('search-recipes-result', result, 'success');
+                    showStatus('Search completed successfully!');
+                } else {
+                    showResult('search-recipes-result', result, 'error');
+                    showStatus('Search failed', 'error');
+                }
+            } catch (error) {
+                showResult('search-recipes-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getOneRecipe() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const nftAddress = document.getElementById('nft-address').value;
+                const userAddress = document.getElementById('user-address').value;
+                const response = await fetch(`${API_BASE_URL}/recipes/get_one_recipe/${nftAddress}/${userAddress}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('get-one-recipe-result', result, 'success');
+                    showStatus('Recipe retrieved successfully!');
+                } else {
+                    showResult('get-one-recipe-result', result, 'error');
+                    showStatus('Failed to get recipe', 'error');
+                }
+            } catch (error) {
+                showResult('get-one-recipe-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        // File input handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const label = this.parentElement.querySelector('.file-input-label');
+                    if (this.files.length > 0) {
+                        label.textContent = this.files[0].name;
+                        label.style.color = '#28a745';
+                    } else {
+                        label.textContent = 'Choose JPG file';
+                        label.style.color = '#667eea';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
