@@ -1,5 +1,27 @@
 // Create NFT functionality
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // Wait for ethers library to be loaded
+    function waitForEthers() {
+        return new Promise((resolve) => {
+            if (typeof ethers !== 'undefined') {
+                resolve();
+            } else {
+                const checkEthers = setInterval(() => {
+                    if (typeof ethers !== 'undefined') {
+                        clearInterval(checkEthers);
+                        resolve();
+                    }
+                }, 100);
+                
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    clearInterval(checkEthers);
+                    resolve();
+                }, 10000);
+            }
+        });
+    }
     // Header scroll effect
     window.addEventListener('scroll', () => {
         const header = document.getElementById('header');
@@ -278,7 +300,16 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
 
         try {
+            // Step 0: Wait for ethers to be loaded
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading libraries...';
+            await waitForEthers();
+            
+            if (typeof ethers === 'undefined') {
+                throw new Error('Ethers library failed to load. Please refresh the page and try again.');
+            }
+
             // Step 1: Connect to wallet and get signer
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting to wallet...';
             if (typeof window.ethereum === 'undefined') {
                 throw new Error('MetaMask is not installed. Please install it to continue.');
             }
@@ -288,16 +319,66 @@ document.addEventListener('DOMContentLoaded', function() {
             const signer = provider.getSigner();
             const walletAddress = await signer.getAddress();
 
-            // Step 2: Upload image to IPFS
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading image to IPFS...';
-            const imageFile = document.getElementById('cocktail-image').files[0];
-            if (!imageFile) {
-                throw new Error('No image file selected');
-            }
-            const imageCID = await apiService.uploadToIPFS(imageFile);
+            // Step 1.5: Check for ID NFT ownership (CA1 requirement)
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking ID NFT ownership...';
             
-            // Step 3: Prepare and upload metadata to IPFS
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading metadata to IPFS...';
+            // Initialize IDNFT service if not already done
+            if (!window.idnftService) {
+                console.error('IDNFT service not found');
+                throw new Error('ID NFT service not loaded. Please refresh the page.');
+            }
+            
+            try {
+                await window.idnftService.ensureInitialized();
+            } catch (error) {
+                console.error('Failed to initialize ID NFT service:', error);
+                throw new Error('Failed to connect to ID NFT contract. Please check your network connection.');
+            }
+
+            // Check if user has an active ID NFT
+            try {
+                const idnftStatus = await window.idnftService.checkUserIDNFT(walletAddress);
+                
+                if (!idnftStatus.hasActive) {
+                    // User doesn't have an active ID NFT - redirect to registration
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    
+                    const userResponse = confirm(
+                        'You need to create a Bar Identity NFT before you can mint recipe NFTs.\n\n' +
+                        'An ID NFT represents your bar identity and is required for all recipe creations.\n\n' +
+                        'Would you like to create your ID NFT now?'
+                    );
+                    
+                    if (userResponse) {
+                        // Show the ID NFT creation modal
+                        if (typeof window.idnftModal !== 'undefined') {
+                            window.idnftModal.openModal();
+                        } else {
+                            // Fallback: redirect to dedicated IDNFT creation page
+                            const currentPath = window.location.pathname;
+                            let idnftPagePath;
+                            
+                            if (currentPath.includes('/pages/')) {
+                                idnftPagePath = 'create-idnft.html';
+                            } else {
+                                idnftPagePath = 'pages/create-idnft.html';
+                            }
+                            
+                            console.log('IDNFT modal not available, redirecting to:', idnftPagePath);
+                            window.location.href = idnftPagePath;
+                        }
+                    }
+                    return; // Stop form submission
+                }
+                
+                console.log('User has active ID NFT with token ID:', idnftStatus.tokenId);
+            } catch (error) {
+                console.error('Error checking ID NFT status:', error);
+                throw new Error('Failed to verify ID NFT ownership. Please try again.');
+            }
+
+            // Step 2: Collect form data once
             const ingredients = Array.from(document.querySelectorAll('input[name="ingredients[]"]'))
                 .map(input => input.value.trim())
                 .filter(value => value);
@@ -305,35 +386,33 @@ document.addEventListener('DOMContentLoaded', function() {
             const instructions = Array.from(document.querySelectorAll('input[name="instructions[]"]'))
                 .map(input => input.value.trim())
                 .filter(value => value);
-                
-            const metadata = {
-                name: formData.get('name'),
-                description: formData.get('description'),
-                image: `ipfs://${imageCID}`,
-                attributes: [
-                    {
-                        trait_type: 'Category',
-                        value: formData.get('category')
-                    },
-                    {
-                        trait_type: 'Price',
-                        value: formData.get('price')
-                    },
-                    {
-                        trait_type: 'Royalties',
-                        value: formData.get('royalties')
-                    }
-                ],
-                properties: {
+            
+            // Step 3: Upload image to IPFS
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading image to IPFS...';
+            const imageFile = document.getElementById('cocktail-image').files[0];
+            if (!imageFile) {
+                throw new Error('No image file selected');
+            }
+            
+            // Prepare metadata for IPFS upload
+            const uploadMetadata = {
+                cocktail_name: formData.get('name'),
+                cocktail_intro: formData.get('description'),
+                cocktail_recipe: JSON.stringify({
                     ingredients: ingredients,
-                    instructions: instructions
-                }
+                    instructions: instructions,
+                    category: formData.get('category')
+                })
             };
+            
+            const uploadResult = await apiService.uploadToIPFS(imageFile, uploadMetadata);
+            console.log('Upload result:', uploadResult);
+            
+            // The backend returns the final metadata CID
+            const finalCID = uploadResult.final_cid || uploadResult.cid || uploadResult;
+            const metadataURI = `ipfs://${finalCID}`;
 
-            const metadataCID = await apiService.uploadMetadataToIPFS(metadata);
-            const metadataURI = `ipfs://${metadataCID}`;
-
-            // Step 4: Mint the NFT
+            // Step 5: Mint the NFT
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Minting NFT...';
             const contractAddress = APP_CONFIG.blockchain.recipeNft.address;
             const contractABI = APP_CONFIG.blockchain.recipeNft.abi;
@@ -342,24 +421,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const transaction = await contract.mintRecipeNFT(metadataURI);
             await transaction.wait();
             
-            // Step 5: Store recipe in backend (optional, if still needed)
+            // Step 6: Store recipe in backend (optional, if still needed)
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing...';
-            const recipeData = {
-                recipe_name: formData.get('name'),
-                intro: formData.get('description'),
-                category: formData.get('category'),
-                price: formData.get('price'),
-                royalties: formData.get('royalties'),
-                ingredients: ingredients,
-                instructions: instructions,
-                image_cid: imageCID,
-                metadata_cid: metadataCID,
-                owner_nft_address: walletAddress,
-                nft_id: transaction.hash,
-                created_at: new Date().toISOString()
-            };
-
-            const success = await apiService.storeRecipe(recipeData);
+            
+            // The storeRecipe function expects 4 individual parameters
+            // Backend expects: recipe_address: str, metadata_cid: str, owner_address: str, price: float
+            const priceValue = parseFloat(formData.get('price') || '0');
+            
+            const success = await apiService.storeRecipe(
+                transaction.hash,  // recipeAddress (string)
+                finalCID,         // metadataCid (string)
+                walletAddress,    // ownerAddress (string)
+                priceValue        // price (float/number)
+            );
 
             if (success) {
                 submitBtn.innerHTML = originalText;

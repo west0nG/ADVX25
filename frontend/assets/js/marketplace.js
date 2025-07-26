@@ -2,10 +2,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Header scroll effect
     window.addEventListener('scroll', () => {
-        const header = document.getElementById('header');
-        if (window.scrollY > 100) {
+        const header = document.getElementById('header-placeholder');
+        if (header && window.scrollY > 100) {
             header.classList.add('scrolled');
-        } else {
+        } else if (header) {
             header.classList.remove('scrolled');
         }
     });
@@ -56,18 +56,72 @@ document.addEventListener('DOMContentLoaded', function() {
     function transformRecipeData(recipes) {
         return recipes.map((recipe, index) => ({
             id: index + 1,
-            name: recipe.recipe_name || recipe.name || 'Unnamed Recipe',
-            image: recipe.image_cid ? `https://ipfs.io/ipfs/${recipe.image_cid}` : recipe.image || getDefaultImage(),
-            price: recipe.price || "0.5",
-            creator: recipe.owner_nft_address || recipe.creator || "@Unknown",
+            name: recipe.cocktail_name || 'Unnamed Recipe',
+            image: formatImageUrl(recipe.cocktail_photo),
+            price: formatPrice(recipe.price),
+            creator: formatCreatorName(recipe.owner_address),
             creatorAvatar: getDefaultAvatar(),
             category: recipe.category || "classic",
-            tokenId: recipe.nft_id || recipe.token_id || String(index + 1).padStart(3, '0'),
-            intro: recipe.intro || recipe.description || '',
-            nft_address: recipe.owner_nft_address,
-            nft_hash: recipe.nft_hash,
-            cid: recipe.image_cid
+            tokenId: formatTokenId(recipe.recipe_address, index),
+            intro: recipe.cocktail_intro || '',
+            recipe_address: recipe.recipe_address,
+            owner_address: recipe.owner_address,
+            user_addresses: recipe.user_address || [],
+            cocktail_recipe: recipe.cocktail_recipe,
+            nft_address: recipe.recipe_address // Use recipe_address as nft_address for compatibility
         }));
+    }
+
+    // Format image URL from cocktail_photo field
+    function formatImageUrl(cocktailPhoto) {
+        if (!cocktailPhoto) {
+            return getDefaultImage();
+        }
+        
+        // If it's already a URL, use it
+        if (cocktailPhoto.startsWith('http')) {
+            return cocktailPhoto;
+        }
+        
+        // If it's a hex string, try to format as IPFS
+        if (cocktailPhoto.startsWith('0x')) {
+            // Remove 0x prefix and treat as IPFS hash
+            const hash = cocktailPhoto.slice(2);
+            return `https://ipfs.io/ipfs/${hash}`;
+        }
+        
+        // If it looks like an IPFS hash, format it
+        if (cocktailPhoto.length > 40) {
+            return `https://ipfs.io/ipfs/${cocktailPhoto}`;
+        }
+        
+        // Fallback to default image
+        return getDefaultImage();
+    }
+
+    // Format price to display with proper decimals
+    function formatPrice(price) {
+        if (!price || price === 0) return "0.0";
+        return typeof price === 'number' ? price.toFixed(2) : price.toString();
+    }
+
+    // Format creator name from owner address
+    function formatCreatorName(ownerAddress) {
+        if (!ownerAddress) return "@Unknown";
+        // Format address to show first 6 and last 4 characters
+        if (ownerAddress.length > 10) {
+            return `@${ownerAddress.slice(0, 6)}...${ownerAddress.slice(-4)}`;
+        }
+        return `@${ownerAddress}`;
+    }
+
+    // Format token ID from recipe address
+    function formatTokenId(recipeAddress, index) {
+        if (!recipeAddress) {
+            return String(index + 1).padStart(3, '0');
+        }
+        // Use last 4 characters of address as token ID
+        return recipeAddress.slice(-4).toUpperCase();
     }
 
     // Get default image for recipes without images
@@ -455,36 +509,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img src="${detailedRecipe.image}" alt="${detailedRecipe.name}" style="width: 100%; border-radius: 10px; margin-bottom: 1rem;">
                 <div class="nft-details">
                     <p><strong>Creator:</strong> ${detailedRecipe.creator}</p>
+                    <p><strong>Owner Address:</strong> <code>${detailedRecipe.owner_address || 'Unknown'}</code></p>
+                    <p><strong>Recipe Address:</strong> <code>${detailedRecipe.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${detailedRecipe.tokenId}</p>
                     <p><strong>Category:</strong> ${detailedRecipe.category}</p>
                     <p><strong>Price:</strong> ${detailedRecipe.price} ETH</p>
                     ${detailedRecipe.intro ? `<p><strong>Description:</strong> ${detailedRecipe.intro}</p>` : ''}
-                    ${detailedRecipe.ingredients ? `
+                    ${detailedRecipe.user_addresses && detailedRecipe.user_addresses.length > 0 ? `
                         <div class="recipe-section">
-                            <h4>Ingredients:</h4>
+                            <h4>Authorized Users:</h4>
                             <ul>
-                                ${Array.isArray(detailedRecipe.ingredients) 
-                                    ? detailedRecipe.ingredients.map(ing => `<li>${ing}</li>`).join('')
-                                    : '<li>Ingredients not available</li>'
-                                }
+                                ${detailedRecipe.user_addresses.map(addr => `<li><code>${addr}</code></li>`).join('')}
                             </ul>
                         </div>
                     ` : ''}
-                    ${detailedRecipe.instructions ? `
+                    ${detailedRecipe.cocktail_recipe ? `
                         <div class="recipe-section">
-                            <h4>Instructions:</h4>
-                            <ol>
-                                ${Array.isArray(detailedRecipe.instructions) 
-                                    ? detailedRecipe.instructions.map(inst => `<li>${inst}</li>`).join('')
-                                    : '<li>Instructions not available</li>'
+                            <h4>Recipe Details:</h4>
+                            <div class="recipe-content">
+                                ${typeof detailedRecipe.cocktail_recipe === 'string' 
+                                    ? `<p>${detailedRecipe.cocktail_recipe.replace(/\n/g, '<br>')}</p>`
+                                    : '<p>Recipe details available upon purchase</p>'
                                 }
-                            </ol>
+                            </div>
                         </div>
-                    ` : ''}
+                    ` : '<div class="recipe-section"><h4>Recipe:</h4><p>Recipe details will be available upon purchase</p></div>'}
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${detailedRecipe.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary">Buy Now</button>
+                    <button class="btn-primary">Buy Now - ${detailedRecipe.price} ETH</button>
                 </div>
             `;
 
@@ -495,14 +548,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img src="${nft.image}" alt="${nft.name}" style="width: 100%; border-radius: 10px; margin-bottom: 1rem;">
                 <div class="nft-details">
                     <p><strong>Creator:</strong> ${nft.creator}</p>
+                    <p><strong>Owner Address:</strong> <code>${nft.owner_address || 'Unknown'}</code></p>
+                    <p><strong>Recipe Address:</strong> <code>${nft.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${nft.tokenId}</p>
                     <p><strong>Category:</strong> ${nft.category}</p>
                     <p><strong>Price:</strong> ${nft.price} ETH</p>
+                    ${nft.intro ? `<p><strong>Description:</strong> ${nft.intro}</p>` : ''}
                     <p class="error-message">Could not load detailed recipe information</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${nft.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary">Buy Now</button>
+                    <button class="btn-primary">Buy Now - ${nft.price} ETH</button>
                 </div>
             `;
                  }
@@ -711,29 +767,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePagination() {
         const totalPages = Math.ceil(filteredNFTs.length / itemsPerPage);
         const pageNumbers = document.querySelector('.page-numbers');
-        const prevBtn = document.querySelector('.pagination-btn[data-page="prev"]');
-        const nextBtn = document.querySelector('.pagination-btn[data-page="next"]');
+        const prevBtn = document.querySelector('.page-btn[data-page="prev"]');
+        const nextBtn = document.querySelector('.page-btn[data-page="next"]');
 
         // Update page numbers
-        pageNumbers.innerHTML = '';
-        for (let i = 1; i <= totalPages; i++) {
-            const btn = document.createElement('button');
-            btn.className = 'pagination-btn';
-            btn.dataset.page = i;
-            btn.textContent = i;
-            if (i === currentPage) btn.classList.add('active');
-            pageNumbers.appendChild(btn);
+        if (pageNumbers) {
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn';
+                btn.dataset.page = i;
+                btn.textContent = i;
+                if (i === currentPage) btn.classList.add('active');
+                pageNumbers.appendChild(btn);
+            }
         }
 
         // Update prev/next buttons
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages;
-
-        if (prevBtn.disabled) prevBtn.style.opacity = '0.5';
-        else prevBtn.style.opacity = '1';
-
-        if (nextBtn.disabled) nextBtn.style.opacity = '0.5';
-        else nextBtn.style.opacity = '1';
+        if (prevBtn) {
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+        }
+        
+        if (nextBtn) {
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+        }
     }
 
     // Initialize

@@ -26,7 +26,10 @@ class WalletService {
             '0x1': { name: 'Ethereum Mainnet', id: 1 },
             '0x89': { name: 'Polygon', id: 137 },
             '0xaa36a7': { name: 'Sepolia Testnet', id: 11155111 },
-            '0x5': { name: 'Goerli Testnet', id: 5 }
+            '0x5': { name: 'Goerli Testnet', id: 5 },
+            '0x9dd': { name: 'inEVM Mainnet', id: 2525, rpcUrl: 'https://mainnet.rpc.inevm.com/http', blockExplorer: 'https://explorer.inevm.com', currency: 'INJ' },
+            '0x978': { name: 'inEVM Testnet', id: 2424, rpcUrl: 'https://testnet.rpc.inevm.com/http', blockExplorer: 'https://testnet.explorer.inevm.com', currency: 'INJ' },
+            '0x59f': { name: 'Injective Testnet', id: 1439, rpcUrl: 'https://clean-cool-dust.injective-testnet.quiknode.pro/f2dcf86a3537602a3470aa71713305c63797504d', blockExplorer: 'https://testnet.explorer.injective.network', currency: 'INJ' }
         };
         
         // Storage keys - using consistent localStorage for persistence
@@ -368,8 +371,9 @@ class WalletService {
             },
             'UNSUPPORTED_NETWORK': {
                 type: 'WRONG_NETWORK',
-                message: 'Please switch to a supported network (Ethereum, Polygon, or Sepolia)',
-                recoverable: true
+                message: 'Please switch to a supported network (Ethereum, Polygon, Sepolia, or Injective)',
+                recoverable: true,
+                action: () => this.showNetworkSelector()
             },
             'CONNECTION_TIMEOUT': {
                 type: 'TIMEOUT',
@@ -576,9 +580,78 @@ class WalletService {
         } catch (error) {
             // This error code indicates that the chain has not been added to MetaMask
             if (error.code === 4902) {
-                throw new Error('Please add this network to MetaMask');
+                const network = this.SUPPORTED_CHAINS[chainId];
+                try {
+                    // Add the network to MetaMask first
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: chainId,
+                            chainName: network.name,
+                            rpcUrls: [network.rpcUrl],
+                            nativeCurrency: {
+                                name: network.currency || 'ETH',
+                                symbol: network.currency || 'ETH',
+                                decimals: 18
+                            },
+                            blockExplorerUrls: network.blockExplorer ? [network.blockExplorer] : null
+                        }]
+                    });
+                } catch (addError) {
+                    throw new Error(`Failed to add network to MetaMask: ${addError.message}`);
+                }
+            } else {
+                throw error;
             }
-            throw error;
+        }
+    }
+
+    /**
+     * Show network selection modal
+     */
+    showNetworkSelector() {
+        // Remove any existing modal
+        const existingModal = document.getElementById('network-selector-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'network-selector-modal';
+        modal.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                <div style="background: rgba(31, 41, 55, 0.95); padding: 2rem; border-radius: 20px; border: 1px solid rgba(55, 65, 81, 0.3); max-width: 400px; width: 90%;">
+                    <h2 style="color: #25f2f2; margin-bottom: 1rem; text-align: center;">Select Network</h2>
+                    <p style="color: #9ca3af; margin-bottom: 1.5rem; text-align: center;">Choose a supported network to continue:</p>
+                    <div id="network-options" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        ${Object.entries(this.SUPPORTED_CHAINS).map(([chainId, network]) => `
+                            <button onclick="window.walletService.selectNetwork('${chainId}')" 
+                                    style="background: rgba(37, 242, 242, 0.1); color: #25f2f2; border: 1px solid rgba(37, 242, 242, 0.3); padding: 0.75rem 1rem; border-radius: 10px; cursor: pointer; transition: all 0.3s;">
+                                ${network.name}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <button onclick="document.getElementById('network-selector-modal').remove()" 
+                            style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; margin-top: 1rem; width: 100%;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+    }
+
+    /**
+     * Select a network and switch to it
+     */
+    async selectNetwork(chainId) {
+        try {
+            document.getElementById('network-selector-modal')?.remove();
+            await this.switchNetwork(chainId);
+        } catch (error) {
+            console.error('Failed to switch network:', error);
+            alert(`Failed to switch network: ${error.message}`);
         }
     }
 

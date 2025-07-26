@@ -7,38 +7,50 @@ class IDNFTService {
         this.signer = null;
         this.contractABI = null;
         this.isInitialized = false;
+        this.config = null;
     }
 
-    // 初始化服务
-    async initialize(contractAddress) {
+    // 初始化服务 - 使用配置中的合约地址和ABI
+    async initialize() {
         try {
             if (typeof window.ethereum === 'undefined') {
                 throw new Error('MetaMask not found');
             }
 
+            // 获取配置
+            this.config = window.APP_CONFIG || APP_CONFIG;
+            if (!this.config?.blockchain?.idNft) {
+                throw new Error('ID NFT contract configuration not found');
+            }
+
             this.provider = new ethers.providers.Web3Provider(window.ethereum);
             this.signer = this.provider.getSigner();
-            this.contractAddress = contractAddress;
+            this.contractAddress = this.config.blockchain.idNft.address;
+            this.contractABI = this.config.blockchain.idNft.abi;
 
-            // 简化的ABI，只包含我们需要的方法
-            this.contractABI = [
-                "function hasActiveIDNFT(address user) external view returns (bool)",
-                "function getTokenIdByAddress(address user) external view returns (uint256)",
-                "function getBarMetadata(uint256 tokenId) external view returns (tuple(string tokenURI, bool isActive, uint256 createdAt, uint256 updatedAt))",
-                "function createIDNFT(address to, string uri) external returns (uint256)",
-                "function ownerOf(uint256 tokenId) external view returns (address)",
-                "function balanceOf(address owner) external view returns (uint256)"
-            ];
-
-            this.contract = new ethers.Contract(contractAddress, this.contractABI, this.signer);
+            this.contract = new ethers.Contract(this.contractAddress, this.contractABI, this.signer);
             this.isInitialized = true;
 
-            console.log('IDNFT Service initialized successfully');
+            console.log('IDNFT Service initialized successfully with address:', this.contractAddress);
             return true;
         } catch (error) {
             console.error('Failed to initialize IDNFT Service:', error);
             throw error;
         }
+    }
+
+    // Ensure service is initialized
+    async ensureInitialized() {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+        return true;
+    }
+
+    // 向后兼容的初始化方法
+    async initializeWithAddress(contractAddress) {
+        console.warn('initializeWithAddress is deprecated, use initialize() instead');
+        return await this.initialize();
     }
 
     // 检查用户是否拥有活跃的ID NFT
@@ -62,7 +74,48 @@ class IDNFTService {
         }
     }
 
-    // 获取ID NFT的元数据
+    // Alias method for backward compatibility
+    async checkUserHasIDNFT(userAddress) {
+        try {
+            const result = await this.checkUserIDNFT(userAddress);
+            return result.hasActive;
+        } catch (error) {
+            console.error('Error checking user has ID NFT:', error);
+            throw error;
+        }
+    }
+
+    // Get user's token ID
+    async getUserTokenId(userAddress) {
+        try {
+            if (!this.isInitialized) {
+                throw new Error('Service not initialized');
+            }
+
+            const tokenId = await this.contract.getTokenIdByAddress(userAddress);
+            return tokenId.toString();
+        } catch (error) {
+            console.error('Error getting user token ID:', error);
+            throw error;
+        }
+    }
+
+    // Get address by token ID
+    async getAddressByTokenId(tokenId) {
+        try {
+            if (!this.isInitialized) {
+                throw new Error('Service not initialized');
+            }
+
+            const address = await this.contract.getAddressByTokenId(tokenId);
+            return address;
+        } catch (error) {
+            console.error('Error getting address by token ID:', error);
+            throw error;
+        }
+    }
+
+    // Get ID NFT metadata
     async getIDNFTMetadata(tokenId) {
         try {
             if (!this.isInitialized) {
@@ -80,6 +133,11 @@ class IDNFTService {
             console.error('Error getting ID NFT metadata:', error);
             throw error;
         }
+    }
+
+    // Alias for backward compatibility
+    async getBarMetadata(tokenId) {
+        return this.getIDNFTMetadata(tokenId);
     }
 
     // 创建ID NFT（空投）
@@ -111,6 +169,21 @@ class IDNFTService {
     getShortAddress(address) {
         if (!address) return '';
         return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    }
+
+    // Get ERC-6551 account address for a token ID
+    async getAccountAddress(tokenId) {
+        try {
+            if (!this.isInitialized) {
+                throw new Error('Service not initialized');
+            }
+
+            const accountAddress = await this.contract.getAccountAddress(tokenId);
+            return accountAddress;
+        } catch (error) {
+            console.error('Error getting account address:', error);
+            throw error;
+        }
     }
 }
 

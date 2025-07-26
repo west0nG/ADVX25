@@ -120,6 +120,54 @@ class AuthManager {
     }
 
     /**
+     * Check ID NFT ownership and redirect accordingly
+     */
+    async checkIDNFTAndRedirect(account) {
+        try {
+            // Initialize IDNFT service if not already done
+            if (!window.idnftService || !window.idnftService.isInitialized) {
+                try {
+                    await window.idnftService.initialize();
+                } catch (error) {
+                    console.error('AuthManager: Failed to initialize ID NFT service:', error);
+                    // Proceed with normal redirect if IDNFT service fails
+                    this.redirectToIntendedDestination();
+                    return;
+                }
+            }
+
+            // Check if user has an active ID NFT
+            const idnftStatus = await window.idnftService.checkUserIDNFT(account);
+            
+            if (!idnftStatus.hasActive) {
+                // User doesn't have an active ID NFT - show modal for creation
+                console.log('AuthManager: User lacks ID NFT, showing creation modal');
+                
+                // Try to show IDNFT modal
+                try {
+                    if (window.idnftModal) {
+                        await window.idnftModal.openModal();
+                    } else {
+                        // Modal not available, show creation button
+                        this.showIDNFTCreationButton();
+                    }
+                } catch (error) {
+                    console.error('Failed to open IDNFT modal:', error);
+                    this.showIDNFTCreationButton();
+                }
+            } else {
+                // User has ID NFT, proceed with normal redirect
+                console.log('AuthManager: User has ID NFT, proceeding with redirect');
+                this.redirectToIntendedDestination();
+            }
+        } catch (error) {
+            console.error('AuthManager: Error checking ID NFT status:', error);
+            // On error, proceed with normal redirect
+            this.redirectToIntendedDestination();
+        }
+    }
+
+    /**
      * Redirect to intended destination after login
      */
     redirectToIntendedDestination() {
@@ -147,7 +195,7 @@ class AuthManager {
      */
     setupWalletEventListeners() {
         // Wallet connected
-        window.addEventListener('walletConnected', (event) => {
+        window.addEventListener('walletConnected', async (event) => {
             const { account, chainId } = event.detail;
             console.log('AuthManager: Wallet connected event received', { account, chainId });
             
@@ -159,11 +207,11 @@ class AuthManager {
                 network: window.walletService.SUPPORTED_CHAINS[chainId]
             });
             
-            // If on auth page, redirect to intended destination
+            // If on auth page, check ID NFT ownership before redirecting
             if (this.getCurrentPage() === this.authPage) {
-                console.log('AuthManager: On auth page, redirecting after successful connection');
-                setTimeout(() => {
-                    this.redirectToIntendedDestination();
+                console.log('AuthManager: On auth page, checking ID NFT ownership before redirect');
+                setTimeout(async () => {
+                    await this.checkIDNFTAndRedirect(account);
                 }, 1500);
             }
         });
@@ -267,7 +315,23 @@ class AuthManager {
             
             // Ensure wallet service is ready and connect
             await window.walletService.ensureReady();
-            await window.walletService.connect();
+            const connectionResult = await window.walletService.connect();
+            
+            // Check if we need to switch to Injective testnet
+            const targetChainId = '0x59f'; // Injective testnet
+            if (connectionResult.chainId !== targetChainId) {
+                console.log('AuthManager: Switching to Injective testnet...');
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Switching to Injective...';
+                
+                try {
+                    await window.walletService.switchNetwork(targetChainId);
+                    console.log('AuthManager: Successfully switched to Injective testnet');
+                } catch (switchError) {
+                    console.warn('AuthManager: Failed to switch network:', switchError);
+                    // Continue anyway - user might switch manually
+                    this.showNetworkWarning('Please switch to Injective testnet in MetaMask');
+                }
+            }
             
             // Success - button will be updated by global UI update
         } catch (error) {
@@ -409,10 +473,98 @@ class AuthManager {
     }
 
     /**
+     * Show IDNFT creation button when modal fails
+     */
+    showIDNFTCreationButton() {
+        // Remove any existing IDNFT prompt
+        const existingPrompt = document.getElementById('idnft-creation-prompt');
+        if (existingPrompt) {
+            existingPrompt.remove();
+        }
+        
+        // Create IDNFT creation prompt
+        const promptContainer = document.createElement('div');
+        promptContainer.id = 'idnft-creation-prompt';
+        promptContainer.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                <div style="background: rgba(31, 41, 55, 0.95); padding: 2rem; border-radius: 20px; border: 1px solid rgba(55, 65, 81, 0.3); max-width: 400px; width: 90%; text-align: center;">
+                    <h3 style="color: #25f2f2; margin-bottom: 1rem;">
+                        <i class="fas fa-id-card"></i> ID NFT Required
+                    </h3>
+                    <p style="color: #9ca3af; margin-bottom: 1.5rem;">
+                        You need to create a Bar Identity NFT to access all platform features. This is a one-time setup.
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer;">
+                            Skip for Now
+                        </button>
+                        <button onclick="window.authManager.createIDNFTManually()" 
+                                style="background: rgba(37, 242, 242, 0.1); color: #25f2f2; border: 1px solid rgba(37, 242, 242, 0.3); padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer;">
+                            <i class="fas fa-magic"></i> Create ID NFT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(promptContainer);
+    }
+
+    /**
+     * Manual IDNFT creation when modal fails
+     */
+    async createIDNFTManually() {
+        try {
+            // Remove the prompt
+            const prompt = document.getElementById('idnft-creation-prompt');
+            if (prompt) {
+                prompt.remove();
+            }
+            
+            // Try to initialize IDNFT modal if not already done
+            if (!window.idnftModal) {
+                // Import and initialize the modal
+                const script = document.createElement('script');
+                script.src = window.location.pathname.includes('/pages/') 
+                    ? '../assets/js/idnft-modal.js' 
+                    : 'assets/js/idnft-modal.js';
+                document.head.appendChild(script);
+                
+                // Wait for script to load
+                await new Promise((resolve, reject) => {
+                    script.onload = resolve;
+                    script.onerror = reject;
+                });
+                
+                // Wait a bit more for initialization
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            // Try to open modal again
+            if (window.idnftModal) {
+                await window.idnftModal.openModal();
+            } else {
+                                    // Final fallback - redirect to IDNFT creation page
+                    const createIDNFTPath = window.location.pathname.includes('/pages/')
+                        ? 'create-idnft.html'
+                        : 'pages/create-idnft.html';
+                    window.location.href = createIDNFTPath;
+            }
+        } catch (error) {
+            console.error('Manual IDNFT creation failed:', error);
+            alert('Failed to open IDNFT creation form. Please try refreshing the page.');
+        }
+    }
+
+    /**
      * Show network warning
      */
-    showNetworkWarning(chainId) {
-        const message = 'Please switch to a supported network (Ethereum, Polygon, or Sepolia)';
+    showNetworkWarning(messageOrChainId) {
+        // Handle both string messages and chainId
+        const message = typeof messageOrChainId === 'string' 
+            ? messageOrChainId 
+            : 'Please switch to a supported network (Ethereum, Polygon, Sepolia, or Injective)';
         
         let warningDisplay = document.getElementById('network-warning-display');
         if (!warningDisplay) {

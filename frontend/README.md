@@ -45,12 +45,11 @@ frontend/
 ├── config/
 │   └── app.config.js       # Application configuration
 ├── pages/
-│   ├── bars.html           # Bar management interface
 │   ├── marketplace.html    # Recipe marketplace
 │   ├── create.html         # Recipe creation
 │   ├── profile.html        # User profile
 │   └── [other-pages]       # Additional pages
-├── test-api.html           # Comprehensive API testing interface
+
 ├── index.html              # Landing page
 └── API_INTEGRATION_GUIDE.md # Detailed API documentation
 ```
@@ -131,19 +130,7 @@ apiExamples.listAvailableMethods();
 
 ## 🧪 Testing
 
-### API Testing Interface
-Access the comprehensive API testing interface at:
-```
-http://localhost:8000/test-api.html
-```
 
-Features:
-- ✅ Test all bars and recipes endpoints
-- ✅ Complete workflow testing
-- ✅ Real-time API health monitoring
-- ✅ Interactive form interfaces
-- ✅ JSON response visualization
-- ✅ Error handling demonstration
 
 ### Manual Testing
 1. **Recipe Creation**
@@ -151,10 +138,10 @@ Features:
    - Upload an image and fill recipe details
    - Test IPFS upload and recipe storage
 
-2. **Bar Management**
-   - Go to bars.html
-   - Create a new bar
-   - Test bar updating and recipe viewing
+2. **Recipe Management**
+   - Navigate to the marketplace
+   - Test recipe browsing and management
+   - View recipe details and interactions
 
 3. **Marketplace**
    - Browse existing recipes
@@ -264,7 +251,7 @@ const isHealthy = await apiService.checkHealth();
 2. Extend `api-service.js` with new methods
 3. Add examples to `api-examples.js`
 4. Update documentation
-5. Test in `test-api.html`
+5. Test the implementation
 
 ### Code Style
 - Use modern JavaScript (ES6+)
@@ -286,7 +273,7 @@ const isHealthy = await apiService.checkHealth();
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly using test-api.html
+4. Test thoroughly
 5. Update documentation
 6. Submit a pull request
 
@@ -298,8 +285,8 @@ const isHealthy = await apiService.checkHealth();
 
 For technical support:
 1. Check the API_INTEGRATION_GUIDE.md
-2. Use the test-api.html interface for debugging
-3. Review browser console for errors
+2. Review browser console for errors
+3. Test API endpoints directly
 4. Check backend server logs
 5. Open an issue with detailed error information
 

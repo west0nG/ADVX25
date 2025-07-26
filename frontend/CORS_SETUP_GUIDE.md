@@ -215,10 +215,10 @@ app.listen(8080, () => {
 
 ## 🧪 Testing CORS Setup
 
-### 1. Test with our API interface
+### 1. Test with browser console
 
-Open `test-api.html` and check the health status. If CORS is working, you should see:
-- ✅ Green "API is healthy and ready!" message
+Check the browser console and API responses. If CORS is working, you should see:
+- ✅ Successful API responses
 - No CORS errors in the browser console
 
 ### 2. Manual testing
