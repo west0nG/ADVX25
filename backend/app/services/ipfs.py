@@ -133,31 +133,33 @@ def fetch_metadata_from_ipfs(cid: str) -> dict:
     except Exception as e:
         raise Exception(f"获取IPFS元数据失败: {str(e)}")
 
-# 用法示例
-# 1. 上传图片获取CID
-cocktail_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
-recipe_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
 
-# 2. 上传Recipe元数据
-recipe_metadata_cid = upload_recipe_to_pinata(
-    cocktail_name="Mojito",
-    cocktail_intro="经典古巴鸡尾酒",
-    cocktail_photo_cid=cocktail_photo_cid,
-    cocktail_recipe="朗姆酒 30ml, 青柠汁 15ml, 糖浆 10ml...",
-    recipe_photo_cid=recipe_photo_cid
-)
-
-# 3. 上传Bar元数据
-bar_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
-bar_metadata_cid = upload_bar_to_pinata(
-    bar_photo_cid=bar_photo_cid,
-    bar_name="蓝调酒吧",
-    bar_location="北京市朝阳区",
-    bar_intro="专注于经典鸡尾酒的精品酒吧"
-) 
-
-print(cocktail_photo_cid)
-print(recipe_photo_cid)
-print(recipe_metadata_cid)
-print(bar_metadata_cid)
+# 测试代码（已注释，避免在导入时执行）
+# if __name__ == "__main__":
+#     # 1. 上传图片获取CID
+#     cocktail_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
+#     recipe_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
+# 
+#     # 2. 上传Recipe元数据
+#     recipe_metadata_cid = upload_recipe_to_pinata(
+#         cocktail_name="Mojito",
+#         cocktail_intro="经典古巴鸡尾酒",
+#         cocktail_photo_cid=cocktail_photo_cid,
+#         cocktail_recipe="朗姆酒 30ml, 青柠汁 15ml, 糖浆 10ml...",
+#         recipe_photo_cid=recipe_photo_cid
+#     )
+# 
+#     # 3. 上传Bar元数据
+#     bar_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
+#     bar_metadata_cid = upload_bar_to_pinata(
+#         bar_photo_cid=bar_photo_cid,
+#         bar_name="蓝调酒吧",
+#         bar_location="北京市朝阳区",
+#         bar_intro="专注于经典鸡尾酒的精品酒吧"
+#     )
+# 
+#     print(cocktail_photo_cid)
+#     print(recipe_photo_cid)
+#     print(recipe_metadata_cid)
+#     print(bar_metadata_cid)
 
