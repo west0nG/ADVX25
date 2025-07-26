@@ -3,4 +3,4 @@ uvicorn
 sqlalchemy[asyncio]
 asyncpg
 requests
-python-multipart
+python-dotenv
