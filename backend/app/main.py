@@ -1,8 +1,30 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import os
 
 app = FastAPI(title="Bars Help Bars Backend API")
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",      # React default port
+        "http://localhost:8000",      # Vue default port
+        "http://localhost:4200",      # Angular default port
+        "http://localhost:5173",      # Vite default port
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8000",
+        "http://127.0.0.1:4200",
+        "http://127.0.0.1:5173",
+        "http://localhost:5500",      # Live Server default port
+        "http://127.0.0.1:5500",
+        "*"  # Allow all origins (for development - remove in production)
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 # 路由导入
 from app.api import bars, recipes
