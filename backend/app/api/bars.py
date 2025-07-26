@@ -156,7 +156,7 @@ async def set_bar(
             raise HTTPException(status_code=400, detail="酒吧已存在，无法重复创建")
         
         # 从IPFS获取元数据
-        metadata = fetch_metadata_from_ipfs(item.meta_cid)
+        metadata = fetch_metadata_from_ipfs(item["meta_cid"])
         
         # 解析元数据
         bar_metadata = metadata.get("metadata", {})
