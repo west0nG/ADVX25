@@ -38,7 +38,6 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-
 @router.post("/upload_bar_ipfs")
 async def upload_bar_ipfs(
     bar_name: str = Form(...),
@@ -95,7 +94,7 @@ async def get_bar(
         # 解析owned_recipes和used_recipes
         owned_recipes = json.loads(bar.owned_recipes) if bar.owned_recipes else []
         used_recipes = json.loads(bar.used_recipes) if bar.used_recipes else []
-        
+
         return BarResponse(
             bar_name=bar.bar_name,
             bar_photo_cid=bar.bar_photo,

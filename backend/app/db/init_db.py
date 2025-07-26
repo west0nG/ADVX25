@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from app.config import DATABASE_URL
 from app.models.bar import Bar, Base as BarBase
 from app.models.recipe import Recipe, Base as RecipeBase
+from app.models.transaction import Transaction, Base as TransactionBase
 import asyncio
 
 async def init_db():
@@ -11,6 +12,7 @@ async def init_db():
         # 创建所有表
         await conn.run_sync(BarBase.metadata.create_all)
         await conn.run_sync(RecipeBase.metadata.create_all)
+        await conn.run_sync(TransactionBase.metadata.create_all)
     await engine.dispose()
 
 async def reset_db():
@@ -20,9 +22,11 @@ async def reset_db():
         # 删除所有表
         await conn.run_sync(BarBase.metadata.drop_all)
         await conn.run_sync(RecipeBase.metadata.drop_all)
+        await conn.run_sync(TransactionBase.metadata.drop_all)
         # 重新创建所有表
         await conn.run_sync(BarBase.metadata.create_all)
         await conn.run_sync(RecipeBase.metadata.create_all)
+        await conn.run_sync(TransactionBase.metadata.create_all)
     await engine.dispose()
 
 if __name__ == "__main__":
