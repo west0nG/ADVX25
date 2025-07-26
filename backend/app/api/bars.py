@@ -146,15 +146,6 @@ async def set_bar(
 ):
     """新建酒吧信息。如果已有报错，应该是在sign up的时候使用, 前端先从链上获得address然后再传过来一个Metadata的CID"""
     try:
-        # 检查是否已存在
-        result = await db.execute(
-            select(Bar).where(Bar.bar_address == item.bar_address)
-        )
-        existing_bar = result.scalar_one_or_none()
-        
-        if existing_bar:
-            raise HTTPException(status_code=400, detail="酒吧已存在，无法重复创建")
-        
         # 从IPFS获取元数据
         metadata = fetch_metadata_from_ipfs(item.meta_cid)
         
@@ -172,13 +163,13 @@ async def set_bar(
             bar_photo=bar_photo,
             bar_location=bar_location,
             bar_intro=bar_intro,
-            owned_recipes="[]",
-            used_recipes="[]"
+            owned_recipes=json.dumps([]),
+            used_recipes=json.dumps([])
         )
         db.add(bar)
         
         await db.commit()
-        
+        await db.refresh(bar)
         return {"success": True}
         
     except Exception as e:
