@@ -270,6 +270,7 @@
         <div class="tabs">
             <button class="tab active" onclick="showTab('bars')">Bars API</button>
             <button class="tab" onclick="showTab('recipes')">Recipes API</button>
+            <button class="tab" onclick="showTab('transactions')">Transactions & Mint API</button>
         </div>
 
         <div class="content">
@@ -471,6 +472,91 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Transactions & Mint API Tab -->
+            <div id="transactions-tab" class="tab-content hidden">
+                <div class="section">
+                    <h3>📤 Upload Picture to IPFS</h3>
+                    <div class="form-group">
+                        <label>Picture File (JPG/PNG):</label>
+                        <div class="file-input">
+                            <input type="file" id="trans-picture" accept=".jpg,.jpeg,.png">
+                            <div class="file-input-label">Choose JPG/PNG file</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="uploadPictureToIPFS()">Upload Picture to IPFS</button>
+                    <div id="upload-picture-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>💼 Complete Transaction</h3>
+                    <div class="form-group">
+                        <label>Recipe NFT Address:</label>
+                        <input type="text" id="complete-tx-recipe" placeholder="Enter recipe NFT address">
+                    </div>
+                    <div class="form-group">
+                        <label>Buyer Address:</label>
+                        <input type="text" id="complete-tx-buyer" placeholder="Enter buyer wallet address">
+                    </div>
+                    <div class="form-group">
+                        <label>Timestamp (ISO format):</label>
+                        <input type="text" id="complete-tx-timestamp" placeholder="2024-01-25T10:30:00" value="2024-01-25T10:30:00">
+                    </div>
+                    <button class="btn" onclick="completeTransaction()">Complete Transaction</button>
+                    <div id="complete-transaction-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>🪙 Complete Recipe Mint</h3>
+                    <div class="form-group">
+                        <label>Recipe NFT Address:</label>
+                        <input type="text" id="complete-mint-recipe" placeholder="Enter recipe NFT address">
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Address:</label>
+                        <input type="text" id="complete-mint-owner" placeholder="Enter owner wallet address">
+                    </div>
+                    <button class="btn" onclick="completeRecipeMint()">Complete Recipe Mint</button>
+                    <div id="complete-mint-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>📊 Transaction History</h3>
+                    <div class="form-group">
+                        <label>Wallet Address:</label>
+                        <input type="text" id="tx-history-address" placeholder="Enter wallet address">
+                    </div>
+                    <button class="btn" onclick="getTransactionHistory()">Get Transaction History</button>
+                    <div id="transaction-history-result" class="result hidden"></div>
+                </div>
+
+                <div class="section">
+                    <h3>🧪 Quick Test Data</h3>
+                    <div class="grid">
+                        <div>
+                            <h4>Sample Bar Addresses</h4>
+                            <button class="btn btn-secondary" onclick="fillSampleBarAddress()">Fill Sample Bar Address</button>
+                            <div class="result info">
+                                <strong>Sample addresses:</strong><br>
+                                0x1234567890123456789012345678901234567890<br>
+                                0x0987654321098765432109876543210987654321<br>
+                                0xabcdef1234567890abcdef1234567890abcdef12
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Sample Recipe Addresses</h4>
+                            <button class="btn btn-secondary" onclick="fillSampleRecipeAddress()">Fill Sample Recipe Address</button>
+                            <div class="result info">
+                                <strong>Sample addresses:</strong><br>
+                                0xrecipe1<br>
+                                0xrecipe2<br>
+                                0xrecipe3<br>
+                                0xrecipe4
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -478,7 +564,7 @@
 
     <script>
         // Configuration
-        const API_BASE_URL = 'http://localhost:8080/api';
+        const API_BASE_URL = 'http://localhost:8000/api';
         
         // Tab management
         function showTab(tabName) {
@@ -875,6 +961,170 @@
             }
         }
 
+        // Transactions & Mint API Functions
+        async function uploadPictureToIPFS() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const formData = new FormData();
+                const fileInput = document.getElementById('trans-picture');
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                } else {
+                    throw new Error('Please select a file');
+                }
+
+                const response = await fetch(`${API_BASE_URL}/trans/upload_pic_to_ipfs`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('upload-picture-result', result, 'success');
+                    showStatus('Picture uploaded to IPFS successfully!');
+                } else {
+                    showResult('upload-picture-result', result, 'error');
+                    showStatus('Failed to upload picture to IPFS', 'error');
+                }
+            } catch (error) {
+                showResult('upload-picture-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function completeTransaction() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const data = {
+                    recipe_nft: document.getElementById('complete-tx-recipe').value,
+                    buyer: document.getElementById('complete-tx-buyer').value,
+                    timestamp: document.getElementById('complete-tx-timestamp').value
+                };
+
+                const response = await fetch(`${API_BASE_URL}/trans/complete_transaction`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('complete-transaction-result', result, 'success');
+                    showStatus('Transaction completed successfully!');
+                } else {
+                    showResult('complete-transaction-result', result, 'error');
+                    showStatus('Failed to complete transaction', 'error');
+                }
+            } catch (error) {
+                showResult('complete-transaction-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function completeRecipeMint() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const data = {
+                    recipe_nft: document.getElementById('complete-mint-recipe').value,
+                    owner: document.getElementById('complete-mint-owner').value
+                };
+
+                const response = await fetch(`${API_BASE_URL}/trans/complete_recipe_mint`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('complete-mint-result', result, 'success');
+                    showStatus('Recipe mint completed successfully!');
+                } else {
+                    showResult('complete-mint-result', result, 'error');
+                    showStatus('Failed to complete recipe mint', 'error');
+                }
+            } catch (error) {
+                showResult('complete-mint-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function getTransactionHistory() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const address = document.getElementById('tx-history-address').value;
+                const response = await fetch(`${API_BASE_URL}/trans/transaction_history/${address}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('transaction-history-result', result, 'success');
+                    showStatus('Transaction history retrieved successfully!');
+                } else {
+                    showResult('transaction-history-result', result, 'error');
+                    showStatus('Failed to get transaction history', 'error');
+                }
+            } catch (error) {
+                showResult('transaction-history-result', `Error: ${error.message}`, 'error');
+                showStatus('Network error occurred', 'error');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        // Helper functions for quick test data
+        function fillSampleBarAddress() {
+            const sampleAddresses = [
+                '0x1234567890123456789012345678901234567890',
+                '0x0987654321098765432109876543210987654321',
+                '0xabcdef1234567890abcdef1234567890abcdef12'
+            ];
+            const randomAddress = sampleAddresses[Math.floor(Math.random() * sampleAddresses.length)];
+            
+            // Fill in all bar address fields
+            document.getElementById('complete-tx-buyer').value = randomAddress;
+            document.getElementById('complete-mint-owner').value = randomAddress;
+            document.getElementById('tx-history-address').value = randomAddress;
+            
+            showStatus('Sample bar address filled!');
+        }
+
+        function fillSampleRecipeAddress() {
+            const sampleAddresses = [
+                '0xrecipe1',
+                '0xrecipe2',
+                '0xrecipe3',
+                '0xrecipe4'
+            ];
+            const randomAddress = sampleAddresses[Math.floor(Math.random() * sampleAddresses.length)];
+            
+            // Fill in all recipe address fields
+            document.getElementById('complete-tx-recipe').value = randomAddress;
+            document.getElementById('complete-mint-recipe').value = randomAddress;
+            
+            showStatus('Sample recipe address filled!');
+        }
+
         // File input handling
         document.addEventListener('DOMContentLoaded', function() {
             const fileInputs = document.querySelectorAll('input[type="file"]');
@@ -885,7 +1135,12 @@
                         label.textContent = this.files[0].name;
                         label.style.color = '#28a745';
                     } else {
-                        label.textContent = 'Choose JPG file';
+                        // 根据不同的文件输入设置不同的默认文本
+                        if (this.id === 'trans-picture') {
+                            label.textContent = 'Choose JPG/PNG file';
+                        } else {
+                            label.textContent = 'Choose JPG file';
+                        }
                         label.style.color = '#667eea';
                     }
                 });
