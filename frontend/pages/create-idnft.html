@@ -255,34 +255,26 @@
                     this.showStatus('Uploading bar data to IPFS...', 'loading');
                     const uploadResult = await this.uploadBarToIPFSWithFallback(barName, barLocation, barIntro, barPhotoFile);
                     
-                    if (uploadResult.development_mode) {
-                        this.showStatus('⚠️ Development mode: Using mock data since backend is not available', 'error');
-                        // Still show success for development testing
-                        setTimeout(() => {
-                            this.showStatus('Development mode complete - IDNFT creation requires backend integration', 'success');
-                        }, 1000);
-                    } else {
-                        // Data uploaded successfully to IPFS, now mint the IDNFT
-                        this.showStatus('✅ Bar data uploaded to IPFS successfully!', 'success');
+                    // Data uploaded successfully to IPFS, now mint the IDNFT
+                    this.showStatus('✅ Bar data uploaded to IPFS successfully!', 'success');
+                    
+                    // Try to mint the IDNFT on blockchain
+                    this.showStatus('Creating Identity NFT on blockchain...', 'loading');
+                    
+                    try {
+                        const mintResult = await this.createIDNFTOnBlockchain(uploadResult.ipfs_cid);
+                        this.showStatus('✅ Bar Identity NFT created successfully!', 'success');
                         
-                        // Try to mint the IDNFT on blockchain
-                        this.showStatus('Creating Identity NFT on blockchain...', 'loading');
+                        // Call backend to sync the bar data with ERC-6551 tokenId
+                        await this.syncBarToBackend(uploadResult.ipfs_cid, barName, mintResult.tokenId);
                         
-                        try {
-                            const mintResult = await this.createIDNFTOnBlockchain(uploadResult.ipfs_cid);
-                            this.showStatus('✅ Bar Identity NFT created successfully!', 'success');
-                            
-                            // Call backend to sync the bar data with ERC-6551 tokenId
-                            await this.syncBarToBackend(uploadResult.ipfs_cid, barName, mintResult.tokenId);
-                            
-                        } catch (mintError) {
-                            console.error('IDNFT minting failed:', mintError);
-                            this.showStatus(`IDNFT creation failed: ${mintError.message}`, 'error');
-                            throw mintError;
-                        }
-                        
-                        console.log('Bar data uploaded successfully:', uploadResult);
+                    } catch (mintError) {
+                        console.error('IDNFT minting failed:', mintError);
+                        this.showStatus(`IDNFT creation failed: ${mintError.message}`, 'error');
+                        throw mintError;
                     }
+                    
+                    console.log('Bar data uploaded successfully:', uploadResult);
                     
                     // Wait a bit for the transaction to be confirmed
                     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -448,25 +440,9 @@
                     }
                 }
                 
-                // If we get here, all attempts failed - provide mock response for development
-                console.error('All API endpoint attempts failed, using mock response');
-                console.warn('DEVELOPMENT MODE: Using mock IPFS response since backend is not available');
-                
-                // Return a mock successful response for development purposes
-                const mockResponse = {
-                    success: true,
-                    message: 'Mock IPFS upload (backend not available)',
-                    cid: 'QmMOCK' + Date.now(),
-                    final_cid: 'QmMOCK' + Date.now(),
-                    metadata_cid: 'QmMOCK' + Date.now(),
-                    ipfs_url: `ipfs://QmMOCK${Date.now()}`,
-                    development_mode: true
-                };
-                
-                // Show warning to user
-                this.showStatus('⚠️ Backend not available - using development mode. IDNFT creation may not work fully.', 'error');
-                
-                return mockResponse;
+                // If we get here, all attempts failed - throw error instead of using mock data
+                console.error('All API endpoint attempts failed');
+                throw new Error('IPFS upload failed: Backend not available. Please ensure the backend is running and accessible.');
             }
             
             // IDNFT creation must be handled by the backend since it requires contract owner permissions
