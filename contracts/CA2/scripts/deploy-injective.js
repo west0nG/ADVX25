@@ -1,9 +1,8 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("🚀 开始部署 RecipeNFT 到 Injective 测试网...");
-
-  // 获取部署账户
+  console.log("🚀 开始部署 RecipeNFT 合约到 Injective 测试网...");
+  
   const [deployer] = await ethers.getSigners();
   console.log("📝 部署账户:", deployer.address);
   console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "INJ");
@@ -11,7 +10,16 @@ async function main() {
   // 部署 RecipeNFT 合约
   console.log("\n📦 部署 RecipeNFT 合约...");
   const RecipeNFT = await ethers.getContractFactory("RecipeNFT");
-  const recipeNFT = await RecipeNFT.deploy("Bars Help Bars Recipe NFT", "BHBRecipe");
+  
+  // 注意：这里需要传入ID NFT合约地址，暂时使用零地址作为占位符
+  // 在实际部署时，需要先部署ID NFT合约，然后传入其地址
+  const idnftContractAddress = "0x0000000000000000000000000000000000000000"; // 占位符
+  
+  const recipeNFT = await RecipeNFT.deploy(
+    "Bars Help Bars Recipe NFT", 
+    "BHBRecipe",
+    idnftContractAddress
+  );
   
   console.log("⏳ 等待交易确认...");
   await recipeNFT.waitForDeployment();
@@ -41,31 +49,10 @@ async function main() {
   console.log("👑 合约所有者:", owner);
   console.log("✅ 所有者验证:", owner === deployer.address ? "通过" : "失败");
 
-  // 测试铸造功能
-  console.log("\n🎨 测试铸造功能...");
-  const testURI = "ipfs://QmTestRecipe123456789";
-  const mintTx = await recipeNFT.mintRecipeNFT(testURI);
-  console.log("⏳ 等待铸造交易确认...");
-  await mintTx.wait();
-  
-  // 获取铸造的token ID（通过事件或直接查询）
-  const receipt = await mintTx.wait();
-  let tokenId = 1; // 默认值
-  if (receipt.logs && receipt.logs.length > 0) {
-    // 尝试从事件中获取token ID
-    for (const log of receipt.logs) {
-      try {
-        const parsedLog = recipeNFT.interface.parseLog(log);
-        if (parsedLog && parsedLog.name === 'RecipeNFTCreated') {
-          tokenId = parsedLog.args.tokenId.toString();
-          break;
-        }
-      } catch (e) {
-        // 忽略解析错误
-      }
-    }
-  }
-  console.log("✅ 成功铸造 Recipe NFT, Token ID:", tokenId);
+  // 检查ID NFT合约地址
+  const idnftContract = await recipeNFT.idnftContract();
+  console.log("🔗 ID NFT合约地址:", idnftContract);
+  console.log("⚠️  注意：需要后续设置正确的ID NFT合约地址");
 
   console.log("\n🎉 部署完成！");
   console.log("=" * 50);
@@ -74,7 +61,7 @@ async function main() {
   console.log("📦 合约: RecipeNFT");
   console.log("📍 地址:", recipeNFTAddress);
   console.log("👤 部署者:", deployer.address);
-  console.log("🎨 测试Token ID:", tokenId.toString());
+  console.log("🔗 ID NFT合约:", idnftContract);
   console.log("=" * 50);
 
   // 保存部署信息
@@ -85,7 +72,8 @@ async function main() {
     deployer: deployer.address,
     timestamp: new Date().toISOString(),
     chainId: 1439,
-    testTokenId: tokenId.toString()
+    idnftContractAddress: idnftContract,
+    note: "需要后续设置正确的ID NFT合约地址"
   };
 
   console.log("\n💾 部署信息已保存到 deployment-info.json");
@@ -97,7 +85,7 @@ async function main() {
   return {
     recipeNFTAddress,
     deployer: deployer.address,
-    testTokenId: tokenId.toString()
+    idnftContractAddress: idnftContract
   };
 }
 

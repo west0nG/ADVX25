@@ -3,8 +3,6 @@ const fs = require("fs");
 
 async function main() {
   console.log("🚀 开始部署 CA4 合约到 Injective 测试网（重用CA1和CA2合约）...");
-
-  // 获取部署账户
   const [deployer] = await ethers.getSigners();
   console.log("📝 部署账户:", deployer.address);
   console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "INJ");
@@ -31,10 +29,7 @@ async function main() {
   console.log("\n📦 部署 MockUSDT 合约...");
   const MockUSDT = await ethers.getContractFactory("MockUSDT");
   const mockUSDT = await MockUSDT.deploy("Mock USDT", "mUSDT");
-  
-  console.log("⏳ 等待 MockUSDT 部署确认...");
   await mockUSDT.waitForDeployment();
-  
   const mockUSDTAddress = await mockUSDT.getAddress();
   console.log("✅ MockUSDT 合约已部署到:", mockUSDTAddress);
 
@@ -46,10 +41,7 @@ async function main() {
     idnftAddress,
     recipeNFTAddress
   );
-  
-  console.log("⏳ 等待 RecipeMarketplace 部署确认...");
   await marketplace.waitForDeployment();
-  
   const marketplaceAddress = await marketplace.getAddress();
   console.log("✅ RecipeMarketplace 合约已部署到:", marketplaceAddress);
 
@@ -67,30 +59,30 @@ async function main() {
   // 测试基本功能
   console.log("\n🧪 测试基本功能...");
   
-  // 检查合约基本信息
+  // 检查合约名称和符号
   const usdtName = await mockUSDT.name();
   const usdtSymbol = await mockUSDT.symbol();
-  console.log("📛 MockUSDT 名称:", usdtName);
-  console.log("🔤 MockUSDT 符号:", usdtSymbol);
+  console.log("💰 USDT名称:", usdtName);
+  console.log("💰 USDT符号:", usdtSymbol);
 
-  // 连接到已部署的IDNFT和RecipeNFT合约
-  const IDNFT = await ethers.getContractFactory("IDNFT");
-  const RecipeNFT = await ethers.getContractFactory("RecipeNFT");
+  // 检查合约所有者
+  const usdtOwner = await mockUSDT.owner();
+  const marketplaceOwner = await marketplace.owner();
   
-  const idnftContract = IDNFT.attach(idnftAddress);
-  const recipeNFTContract = RecipeNFT.attach(recipeNFTAddress);
+  console.log("👑 合约所有者验证:");
+  console.log("   - MockUSDT:", usdtOwner === deployer.address ? "✅" : "❌");
+  console.log("   - Marketplace:", marketplaceOwner === deployer.address ? "✅" : "❌");
 
-  const idnftName = await idnftContract.name();
-  const idnftSymbol = await idnftContract.symbol();
-  console.log("📛 IDNFT 名称:", idnftName);
-  console.log("🔤 IDNFT 符号:", idnftSymbol);
-
-  const recipeName = await recipeNFTContract.name();
-  const recipeSymbol = await recipeNFTContract.symbol();
-  console.log("📛 RecipeNFT 名称:", recipeName);
-  console.log("🔤 RecipeNFT 符号:", recipeSymbol);
+  // 测试铸造USDT
+  console.log("\n💰 测试铸造USDT...");
+  const mintAmount = ethers.parseUnits("10000", 6); // 10,000 USDT
+  const mintTx = await mockUSDT.mint(deployer.address, mintAmount);
+  await mintTx.wait();
+  const balance = await mockUSDT.balanceOf(deployer.address);
+  console.log("✅ USDT铸造成功，余额:", ethers.formatUnits(balance, 6), "USDT");
 
   // 检查市场合约配置
+  console.log("\n🔗 检查市场合约配置...");
   const marketplaceUSDT = await marketplace.usdtToken();
   const marketplaceIDNFT = await marketplace.idnftContract();
   const marketplaceRecipeNFT = await marketplace.recipeNFTContract();
@@ -100,51 +92,18 @@ async function main() {
   console.log("   - IDNFT 地址:", marketplaceIDNFT);
   console.log("   - RecipeNFT 地址:", marketplaceRecipeNFT);
 
-  // 测试铸造功能
-  console.log("\n🎨 测试铸造功能...");
-  
-  // 铸造一些USDT
-  const mintAmount = ethers.parseEther("10000"); // 10,000 USDT
-  const mintTx = await mockUSDT.mint(deployer.address, mintAmount);
-  await mintTx.wait();
-  console.log("✅ 铸造 USDT 成功:", ethers.formatEther(mintAmount), "USDT");
-
-  // 检查是否已有ID NFT（从CA1部署时创建）
-  const hasActiveIDNFT = await idnftContract.hasActiveIDNFT(deployer.address);
-  if (hasActiveIDNFT) {
-    console.log("✅ ID NFT 已存在（来自CA1部署）");
-  } else {
-    // 创建ID NFT
-    const idnftURI = "ipfs://QmTestIDNFT123456789";
-    const createIDNFTTx = await idnftContract.createIDNFT(deployer.address, idnftURI);
-    await createIDNFTTx.wait();
-    console.log("✅ 创建 ID NFT 成功");
-  }
-
-  // 检查是否已有Recipe NFT（从CA2部署时创建）
-  try {
-    const tokenId = 1; // 假设CA2部署时创建了token ID 1
-    const metadata = await recipeNFTContract.recipeMetadata(tokenId);
-    console.log("✅ Recipe NFT 已存在（来自CA2部署）");
-  } catch (error) {
-    // 铸造Recipe NFT
-    const recipeURI = "ipfs://QmTestRecipe123456789";
-    const mintRecipeTx = await recipeNFTContract.mintRecipeNFT(recipeURI);
-    await mintRecipeTx.wait();
-    console.log("✅ 铸造 Recipe NFT 成功");
-  }
-
   console.log("\n🎉 部署完成！");
   console.log("=" * 60);
   console.log("📋 部署摘要:");
   console.log("🌐 网络: Injective 测试网");
   console.log("📦 合约: CA4 市场系统（重用CA1和CA2合约）");
-  console.log("📍 合约地址:");
+  console.log("📍 主要地址:");
   console.log("   - MockUSDT:", mockUSDTAddress);
   console.log("   - IDNFT (重用CA1):", idnftAddress);
   console.log("   - RecipeNFT (重用CA2):", recipeNFTAddress);
-  console.log("   - RecipeMarketplace:", marketplaceAddress);
+  console.log("   - Marketplace:", marketplaceAddress);
   console.log("👤 部署者:", deployer.address);
+  console.log("💰 USDT余额:", ethers.formatUnits(balance, 6), "USDT");
   console.log("=" * 60);
 
   // 保存部署信息
@@ -170,13 +129,13 @@ async function main() {
     timestamp: new Date().toISOString(),
     chainId: 1439,
     testData: {
-      usdtMinted: ethers.formatEther(mintAmount)
+      usdtMinted: ethers.formatUnits(mintAmount, 6)
     }
   };
 
   console.log("\n💾 部署信息已保存到 deployment-info-reuse.json");
   require('fs').writeFileSync(
-    'deployment-info-reuse.json', 
+    'deployment-info-reuse.json',
     JSON.stringify(deploymentInfo, null, 2)
   );
 

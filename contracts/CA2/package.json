@@ -1,22 +1,36 @@
 {
-  "name": "bars-help-bars-recipenft",
+  "name": "recipe-nft-contract",
   "version": "1.0.0",
-  "description": "RecipeNFT contract for Bars Help Bars project (CA2)",
+  "description": "Recipe NFT合约 - 基于ERC-4907标准的鸡尾酒配方NFT",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "deploy:injective": "hardhat run scripts/deploy-injective.js --network injective_testnet",
-    "test:injective": "hardhat run scripts/test-injective.js --network injective_testnet"
+    "test": "npx hardhat test",
+    "deploy:local": "npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia",
+    "deploy:injective": "npx hardhat run scripts/deploy-injective.js --network injective_testnet",
+    "deploy:injective-with-idnft": "npx hardhat run scripts/deploy-injective-with-idnft.js --network injective_testnet",
+    "test:local": "npx hardhat run scripts/test-contract.js --network localhost",
+    "test:sepolia": "npx hardhat run scripts/test-contract.js --network sepolia",
+    "test:injective": "npx hardhat run scripts/test-injective-fixed.js --network injective_testnet",
+    "clean": "npx hardhat clean",
+    "node": "npx hardhat node"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "nft",
+    "erc-4907",
+    "recipe",
+    "cocktail"
+  ],
+  "author": "Bars Help Bars Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.4.0"
-  },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
-    "chai": "^4.5.0",
-    "ethers": "^6.15.0",
-    "hardhat": "^2.26.1",
-    "dotenv": "^16.3.1"
+    "@openzeppelin/contracts": "^5.0.0"
   }
 }
