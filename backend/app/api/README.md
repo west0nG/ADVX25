@@ -12,22 +12,19 @@
 
 ## Routers to Implement in `recipes.py`
 
-### 1. upload_recipe_to_ipfs
+### 1. upload_ipfs
 
-- **Purpose:** Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID.
-- **Input:** JPG file (multipart/form-data) and JSON file (multipart/form-data)
+- **Purpose:** Upload a JPG image to IPFS and return its CID.
+- **Input:** JPG file (multipart/form-data)
 - **Output:** `{ "cid": "<IPFS_CID>" }`
 - **Backend Steps:**
-  - Create a POST endpoint `/recipes/upload_recipe_to_ipfs`
+  - Create a POST endpoint `/recipes/upload_ipfs`
   - Use FastAPI’s `File` and `UploadFile`
-  - First upload JPG to IPFS, get JPG CID
-  - Integrate JPG CID into JSON metadata
-  - Upload complete metadata JSON to IPFS, get final CID
-  - Return the final metadata CID
+  - Call IPFS upload logic (in `ipfs_service.py`)
+  - Return the CID
 - **Frontend Steps:**
-  - Add file upload UI for both JPG and JSON files
-  - JS to call this endpoint with both files
-  - Display or use the returned final CID
+  - Add file upload UI and JS to call this endpoint
+  - Display or use the returned CID
 
 ### 2. store_recipe
 
@@ -117,7 +114,7 @@
 
 | Endpoint        | Method | Path                       | Input              | Output       | Backend File                        | Frontend File(s)          |
 | --------------- | ------ | -------------------------- | ------------------ | ------------ | ----------------------------------- | ------------------------- |
-| upload_recipe_to_ipfs     | POST   | /recipes/upload_recipe_to_ipfs       | JPG file + JSON file | FINAL_CID    | api/v1/recipes.py, ipfs_service.py  | assets/js/recipe.js, HTML |
+| upload_ipfs     | POST   | /recipes/upload_ipfs       | JPG file           | CID          | api/v1/recipes.py, ipfs_service.py  | assets/js/recipe.js, HTML |
 | store_recipe    | POST   | /recipes/store             | JSON               | success bool | api/v1/recipes.py, models/recipe.py | assets/js/recipe.js, HTML |
 | get_ten_recipes | GET    | /recipes/ten               | None               | JSON (10)    | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
 | get_all_recipes | GET    | /recipes/all               | None               | JSON (all)   | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
@@ -166,30 +163,28 @@
 
 ## Routers to Implement in `bars.py`
 
-### 1. upload_bar_photo_ipfs
+### 1. upload_bar_ipfs
 
-- **Purpose:** Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID.
-- **Input:** JPG file (multipart/form-data) and JSON file (multipart/form-data)
-- **Output:** `{ "cid": "<FINAL_METADATA_CID>" }`
+- **Purpose:** 上传酒吧Meta到IPFS，返回 CID。
+- **Input:** 表单以及图片（multipart/form-data）
+- **Output:** `{ "cid": "<IPFS_CID>" }`
 - **Backend Steps:**
-  - Create a POST endpoint `/bars/upload_bar_photo_ipfs`
-  - Use FastAPI's `File` and `UploadFile` for both files
-  - First upload JPG to IPFS, get JPG CID
-  - Integrate JPG CID into JSON metadata
-  - Upload complete metadata JSON to IPFS, get final CID
-  - Return the final metadata CID
+  - 创建 POST 接口 `/bars/upload_bar_ipfs`
+  - 使用 FastAPI 的 `File` 和 `UploadFile`
+  - 然后带着Photo的CID 创建整个meta data的cid
+  - 调用 `ipfs.py` 的上传逻辑
+  - 返回 CID
 - **Frontend Steps:**
-  - Add file upload UI for both JPG and JSON files
-  - JS to call this endpoint with both files
-  - Display or use the returned final CID
+  - 增加文件上传 UI，JS 调用该接口
+  - 显示或使用返回的 CID
 
 ### 2. get_bar
 
 - **Purpose:** 根据 ERC6551 地址获取酒吧信息。
-- **Input:** ERC6551 地址（如 `/bars/get/{erc6551_address}`）
-- **Output:** JSON `{ bar_name, bar_photo_cid, bar_location, bar_intro }`
+- **Input:** ERC6551 地址（如 `/bars/get/{bar_address}`）
+- **Output:** JSON `{ bar_name, bar_photo_cid, bar_location, bar_intro, 等 你自己去看model }`
 - **Backend Steps:**
-  - 创建 GET 接口 `/bars/get/{erc6551_address}`
+  - 创建 GET 接口 `/bars/get/{bar_address}`
   - 查询数据库中对应的 Bar 记录
   - 返回 JSON
 - **Frontend Steps:**
@@ -197,8 +192,8 @@
 
 ### 3. update_bar
 
-- **Purpose:** 更新酒吧信息。
-- **Input:** JSON `{ erc6551_address, bar_name, bar_photo_cid, bar_location, bar_intro }`
+- **Purpose:** 更新酒吧信息。如果没有就报错, 还需要做一下链上的同步
+- **Input:** JSON `{ bar_address, bar_name, bar_photo_cid, bar_location, bar_intro，等 }`
 - **Output:** `{ "success": true/false }`
 - **Backend Steps:**
   - 创建 POST 接口 `/bars/update`
@@ -211,13 +206,14 @@
 
 ### 4. set_bar
 
-- **Purpose:** 新建或设置酒吧信息。
-- **Input:** JSON `{ erc6551_address, bar_name, bar_photo_cid, bar_location, bar_intro }`
+- **Purpose:** 新建酒吧信息。如果已有报错，应该是在sign up的时候使用, 前端先从链上获得address然后再传过来一个Metadata的CID
+- **Input:** JSON `{ bar_address, Meta CID }`
 - **Output:** `{ "success": true/false }`
 - **Backend Steps:**
   - 创建 POST 接口 `/bars/set`
+  - 校验并解析 Meta CID 获得其中的图片等 
   - 校验并解析 JSON
-  - 插入或覆盖数据库中的 Bar 记录
+  - 插入数据库中的 Bar 记录
   - 返回成功状态
 - **Frontend Steps:**
   - 表单收集数据，JS POST 到该接口
@@ -225,11 +221,11 @@
 
 ### 5. get_all_owned_recipes
 
-- **Purpose:** 获取某酒吧拥有的所有 recipe NFT 地址。
-- **Input:** ERC6551 地址（如 `/bars/owned_recipes/{erc6551_address}`）
-- **Output:** JSON 列表 `[recipe_nft_address, ...]`
+- **Purpose:** 获取某酒吧自己创建的所有 recipe NFT 地址。
+- **Input:** ERC6551 地址（如 `/bars/owned_recipes/{bar_address}`）
+- **Output:** JSON 列表 `[owned_recipes列表]`
 - **Backend Steps:**
-  - 创建 GET 接口 `/bars/owned_recipes/{erc6551_address}`
+  - 创建 GET 接口 `/bars/owned_recipes/{bar_address}`
   - 查询数据库中该 Bar 拥有的所有 recipe NFT 地址
   - 返回 JSON 列表
 - **Frontend Steps:**
@@ -237,9 +233,9 @@
 
 ### 6. get_all_used_recipes
 
-- **Purpose:** 获取某酒吧用过的所有 recipe NFT 地址。
-- **Input:** ERC6551 地址（如 `/bars/used_recipes/{erc6551_address}`）
-- **Output:** JSON 列表 `[recipe_nft_address, ...]`
+- **Purpose:** 获取某酒吧通过交易获得的所有 recipe NFT 地址。
+- **Input:** ERC6551 地址（如 `/bars/used_recipes/{bar_address}`）
+- **Output:** JSON 列表 `[used_recipes列表]`
 - **Backend Steps:**
   - 创建 GET 接口 `/bars/used_recipes/{erc6551_address}`
   - 查询数据库中该 Bar 用过的所有 recipe NFT 地址
@@ -253,12 +249,12 @@
 
 | Endpoint                | Method | Path                                         | Input                | Output         | Backend File                        | Frontend File(s)          |
 |-------------------------|--------|----------------------------------------------|----------------------|---------------|-------------------------------------|---------------------------|
-| upload_bar_photo_ipfs   | POST   | /bars/upload_bar_photo_ipfs                  | JPG file + JSON file | FINAL_CID     | api/bars.py, ipfs_service.py        | assets/js/bar.js, HTML    |
-| get_bar                 | GET    | /bars/get/{erc6551_address}                  | ERC6551 address      | JSON          | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
+| upload_bar_ipfs         | POST   | /bars/upload_bar_ipfs                        | Form + JPG file      | CID           | api/bars.py, ipfs.py                | assets/js/bar.js, HTML    |
+| get_bar                 | GET    | /bars/get/{bar_address}                      | Bar address          | JSON          | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
 | update_bar              | POST   | /bars/update                                 | JSON                 | success bool  | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
-| set_bar                 | POST   | /bars/set                                    | JSON                 | success bool  | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
-| get_all_owned_recipes   | GET    | /bars/owned_recipes/{erc6551_address}        | ERC6551 address      | JSON list     | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
-| get_all_used_recipes    | GET    | /bars/used_recipes/{erc6551_address}         | ERC6551 address      | JSON list     | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
+| set_bar                 | POST   | /bars/set                                    | JSON {bar_address, meta_cid} | success bool | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
+| get_all_owned_recipes   | GET    | /bars/owned_recipes/{bar_address}            | Bar address          | JSON list     | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
+| get_all_used_recipes    | GET    | /bars/used_recipes/{bar_address}             | Bar address          | JSON list     | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
 
 ---
 

@@ -6,7 +6,7 @@ Base = declarative_base()
 class Recipe(Base):
     __tablename__ = 'recipes'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    cocktail_address = Column(String, nullable=False, index=True)
+    recipe_address = Column(String, nullable=False, index=True)
     cocktail_name = Column(String, nullable=False)
     cocktail_intro = Column(String, nullable=True)
     cocktail_photo = Column(String, nullable=False)  # IPFS CID或URL
