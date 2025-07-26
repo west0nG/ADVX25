@@ -350,4 +350,195 @@
 - 先实现后端接口，测试通过后再对接前端。
 - 所有接口建议使用 async/await。
 - 文件上传请用 `multipart/form-data`。
-- 所有接口都要有清晰的错误处理和参数校验。 
+- 所有接口都要有清晰的错误处理和参数校验。
+
+# Transaction & Mint Routers Implementation Plan
+
+## Project Structure Reference
+
+- **Backend API:** `backend/app/api/trans_and_mint.py`
+- **Models:** `backend/app/models/transaction.py`
+- **Services:** `backend/app/services/ipfs.py`
+- **Database:** SQLAlchemy models in `models/transaction.py`, `models/bar.py`, `models/recipe.py`
+- **Frontend:** JS in `frontend/assets/js/`, HTML in `frontend/pages/`
+
+---
+
+## Implemented Routers in `trans_and_mint.py`
+
+### 1. upload_pic_to_ipfs ✅
+
+- **Purpose:** 上传图片到IPFS，返回CID供前端mint使用。
+- **Method:** `POST /trans/upload_pic_to_ipfs`
+- **Input:** 
+  - **Form Data:**
+    - `file`: JPG/PNG image file (multipart/form-data)
+- **Output:** `{ "cid": "<IPFS_CID>" }`
+- **Error Responses:**
+  - `400`: "文件必须是JPG或PNG格式" (if file is not JPG/PNG)
+  - `500`: "上传失败: {error_message}"
+- **Frontend Implementation:**
+  - Use `FormData` to send image file
+  - Handle the returned CID string for mint operations
+  - Clean up temporary files after upload
+
+### 2. complete_transaction ✅
+
+- **Purpose:** 完成交易后同步数据到后端，更新used_recipes、user_address、transaction记录。
+- **Method:** `POST /trans/complete_transaction`
+- **Input:** 
+  - **JSON Body:**
+    ```json
+    {
+      "recipe_nft": "string (recipe NFT address)",
+      "buyer": "string (buyer wallet address)",
+      "timestamp": "string (ISO format timestamp)"
+    }
+    ```
+- **Output:** `{ "success": true }`
+- **Backend Steps:**
+  - 查找recipe的owner作为seller
+  - 更新buyer的used_recipes列表
+  - 更新recipe的user_address列表
+  - 新增transaction记录
+- **Error Responses:**
+  - `404`: "Recipe not found"
+  - `500`: "完成交易失败: {error_message}"
+- **Frontend Implementation:**
+  - Call after successful on-chain transaction
+  - Pass transaction details from blockchain
+  - Handle success/failure responses
+
+### 3. complete_recipe_mint ✅
+
+- **Purpose:** 完成recipe mint后同步数据到后端，更新owned_recipes。
+- **Method:** `POST /trans/complete_recipe_mint`
+- **Input:** 
+  - **JSON Body:**
+    ```json
+    {
+      "recipe_nft": "string (recipe NFT address)",
+      "owner": "string (owner wallet address)"
+    }
+    ```
+- **Output:** `{ "success": true }`
+- **Backend Steps:**
+  - 更新owner的owned_recipes列表
+  - 添加新的recipe NFT地址
+- **Error Responses:**
+  - `500`: "完成mint失败: {error_message}"
+- **Frontend Implementation:**
+  - Call after successful NFT mint on blockchain
+  - Pass mint details from smart contract
+  - Handle success/failure responses
+
+### 4. get_transaction_history ✅
+
+- **Purpose:** 获取某地址的交易历史，包括买入和卖出记录。
+- **Method:** `GET /trans/transaction_history/{address}`
+- **Input:** 
+  - **Path Parameters:**
+    - `address`: string (wallet address)
+- **Output:** Array of transaction objects:
+  ```json
+  [
+    {
+      "id": "number",
+      "type": "buy|sell",
+      "counterparty": "string (other party address)",
+      "recipe_address": "string (recipe NFT address)",
+      "timestamp": "string (ISO format timestamp)"
+    }
+  ]
+  ```
+- **Error Responses:**
+  - `500`: "获取交易历史失败: {error_message}"
+- **Frontend Implementation:**
+  - Display transaction history in user profile
+  - Show buy/sell transactions with timestamps
+  - Link to recipe details
+
+---
+
+## Database Models
+
+### Transaction Model
+```python
+class Transaction(Base):
+    __tablename__ = 'transactions'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    buyer = Column(String, nullable=False, index=True)
+    seller = Column(String, nullable=False, index=True)
+    recipe_address = Column(String, nullable=False, index=True)
+    timestamp = Column(DateTime, nullable=False)
+```
+
+### Updated Bar Model Fields
+- `owned_recipes`: JSON string array of recipe NFT addresses
+- `used_recipes`: JSON string array of purchased recipe NFT addresses
+
+### Updated Recipe Model Fields
+- `user_address`: JSON string array of authorized user addresses
+
+---
+
+## Summary Table
+
+| Endpoint                | Method | Path                                         | Input                                    | Output         | Status |
+|-------------------------|--------|----------------------------------------------|------------------------------------------|---------------|--------|
+| upload_pic_to_ipfs      | POST   | /trans/upload_pic_to_ipfs                    | JPG/PNG file                            | CID           | ✅     |
+| complete_transaction    | POST   | /trans/complete_transaction                  | JSON {recipe_nft, buyer, timestamp}     | success bool  | ✅     |
+| complete_recipe_mint    | POST   | /trans/complete_recipe_mint                  | JSON {recipe_nft, owner}                | success bool  | ✅     |
+| get_transaction_history | GET    | /trans/transaction_history/{address}        | Wallet address                          | JSON array    | ✅     |
+
+---
+
+## Web3 Integration Flow
+
+### Mint Flow:
+1. **Frontend** → `upload_pic_to_ipfs` → Get CID
+2. **Frontend** → Smart Contract → Mint NFT (on-chain)
+3. **Frontend** → `complete_recipe_mint` → Sync owned_recipes
+
+### Transaction Flow:
+1. **Frontend** → Smart Contract → Buy NFT (on-chain)
+2. **Frontend** → `complete_transaction` → Sync used_recipes, user_address, transaction
+
+---
+
+## What to Do Next
+
+1. **Frontend Implementation:**
+   
+   - [ ] Create JS functions for file upload to IPFS
+   - [ ] Implement transaction completion calls after blockchain operations
+   - [ ] Build transaction history display component
+   - [ ] Add error handling for all API responses
+   - [ ] Test full flow: upload → mint → transaction → history
+
+2. **Testing:**
+   
+   - [ ] Test file upload with different image formats
+   - [ ] Test transaction completion with valid/invalid data
+   - [ ] Test mint completion with valid/invalid data
+   - [ ] Test transaction history with various addresses
+   - [ ] Verify database consistency after operations
+
+3. **Optional Enhancements:**
+   
+   - [ ] Add transaction filtering (by date, type, recipe)
+   - [ ] Implement transaction notifications
+   - [ ] Add transaction analytics and statistics
+   - [ ] Implement batch transaction processing
+
+---
+
+## Tips
+
+- **Web3 Integration:** These endpoints are designed to work with blockchain operations
+- **File Uploads:** Use `FormData` for image uploads, support JPG/PNG formats
+- **Data Consistency:** Always call completion endpoints after successful blockchain operations
+- **Error Handling:** All endpoints return appropriate HTTP status codes and error messages
+- **Transaction History:** Provides comprehensive buy/sell history for any wallet address
+- **Testing:** Use Swagger UI at `/docs` to test all endpoints before frontend integration
+- **Security:** Validate all input data and handle edge cases (duplicate transactions, etc.) 
