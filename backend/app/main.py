@@ -3,11 +3,11 @@ from fastapi import FastAPI
 app = FastAPI(title="Bars Help Bars Backend API")
 
 # 路由导入
-from app.api.v1 import nft, user
+from app.api import bars, recipes
 
-app.include_router(nft.router, prefix="/api/v1/nfts", tags=["NFT"])
-app.include_router(user.router, prefix="/api/v1/users", tags=["User"])
+app.include_router(bars.router, prefix="/api/bars", tags=["Bars"])
+app.include_router(recipes.router, prefix="/api/recipes", tags=["Recipes"])
 
 @app.get("/")
 def root():
-    return {"msg": "Bars Help Bars Backend is running!"}
+    return {"BNB Running"}
