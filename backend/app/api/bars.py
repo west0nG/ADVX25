@@ -38,17 +38,6 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-def fetch_metadata_from_ipfs(cid: str) -> dict:
-    """从IPFS获取元数据"""
-    try:
-        # 使用IPFS网关获取数据
-        response = requests.get(f"https://gateway.pinata.cloud/ipfs/{cid}")
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise Exception(f"无法从IPFS获取数据: {response.status_code}")
-    except Exception as e:
-        raise Exception(f"获取IPFS元数据失败: {str(e)}")
 
 @router.post("/upload_bar_ipfs")
 async def upload_bar_ipfs(
