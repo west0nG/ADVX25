@@ -54,22 +54,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Transform backend recipe data to frontend NFT format
     function transformRecipeData(recipes) {
-        return recipes.map((recipe, index) => ({
-            id: index + 1,
-            name: recipe.cocktail_name || 'Unnamed Recipe',
-            image: formatImageUrl(recipe.cocktail_photo),
-            price: formatPrice(recipe.price),
-            creator: formatCreatorName(recipe.owner_address),
-            creatorAvatar: getDefaultAvatar(),
-            category: recipe.category || "classic",
-            tokenId: formatTokenId(recipe.recipe_address, index),
-            intro: recipe.cocktail_intro || '',
-            recipe_address: recipe.recipe_address,
-            owner_address: recipe.owner_address,
-            user_addresses: recipe.user_address || [],
-            cocktail_recipe: recipe.cocktail_recipe,
-            nft_address: recipe.recipe_address // Use recipe_address as nft_address for compatibility
-        }));
+        return recipes.map((recipe, index) => {
+            // Parse cocktail_recipe if it's a JSON object
+            let cocktailRecipe = recipe.cocktail_recipe;
+            let category = recipe.category || "classic";
+            
+            if (typeof cocktailRecipe === 'object' && cocktailRecipe !== null) {
+                // Extract category from JSON if available
+                if (cocktailRecipe.category) {
+                    category = cocktailRecipe.category;
+                }
+                
+                // Format the recipe as readable text
+                let recipeText = '';
+                if (cocktailRecipe.ingredients && Array.isArray(cocktailRecipe.ingredients)) {
+                    recipeText += 'Ingredients:\n' + cocktailRecipe.ingredients.map(ing => `- ${ing}`).join('\n');
+                }
+                if (cocktailRecipe.instructions && Array.isArray(cocktailRecipe.instructions)) {
+                    if (recipeText) recipeText += '\n\n';
+                    recipeText += 'Instructions:\n' + cocktailRecipe.instructions.map((inst, i) => `${i + 1}. ${inst}`).join('\n');
+                }
+                cocktailRecipe = recipeText || 'Recipe details available';
+            }
+
+            return {
+                id: index + 1,
+                name: recipe.cocktail_name || 'Unnamed Recipe',
+                image: formatImageUrl(recipe.cocktail_photo),
+                price: formatPrice(recipe.price),
+                creator: formatCreatorName(recipe.owner_address),
+                creatorAvatar: getDefaultAvatar(),
+                category: category,
+                tokenId: formatTokenId(recipe.recipe_address, index),
+                intro: recipe.cocktail_intro || '',
+                recipe_address: recipe.recipe_address,
+                owner_address: recipe.owner_address,
+                user_addresses: recipe.user_address || [],
+                cocktail_recipe: cocktailRecipe,
+                nft_address: recipe.recipe_address // Use recipe_address as nft_address for compatibility
+            };
+        });
     }
 
     // Format image URL from cocktail_photo field
@@ -83,16 +107,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return cocktailPhoto;
         }
         
+        // Handle IPFS protocol URLs
+        if (cocktailPhoto.startsWith('ipfs://')) {
+            const hash = cocktailPhoto.replace('ipfs://', '');
+            return `https://gateway.pinata.cloud/ipfs/${hash}`;
+        }
+        
         // If it's a hex string, try to format as IPFS
         if (cocktailPhoto.startsWith('0x')) {
             // Remove 0x prefix and treat as IPFS hash
             const hash = cocktailPhoto.slice(2);
-            return `https://ipfs.io/ipfs/${hash}`;
+            return `https://gateway.pinata.cloud/ipfs/${hash}`;
         }
         
         // If it looks like an IPFS hash, format it
         if (cocktailPhoto.length > 40) {
-            return `https://ipfs.io/ipfs/${cocktailPhoto}`;
+            return `https://gateway.pinata.cloud/ipfs/${cocktailPhoto}`;
         }
         
         // Fallback to default image
