@@ -262,18 +262,18 @@
 
             <!-- Pagination -->
             <div class="pagination">
-                <button class="page-btn prev" disabled>
+                <button class="page-btn prev" data-page="prev" disabled>
                     <i class="fas fa-chevron-left"></i>
                     Previous
                 </button>
                 <div class="page-numbers">
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
+                    <button class="page-btn active" data-page="1">1</button>
+                    <button class="page-btn" data-page="2">2</button>
+                    <button class="page-btn" data-page="3">3</button>
                     <span class="page-dots">...</span>
-                    <button class="page-btn">10</button>
+                    <button class="page-btn" data-page="10">10</button>
                 </div>
-                <button class="page-btn next">
+                <button class="page-btn next" data-page="next">
                     Next
                     <i class="fas fa-chevron-right"></i>
                 </button>

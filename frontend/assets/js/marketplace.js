@@ -777,19 +777,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const pagination = document.querySelector('.pagination');
         
         pagination.addEventListener('click', (e) => {
-            if (e.target.classList.contains('page-btn') || e.target.closest('.page-btn')) {
-                const button = e.target.classList.contains('page-btn') ? e.target : e.target.closest('.page-btn');
+            // Handle clicks on buttons, their child elements (like icons), or page dots
+            const button = e.target.closest('.page-btn');
+            if (button) {
                 const page = button.dataset.page;
                 
                 if (page === 'prev' && currentPage > 1) {
                     currentPage--;
+                    renderNFTs();
                 } else if (page === 'next' && currentPage < Math.ceil(filteredNFTs.length / itemsPerPage)) {
                     currentPage++;
-                } else if (page !== 'prev' && page !== 'next') {
+                    renderNFTs();
+                } else if (page !== 'prev' && page !== 'next' && !isNaN(parseInt(page))) {
                     currentPage = parseInt(page);
+                    renderNFTs();
                 }
-                
-                renderNFTs();
             }
         });
     }
