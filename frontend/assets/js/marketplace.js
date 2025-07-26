@@ -944,15 +944,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Check if user has active ID NFT
             try {
+                // Ensure IDNFT service is available
+                if (!window.idnftService) {
+                    console.error('IDNFT service not found on window object');
+                    alert('ID NFT service is not available. Please refresh the page and try again.');
+                    return;
+                }
+                
+                console.log('IDNFT service found, initializing...');
                 await window.idnftService.ensureInitialized();
+                console.log('IDNFT service initialized, checking user ID NFT...');
+                
                 const idnftResult = await window.idnftService.checkUserIDNFT(userAddress);
                 if (!idnftResult.hasActive) {
                     alert('You need an active ID NFT to purchase recipes. Please mint an ID NFT first.');
                     return;
                 }
+                console.log('User has active ID NFT:', idnftResult);
             } catch (error) {
                 console.error('Error checking ID NFT:', error);
-                alert('Error checking ID NFT status. Please try again.');
+                alert('Error checking ID NFT status: ' + error.message + '. Please refresh the page and try again.');
                 return;
             }
 
