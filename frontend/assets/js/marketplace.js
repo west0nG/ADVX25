@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let allRecipes = [];
     let currentPage = 1;
     let itemsPerPage = 12;
-    let filteredNFTs = [];
     let isLoading = false;
 
     // Load recipes from backend
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Convert backend data format to frontend format
             allRecipes = recipes;
             nftData = transformRecipeData(recipes);
-            filteredNFTs = [...nftData];
             
             hideLoadingState();
             renderNFTs();
@@ -46,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showErrorState('Failed to load recipes. Using fallback data.');
             // Fallback to minimal mock data if API fails
             nftData = getFallbackData();
-            filteredNFTs = [...nftData];
             hideLoadingState();
             renderNFTs();
         }
@@ -407,8 +404,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize marketplace
     async function initMarketplace() {
         await loadRecipes();
-        setupFilters();
-        setupSearch();
         setupPagination();
     }
 
@@ -423,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        const pageNFTs = filteredNFTs.slice(startIndex, endIndex);
+        const pageNFTs = nftData.slice(startIndex, endIndex);
 
         console.log('Rendering', pageNFTs.length, 'NFTs');
 
@@ -452,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             <div style="position: relative;">
                 <img src="${nft.image}" alt="${nft.name}" class="nft-image">
-                <div class="nft-price">${nft.price} ETH</div>
+                <div class="nft-price">${nft.price} USDT</div>
             </div>
             <div class="nft-info">
                 <h3>${nft.name}</h3>
@@ -513,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${detailedRecipe.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${detailedRecipe.tokenId}</p>
                     <p><strong>Category:</strong> ${detailedRecipe.category}</p>
-                    <p><strong>Price:</strong> ${detailedRecipe.price} ETH</p>
+                    <p><strong>Price:</strong> ${detailedRecipe.price} USDT</p>
                     ${detailedRecipe.intro ? `<p><strong>Description:</strong> ${detailedRecipe.intro}</p>` : ''}
                     ${detailedRecipe.user_addresses && detailedRecipe.user_addresses.length > 0 ? `
                         <div class="recipe-section">
@@ -537,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${detailedRecipe.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary">Buy Now - ${detailedRecipe.price} ETH</button>
+                    <button class="btn-primary">Buy Now - ${detailedRecipe.price} USDT</button>
                 </div>
             `;
 
@@ -552,13 +547,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${nft.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${nft.tokenId}</p>
                     <p><strong>Category:</strong> ${nft.category}</p>
-                    <p><strong>Price:</strong> ${nft.price} ETH</p>
+                    <p><strong>Price:</strong> ${nft.price} USDT</p>
                     ${nft.intro ? `<p><strong>Description:</strong> ${nft.intro}</p>` : ''}
                     <p class="error-message">Could not load detailed recipe information</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${nft.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary">Buy Now - ${nft.price} ETH</button>
+                    <button class="btn-primary">Buy Now - ${nft.price} USDT</button>
                 </div>
             `;
                  }
@@ -642,105 +637,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(style);
     }
 
-    // Setup filters
-    function setupFilters() {
-        const filterOptions = document.querySelectorAll('.filter-option');
-        const sortSelect = document.querySelector('.sort-select');
 
-        filterOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                // Remove active class from all options in the same group
-                const group = option.closest('.filter-options');
-                group.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
 
-                applyFilters();
-            });
-        });
 
-        sortSelect.addEventListener('change', applyFilters);
-    }
-
-    // Apply filters
-    function applyFilters() {
-        const categoryFilter = document.querySelector('.filter-option[data-category].active').dataset.category;
-        const priceFilter = document.querySelector('.filter-option[data-price].active').dataset.price;
-        const sortBy = document.querySelector('.sort-select').value;
-
-        // Filter by category
-        filteredNFTs = nftData.filter(nft => {
-            if (categoryFilter !== 'all' && nft.category !== categoryFilter) return false;
-            return true;
-        });
-
-        // Filter by price
-        if (priceFilter !== 'all') {
-            const [min, max] = priceFilter.split('-').map(Number);
-            filteredNFTs = filteredNFTs.filter(nft => {
-                const price = parseFloat(nft.price);
-                if (max) {
-                    return price >= min && price < max;
-                } else {
-                    return price >= min;
-                }
-            });
-        }
-
-        // Sort
-        filteredNFTs.sort((a, b) => {
-            switch (sortBy) {
-                case 'price-low':
-                    return parseFloat(a.price) - parseFloat(b.price);
-                case 'price-high':
-                    return parseFloat(b.price) - parseFloat(a.price);
-                case 'oldest':
-                    return a.id - b.id;
-                case 'newest':
-                    return b.id - a.id;
-                default:
-                    return 0;
-            }
-        });
-
-        currentPage = 1;
-        renderNFTs();
-    }
-
-    // Setup search
-    function setupSearch() {
-        const searchInput = document.querySelector('.search-box input');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                const searchTerm = e.target.value.trim();
-                
-                if (searchTerm) {
-                    try {
-                        showLoadingState();
-                        const searchResults = await apiService.searchRecipes(searchTerm);
-                        filteredNFTs = transformRecipeData(searchResults);
-                        hideLoadingState();
-                    } catch (error) {
-                        console.error('Search failed:', error);
-                        // Fallback to client-side search
-                        filteredNFTs = nftData.filter(nft => 
-                            nft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            nft.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            nft.category.toLowerCase().includes(searchTerm.toLowerCase())
-                        );
-                        hideLoadingState();
-                    }
-                } else {
-                    filteredNFTs = [...nftData];
-                }
-
-                currentPage = 1;
-                renderNFTs();
-            }, 300);
-        });
-    }
 
     // Setup pagination
     function setupPagination() {
@@ -752,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (page === 'prev' && currentPage > 1) {
                     currentPage--;
-                } else if (page === 'next' && currentPage < Math.ceil(filteredNFTs.length / itemsPerPage)) {
+                } else if (page === 'next' && currentPage < Math.ceil(nftData.length / itemsPerPage)) {
                     currentPage++;
                 } else if (page !== 'prev' && page !== 'next') {
                     currentPage = parseInt(page);
@@ -765,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update pagination
     function updatePagination() {
-        const totalPages = Math.ceil(filteredNFTs.length / itemsPerPage);
+        const totalPages = Math.ceil(nftData.length / itemsPerPage);
         const pageNumbers = document.querySelector('.page-numbers');
         const prevBtn = document.querySelector('.page-btn[data-page="prev"]');
         const nextBtn = document.querySelector('.page-btn[data-page="next"]');

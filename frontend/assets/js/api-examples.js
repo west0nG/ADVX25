@@ -136,7 +136,7 @@ class APIExamples {
             const recipeAddress = "0xabcdef1234567890abcdef1234567890abcdef12";
             const metadataCid = "QmXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
             const ownerAddress = "0x1234567890abcdef1234567890abcdef12345678";
-            const price = "0.1"; // in ETH
+            const price = "0.1"; // in USDT
 
             const result = await this.api.storeRecipe(recipeAddress, metadataCid, ownerAddress, price);
             console.log('Recipe stored:', result);
