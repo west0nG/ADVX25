@@ -7,7 +7,7 @@ const APP_CONFIG = {
     
     // API Configuration  
     api: {
-        baseUrl: 'http://localhost:8080',   // Backend base URL (without /api since it's in endpoints)
+        baseUrl: 'https://bars-help-bars.onrender.com',   // Backend base URL (without /api since it's in endpoints)
         timeout: 30000,
         retries: 3,
         endpoints: {
