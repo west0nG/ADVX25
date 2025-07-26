@@ -1,9 +1,12 @@
 {
   "network": "injective_testnet",
-  "contract": "RecipeNFT",
-  "address": "0x8035fb3F9387C6c09421f2bE7eA797857Dc9fFc9",
+  "contracts": {
+    "idnft": "0x496F4DaaA04FAd0f62e06a8a2F9202431b1a5EC4",
+    "recipeNFT": "0xf9C4A1C157330918568b11C4121ab8bBcBc4131c"
+  },
   "deployer": "0xffEa650e76B756aBAb614CC0143210eEB7813Bea",
-  "timestamp": "2025-07-25T19:18:14.395Z",
+  "timestamp": "2025-07-26T05:56:11.343Z",
   "chainId": 1439,
-  "testTokenId": "1"
+  "testTokenId": "1",
+  "note": "包含ID NFT和Recipe NFT的完整系统，支持ERC-6551集成，已启用Injective兼容模式"
 }

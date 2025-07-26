@@ -8,7 +8,7 @@ import os
 import requests
 from pydantic import BaseModel
 
-from app.services.ipfs import upload_picture_to_pinata, upload_bar_to_pinata
+from app.services.ipfs import upload_picture_to_pinata, upload_bar_to_pinata, fetch_metadata_from_ipfs
 from app.models.bar import Bar
 from app.db.session import AsyncSessionLocal
 

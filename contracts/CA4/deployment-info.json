@@ -1,17 +1,17 @@
 {
   "network": "injective_testnet",
   "contracts": {
-    "mockUSDT": "0x71B085071993CAE6D55a426A6D1cec4A61bEdDb5",
-    "idnft": "0x0cf9a047d442dc62a71bB868BE16E55b24bC4fd7",
-    "recipeNFT": "0x113594FF5220c4eaf9de377919E8a451bbE0863d",
-    "marketplace": "0x4Cf9270ca9997DDF303F8335EF5b0eF1AF5A6ddb"
+    "mockUSDT": "0x81DDAf3D421BD54EdeBdE08C00EF59dA2464b927",
+    "idnft": "0xc4971cd7ef0fC14bd3b3Af97ECC85A298475B4Ff",
+    "recipeNFT": "0x2AF8d627E7767411093163a8a2bCfEd581f8E98b",
+    "marketplace": "0x03bEdd3242b625a8Ce602137314901D77Bc26503"
   },
   "deployer": "0xffEa650e76B756aBAb614CC0143210eEB7813Bea",
-  "timestamp": "2025-07-25T19:38:25.961Z",
+  "timestamp": "2025-07-26T05:45:02.970Z",
   "chainId": 1439,
   "testData": {
     "usdtMinted": "10000.0",
-    "idnftURI": "ipfs://QmTestIDNFT123456789",
-    "recipeURI": "ipfs://QmTestRecipe123456789"
-  }
+    "testTokenId": "1"
+  },
+  "note": "完整市场系统，支持ERC-6551集成，已启用Injective兼容模式"
 }
