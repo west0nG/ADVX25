@@ -147,7 +147,7 @@ async def set_bar(
     """新建酒吧信息。如果已有报错，应该是在sign up的时候使用, 前端先从链上获得address然后再传过来一个Metadata的CID"""
     try:
         # 从IPFS获取元数据
-        metadata = fetch_metadata_from_ipfs(item.meta_cid)
+        metadata = fetch_metadata_from_ipfs(item["meta_cid"])
         
         # 解析元数据
         bar_metadata = metadata.get("metadata", {})
