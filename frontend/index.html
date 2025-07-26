@@ -8,30 +8,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/wallet-ui.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header" id="header">
-        <nav class="nav">
-            <div class="logo">
-                <i class="fas fa-martini-glass-citrus"></i>
-                <span>BarsHelpBars</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="pages/marketplace.html">Marketplace</a></li>
-                <li><a href="pages/profile.html">Bar Profiles</a></li>
-                <li><a href="pages/main.html">Dashboard</a></li>
-            </ul>
-            <div class="header-actions">
-                <div class="search-box">
-                    <input type="text" placeholder="Search recipes...">
-                    <i class="fas fa-search"></i>
-                </div>
-                <a href="pages/auth.html" class="connect-btn">Connect Wallet</a>
-            </div>
-        </nav>
-    </header>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -43,7 +24,7 @@
             <i class="floating-icon fas fa-glass-whiskey" style="bottom: 30%; left: 20%; font-size: 1.8rem; animation-delay: 4s;"></i>
         </div>
         <div class="hero-content">
-                            <h1></h1>
+            <h1></h1>
             <p>Discover, collect, and mint exclusive cocktail recipes as unique NFTs. Own a piece of mixology history or create your own liquid legacy.</p>
             <div class="hero-buttons">
                 <a href="pages/marketplace.html" class="btn-primary">Explore Marketplace</a>
@@ -244,7 +225,14 @@
     </footer>
 
     <script src="config/app.config.js"></script>
+    
+    <!-- Wallet Services -->
+    <script src="assets/js/wallet-service.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    
+    <!-- Page Scripts -->
     <script src="assets/js/api-service.js"></script>
     <script src="assets/js/home.js"></script>
+    <script src="assets/js/header-loader.js"></script>
 </body>
 </html> 

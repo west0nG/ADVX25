@@ -1,23 +1,31 @@
 <!-- Header Component -->
 <header class="header" id="header">
     <nav class="nav">
-        <div class="header-container">
-            <div class="header-logo">
-                <img src="../assets/images/logo/logo.svg" alt="Logo">
+        <div class="logo">
+            <a href="/index.html" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-martini-glass-citrus"></i>
                 <span>BarsHelpBars</span>
-            </div>
-            <div class="header-search">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search recipes...">
+            </a>
             </div>
             <ul class="nav-links">
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="marketplace.html">Marketplace</a></li>
-                <li><a href="profile.html">Bar Profiles</a></li>
-                <li><a href="main.html">Dashboard</a></li>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/pages/marketplace.html">Marketplace</a></li>
+            <li><a href="/pages/profile.html">Bar Profiles</a></li>
+            <li><a href="/pages/main.html">Dashboard</a></li>
             </ul>
             <div class="header-actions">
-                <a href="pages/auth.html" class="connect-btn">Connect Wallet</a>
+            <!-- Wallet Connection Display -->
+            <div class="wallet-container">
+                <a href="/pages/auth.html" class="connect-btn" data-wallet-connect>
+                    <i class="fab fa-ethereum"></i> Connect Wallet
+                </a>
+                <div class="wallet-info" data-wallet-required style="display: none;">
+                    <span class="wallet-address" data-wallet-address></span>
+                    <span class="wallet-network" data-wallet-network></span>
+                    <button class="disconnect-btn" data-wallet-disconnect>
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>

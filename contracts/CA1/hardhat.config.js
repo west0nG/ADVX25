@@ -27,6 +27,17 @@ module.exports = {
     mainnet: {
       url: process.env.MAINNET_URL || "",
       accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : []
+    },
+    injective_testnet: {
+      url: process.env.INJECTIVE_TESTNET_URL || "https://testnet.injective.network:26657",
+      accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : [],
+      chainId: 1439,
+      timeout: 60000,
+      gasPrice: 5000000000, // 5 gwei
+      gas: 8000000,
+      httpHeaders: {
+        "Content-Type": "application/json"
+      }
     }
   },
   gasReporter: {

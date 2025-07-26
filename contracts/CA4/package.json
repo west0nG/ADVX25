@@ -8,6 +8,9 @@
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js",
     "deploy-sepolia": "hardhat run scripts/deploy-sepolia.js",
+    "deploy:injective": "hardhat run scripts/deploy-injective.js --network injective_testnet",
+    "deploy:injective-reuse": "hardhat run scripts/deploy-injective-reuse.js --network injective_testnet",
+    "test:injective": "hardhat run scripts/test-injective.js --network injective_testnet",
     "verify": "hardhat verify"
   },
   "dependencies": {

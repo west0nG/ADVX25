@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaMask Debug - BarsHelpBars</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #1a1a1a; 
+            color: white; 
+            padding: 20px; 
+        }
+        .debug-section { 
+            background: #2a2a2a; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #25f2f2;
+        }
+        .log { 
+            background: #000; 
+            padding: 15px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            font-size: 12px; 
+            max-height: 400px; 
+            overflow-y: auto; 
+        }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .warning { color: #ffd43b; }
+        .info { color: #74c0fc; }
+        button { 
+            background: #25f2f2; 
+            color: #000; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { background: #1cb8c4; }
+        button:disabled { background: #666; cursor: not-allowed; }
+        .status { 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-radius: 4px; 
+        }
+        .status.good { background: #2d5a2d; border-left: 4px solid #51cf66; }
+        .status.bad { background: #5a2d2d; border-left: 4px solid #ff6b6b; }
+        .status.warning { background: #5a5a2d; border-left: 4px solid #ffd43b; }
+    </style>
+</head>
+<body>
+    <h1>🔍 MetaMask Connection Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>Environment Check</h2>
+        <div id="env-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Service Status</h2>
+        <div id="service-status"></div>
+        <button onclick="checkServices()">Refresh Service Status</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Connection Test</h2>
+        <div id="connection-status"></div>
+        <button onclick="testConnection()" id="connect-btn">Test Connection</button>
+        <button onclick="testDirectConnection()">Test Direct MetaMask</button>
+        <button onclick="clearAllData()">Clear All Data</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Event Log</h2>
+        <div class="log" id="debug-log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <!-- Include our services -->
+    <script src="config/app.config.js"></script>
+    <script src="assets/js/wallet-service.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    
+    <script>
+        let logContainer;
+        
+        function log(message, type = 'info') {
+            if (!logContainer) logContainer = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = type;
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('debug-log').innerHTML = '';
+        }
+        
+        function updateStatus(containerId, content) {
+            document.getElementById(containerId).innerHTML = content;
+        }
+        
+        function createStatusDiv(message, type = 'good') {
+            return `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // Environment checks
+        function checkEnvironment() {
+            let status = '';
+            
+            // Check if window.ethereum exists
+            if (typeof window.ethereum !== 'undefined') {
+                status += createStatusDiv('✓ window.ethereum is available', 'good');
+                
+                // Check if it's MetaMask
+                if (window.ethereum.isMetaMask) {
+                    status += createStatusDiv('✓ MetaMask detected', 'good');
+                } else {
+                    status += createStatusDiv('⚠ Ethereum provider is not MetaMask', 'warning');
+                }
+                
+                // Check if connected
+                window.ethereum.request({ method: 'eth_accounts' })
+                    .then(accounts => {
+                        if (accounts.length > 0) {
+                            status += createStatusDiv(`✓ Already connected to account: ${accounts[0]}`, 'good');
+                        } else {
+                            status += createStatusDiv('○ No accounts connected', 'warning');
+                        }
+                        updateStatus('env-status', status);
+                    })
+                    .catch(error => {
+                        status += createStatusDiv(`✗ Error checking accounts: ${error.message}`, 'bad');
+                        updateStatus('env-status', status);
+                    });
+                    
+            } else {
+                status += createStatusDiv('✗ window.ethereum not found - MetaMask not installed', 'bad');
+                updateStatus('env-status', status);
+            }
+        }
+        
+        // Service checks
+        function checkServices() {
+            let status = '';
+            
+            // Check if WalletService is available
+            if (typeof window.walletService !== 'undefined') {
+                status += createStatusDiv('✓ WalletService is available', 'good');
+                
+                // Check service state
+                const connectionInfo = window.walletService.getConnectionInfo();
+                status += createStatusDiv(`Connection State: ${window.walletService.connectionState}`, 'info');
+                status += createStatusDiv(`Is Connected: ${connectionInfo.isConnected}`, connectionInfo.isConnected ? 'good' : 'warning');
+                
+                if (connectionInfo.account) {
+                    status += createStatusDiv(`Account: ${connectionInfo.account}`, 'good');
+                }
+                
+                if (connectionInfo.network) {
+                    status += createStatusDiv(`Network: ${connectionInfo.network.name}`, 'good');
+                }
+                
+            } else {
+                status += createStatusDiv('✗ WalletService not available', 'bad');
+            }
+            
+            // Check if AuthManager is available
+            if (typeof window.authManager !== 'undefined') {
+                status += createStatusDiv('✓ AuthManager is available', 'good');
+            } else {
+                status += createStatusDiv('✗ AuthManager not available', 'bad');
+            }
+            
+            updateStatus('service-status', status);
+        }
+        
+        // Test connection using our service
+        async function testConnection() {
+            const button = document.getElementById('connect-btn');
+            const originalText = button.textContent;
+            
+            try {
+                button.disabled = true;
+                button.textContent = 'Connecting...';
+                
+                log('Starting connection test using WalletService...', 'info');
+                
+                // Check if service is ready
+                if (window.walletService.initializationPromise) {
+                    log('Waiting for service initialization...', 'info');
+                    await window.walletService.ensureReady();
+                    log('Service initialization complete', 'success');
+                }
+                
+                // Test connection
+                const result = await window.walletService.connect();
+                log(`Connection successful: ${result.account}`, 'success');
+                log(`Network: ${result.chainId}`, 'info');
+                
+                updateStatus('connection-status', createStatusDiv(`Connected to: ${result.account}`, 'good'));
+                
+            } catch (error) {
+                log(`Connection failed: ${error.message}`, 'error');
+                log(`Error type: ${error.type || 'unknown'}`, 'error');
+                log(`Recoverable: ${error.recoverable}`, 'info');
+                
+                updateStatus('connection-status', createStatusDiv(`Error: ${error.message}`, 'bad'));
+                
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
+                checkServices();
+            }
+        }
+        
+        // Test direct MetaMask connection
+        async function testDirectConnection() {
+            try {
+                log('Testing direct MetaMask connection...', 'info');
+                
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask not found');
+                }
+                
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+                
+                if (accounts.length > 0) {
+                    log(`Direct connection successful: ${accounts[0]}`, 'success');
+                } else {
+                    log('No accounts returned', 'warning');
+                }
+                
+            } catch (error) {
+                log(`Direct connection failed: ${error.message}`, 'error');
+                log(`Error code: ${error.code}`, 'error');
+            }
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            log('Clearing all stored data...', 'warning');
+            
+            // Clear localStorage
+            localStorage.removeItem('walletConnected');
+            localStorage.removeItem('walletAddress');
+            localStorage.removeItem('walletType');
+            localStorage.removeItem('connectionTime');
+            
+            // Clear sessionStorage
+            sessionStorage.clear();
+            
+            // Reset service if available
+            if (window.walletService) {
+                window.walletService.clearStoredState();
+            }
+            
+            log('All data cleared', 'success');
+            checkServices();
+        }
+        
+        // Event listeners
+        window.addEventListener('walletConnected', (event) => {
+            log(`Event: walletConnected - ${event.detail.account}`, 'success');
+        });
+        
+        window.addEventListener('walletDisconnected', () => {
+            log('Event: walletDisconnected', 'warning');
+        });
+        
+        window.addEventListener('error', (event) => {
+            log(`JavaScript Error: ${event.error?.message || event.message}`, 'error');
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            log(`Unhandled Promise Rejection: ${event.reason}`, 'error');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Debug page loaded', 'info');
+            checkEnvironment();
+            checkServices();
+            
+            // Monitor service initialization
+            if (window.walletService && window.walletService.initializationPromise) {
+                log('Monitoring service initialization...', 'info');
+                window.walletService.initializationPromise
+                    .then(() => {
+                        log('Service initialization completed successfully', 'success');
+                        checkServices();
+                    })
+                    .catch(error => {
+                        log(`Service initialization failed: ${error.message}`, 'error');
+                    });
+            }
+        });
+    </script>
+</body>
+</html> 

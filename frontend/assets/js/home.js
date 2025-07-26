@@ -1,201 +1,48 @@
+// TYPEWRITER EFFECT - Simple and reliable implementation
+console.log('🚀 home.js script loaded successfully!');
 
-
-// Header scroll effect
-window.addEventListener('scroll', () => {
-    const header = document.getElementById('header');
-    if (window.scrollY > 100) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
-
-// Enhanced scroll animations with staggered effects
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            
-            // Add staggered animation for grid items
-            const grid = entry.target.querySelector('.nft-grid, .category-grid, .steps-grid');
-            if (grid) {
-                grid.classList.add('visible');
-            }
-            
-            // Animate section titles
-            const title = entry.target.querySelector('.section-title');
-            if (title) {
-                setTimeout(() => {
-                    title.classList.add('visible');
-                }, 200);
-            }
-        }
-    });
-}, observerOptions);
-
-document.querySelectorAll('.fade-in').forEach(el => {
-    observer.observe(el);
-});
-
-// Parallax scroll effect for hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    const heroContent = document.querySelector('.hero-content');
-    const floatingElements = document.querySelectorAll('.floating-icon');
+function startTypewriter() {
+    console.log('🎬 Starting typewriter animation...');
     
-    if (hero && heroContent) {
-        // Parallax effect for hero content
-        heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
-        // Completely fade out the hero content when scrolled down
-        heroContent.style.opacity = Math.max(0, 1 - scrolled * 0.003);
+    const titleElement = document.querySelector('.hero h1');
+    if (!titleElement) {
+        console.error('❌ Hero h1 element not found!');
+        return;
     }
     
-    // Enhanced parallax for floating elements
-    floatingElements.forEach((element, index) => {
-        const speed = 0.3 + (index * 0.1);
-        const yPos = scrolled * speed;
-        const xPos = Math.sin(scrolled * 0.001 + index) * 20;
-        element.style.transform = `translateY(${yPos}px) translateX(${xPos}px) rotate(${scrolled * 0.1}deg)`;
-    });
-});
-
-// Smooth section visibility without flashing animations
-const sections = document.querySelectorAll('.section');
-
-// Add CSS animation for ripple effects only
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes ripple {
-        0% {
-            transform: scale(0);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// Enhanced Three.js background animation
-function initThreeJS() {
-    const canvas = document.getElementById('hero-canvas');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+    console.log('✅ Found title element:', titleElement);
     
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
-
-    // Create floating particles with enhanced colors
-    const particleCount = 150;
-    const particles = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 25;
-        positions[i + 1] = (Math.random() - 0.5) * 25;
-        positions[i + 2] = (Math.random() - 0.5) * 25;
-
-        // Enhanced color variations with pink accents
-        const colorChoice = Math.random();
-        if (colorChoice < 0.7) {
-            // Cyan variations
-        colors[i] = 0.1 + Math.random() * 0.3;     // R
-        colors[i + 1] = 0.9 + Math.random() * 0.1; // G
-        colors[i + 2] = 0.9 + Math.random() * 0.1; // B
+    const text = "Sip, Own, Create: The Art of the Cocktail, On-Chain";
+    titleElement.innerHTML = ''; // Clear any existing content
+    
+    let index = 0;
+    
+    function typeCharacter() {
+        if (index < text.length) {
+            titleElement.innerHTML += text.charAt(index);
+            index++;
+            console.log(`⌨️ Typed: "${text.substring(0, index)}"`);
+            setTimeout(typeCharacter, 80); // 80ms delay between characters
         } else {
-            // Pink variations
-            colors[i] = 0.9 + Math.random() * 0.1;     // R
-            colors[i + 1] = 0.2 + Math.random() * 0.3; // G
-            colors[i + 2] = 0.6 + Math.random() * 0.4; // B
+            console.log('✨ Typewriter animation complete!');
+            // Add blinking cursor after text is complete
+            titleElement.innerHTML += '<span style="color: #25f2f2; animation: blinkSlow 2s infinite;">|</span>';
         }
     }
-
-    particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const particleMaterial = new THREE.PointsMaterial({
-        size: 0.06,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.8,
-        blending: THREE.AdditiveBlending
-    });
-
-    const particleSystem = new THREE.Points(particles, particleMaterial);
-    scene.add(particleSystem);
-
-    // Create floating cocktail glass shapes with enhanced materials
-    const glassGeometry = new THREE.ConeGeometry(0.2, 0.6, 8);
-    const glassMaterial = new THREE.MeshBasicMaterial({
-        color: 0x25f2f2,
-        transparent: true,
-        opacity: 0.4,
-        wireframe: true
-    });
-
-    const glasses = [];
-    for (let i = 0; i < 10; i++) {
-        const glass = new THREE.Mesh(glassGeometry, glassMaterial);
-        glass.position.set(
-            (Math.random() - 0.5) * 18,
-            (Math.random() - 0.5) * 12,
-            (Math.random() - 0.5) * 12
-        );
-        glass.rotation.set(
-            Math.random() * Math.PI,
-            Math.random() * Math.PI,
-            Math.random() * Math.PI
-        );
-        glasses.push(glass);
-        scene.add(glass);
-    }
-
-    camera.position.z = 5;
-
-    // Enhanced animation loop
-    function animate() {
-        requestAnimationFrame(animate);
-
-        // Rotate particles with varying speeds
-        particleSystem.rotation.y += 0.001;
-        particleSystem.rotation.x += 0.0005;
-
-        // Animate glasses with more complex movements
-        glasses.forEach((glass, index) => {
-            glass.rotation.y += 0.01 + index * 0.001;
-            glass.rotation.x += 0.005;
-            glass.position.y += Math.sin(Date.now() * 0.001 + index) * 0.002;
-            glass.position.x += Math.cos(Date.now() * 0.0008 + index) * 0.001;
-            
-            // Pulse opacity
-            glass.material.opacity = 0.3 + Math.sin(Date.now() * 0.002 + index) * 0.2;
-        });
-
-        renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    
+    // Start typing after a short delay
+    setTimeout(typeCharacter, 1000);
 }
 
-// Initialize Three.js when page loads
-initThreeJS();
+// Try to start immediately when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startTypewriter);
+} else {
+    // DOM is already ready
+    startTypewriter();
+}
+
+
 
 // Enhanced smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -440,59 +287,69 @@ setInterval(() => {
     });
 }, 4000);
 
-// Add typewriter effect to hero title
-function typewriterEffect() {
-    console.log('Typewriter effect function called');
-    const title = document.querySelector('.hero h1');
-    console.log('Title element found:', title);
-    const originalText = "Sip, Own, Create: The Art of the Cocktail, On-Chain";
-    console.log('Original text:', originalText);
-    
-    // Clear the title
-    title.textContent = '';
-    
-    // Create a cursor span first
-    const cursorSpan = document.createElement('span');
-    cursorSpan.textContent = '|';
-    cursorSpan.style.color = '#25f2f2'; // Cool cyan color
-    cursorSpan.style.fontWeight = 'normal';
-    cursorSpan.style.fontSize = '3.5rem';
-    // No shadows, no effects - just a clean cursor
-    // No animation initially - cursor stays solid during typing
-    title.appendChild(cursorSpan);
-    console.log('Cursor created and added to title');
-    
-    let i = 0;
-    const timer = setInterval(() => {
-        if (i < originalText.length) {
-            // Insert character before the cursor
-            const char = document.createTextNode(originalText.charAt(i));
-            title.insertBefore(char, cursorSpan);
-            i++;
-            console.log('Added character:', originalText.charAt(i-1));
-        } else {
-            // All text is complete, change to slower blink and keep flashing
-            clearInterval(timer);
-            console.log('Typewriter complete, cursor will flash slowly');
-            cursorSpan.style.animation = 'blinkSlow 2s infinite'; // Slower blink
-            setTimeout(() => {
-                cursorSpan.remove();
-                console.log('Cursor removed');
-            }, 5000); // Keep flashing for 5 seconds
+// Header scroll effect
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('header');
+    if (window.scrollY > 100) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+});
+
+// Enhanced scroll animations with staggered effects
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            
+            // Add staggered animation for grid items
+            const grid = entry.target.querySelector('.nft-grid, .category-grid, .steps-grid');
+            if (grid) {
+                grid.classList.add('visible');
+            }
+            
+            // Animate section titles
+            const title = entry.target.querySelector('.section-title');
+            if (title) {
+                setTimeout(() => {
+                    title.classList.add('visible');
+                }, 200);
+            }
         }
-    }, 80);
-}
+    });
+}, observerOptions);
 
-// Start typewriter effect after loading
-console.log('Starting typewriter effect...');
+document.querySelectorAll('.fade-in').forEach(el => {
+    observer.observe(el);
+});
 
-// Wait for DOM to be ready
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, setting up typewriter...');
-    setTimeout(() => {
-        console.log('Executing typewriter effect...');
-        typewriterEffect();
-    }, 1500);
+// Parallax scroll effect for hero section
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const hero = document.querySelector('.hero');
+    const heroContent = document.querySelector('.hero-content');
+    const floatingElements = document.querySelectorAll('.floating-icon');
+    
+    if (hero && heroContent) {
+        // Parallax effect for hero content
+        heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
+        // Completely fade out the hero content when scrolled down
+        heroContent.style.opacity = Math.max(0, 1 - scrolled * 0.003);
+    }
+    
+    // Enhanced parallax for floating elements
+    floatingElements.forEach((element, index) => {
+        const speed = 0.3 + (index * 0.1);
+        const yPos = scrolled * speed;
+        const xPos = Math.sin(scrolled * 0.001 + index) * 20;
+        element.style.transform = `translateY(${yPos}px) translateX(${xPos}px) rotate(${scrolled * 0.1}deg)`;
+    });
 });
 
 // Clean JavaScript-based Continuously Rotating Carousel with Mouse Drag

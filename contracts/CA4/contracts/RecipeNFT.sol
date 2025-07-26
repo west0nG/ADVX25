@@ -227,7 +227,42 @@ contract RecipeNFT is ERC721URIStorage, Ownable {
         require(recipeMetadata[tokenId].isForSale, "RecipeNFT: Token is not for sale");
         require(expires > block.timestamp, "RecipeNFT: Expiration time must be in the future");
         
-        _setUserInternal(tokenId, user, expires);
+        UserInfo storage info = _users[tokenId];
+        address oldUser = info.user;
+        
+        // 移除旧用户的授权记录
+        if (oldUser != address(0)) {
+            _removeUserFromAuthorizedList(oldUser, tokenId);
+        }
+        
+        // 设置新用户
+        info.user = user;
+        info.expires = expires;
+        
+        // 添加新用户到授权列表
+        if (user != address(0)) {
+            userToAuthorizedTokenIds[user].push(tokenId);
+        }
+        
+        emit UserUpdated(tokenId, user, expires);
+    }
+
+    /**
+     * @dev 移除token的授权用户
+     * @param tokenId NFT的tokenId
+     */
+    function removeUser(uint256 tokenId) external {
+        require(ownerOf(tokenId) == msg.sender, "RecipeNFT: Not the token owner");
+        
+        UserInfo storage info = _users[tokenId];
+        address oldUser = info.user;
+        
+        if (oldUser != address(0)) {
+            _removeUserFromAuthorizedList(oldUser, tokenId);
+            info.user = address(0);
+            info.expires = 0;
+            emit UserUpdated(tokenId, address(0), 0);
+        }
     }
 
     /**
@@ -270,24 +305,6 @@ contract RecipeNFT is ERC721URIStorage, Ownable {
         require(expires > block.timestamp, "RecipeNFT: Expiration time must be in the future");
         
         _setUserInternal(tokenId, user, expires);
-    }
-
-    /**
-     * @dev 移除token的授权用户
-     * @param tokenId NFT的tokenId
-     */
-    function removeUser(uint256 tokenId) external {
-        require(ownerOf(tokenId) == msg.sender, "RecipeNFT: Not the token owner");
-        
-        UserInfo storage info = _users[tokenId];
-        address oldUser = info.user;
-        
-        if (oldUser != address(0)) {
-            _removeUserFromAuthorizedList(oldUser, tokenId);
-            info.user = address(0);
-            info.expires = 0;
-            emit UserUpdated(tokenId, address(0), 0);
-        }
     }
 
     /**

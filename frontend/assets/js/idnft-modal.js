@@ -115,26 +115,21 @@ class IDNFTModal {
         }
     }
 
-    // 连接MetaMask
+    // 连接MetaMask - 使用集中化的WalletService
     async connectMetaMask() {
-        if (!isMetaMaskAvailable()) {
-            this.showError('MetaMask未找到', '请安装MetaMask浏览器扩展');
-            return null;
-        }
-
         try {
-            const accounts = await window.ethereum.request({
-                method: 'eth_requestAccounts'
-            });
-            
-            if (accounts.length > 0) {
-                return accounts[0];
-            } else {
-                throw new Error('No accounts returned');
-            }
+            // 使用WalletService连接
+            const result = await window.walletService.connect();
+            return result.account;
         } catch (error) {
             console.error('Error connecting to MetaMask:', error);
+            
+            // 根据错误类型显示适当的消息
+            if (error.type === 'NOT_INSTALLED') {
+                this.showError('MetaMask未找到', '请安装MetaMask浏览器扩展');
+            } else {
             this.showError('连接MetaMask失败', error.message);
+            }
             return null;
         }
     }
@@ -373,19 +368,16 @@ class IDNFTModal {
 
     // 处理登录成功
     handleLoginSuccess(walletAddress) {
-        // 存储连接信息
-        localStorage.setItem('walletConnected', 'true');
-        localStorage.setItem('walletAddress', walletAddress);
-        localStorage.setItem('walletType', 'metamask');
-        localStorage.setItem('connectionTime', new Date().toISOString());
+        // WalletService已经处理了基本的连接信息存储
+        // 这里只需存储IDNFT特定的信息
         localStorage.setItem('hasIDNFT', 'true');
         
         // 显示成功消息
         this.showSuccess('连接成功！', `欢迎回来，${window.idnftService.getShortAddress(walletAddress)}`);
         
-        // 跳转到个人资料页面
+        // 使用AuthManager进行导航
         setTimeout(() => {
-            window.location.href = 'profile.html';
+            window.authManager.redirectToIntendedDestination();
         }, 2000);
     }
 

@@ -1,0 +1,30 @@
+{
+  "network": "injective_testnet",
+  "contracts": {
+    "mockUSDT": "0x8F77C9DD44E4A50F3e0bdefCB1DdA948cE3A543e",
+    "idnft": "0x694bF2CB500e0a9bc932B9f113Dc379e82738e1B",
+    "recipeNFT": "0x8035fb3F9387C6c09421f2bE7eA797857Dc9fFc9",
+    "marketplace": "0x57B96760a11a38a34cC2389a4857129B8345523F"
+  },
+  "reusedContracts": {
+    "ca1": {
+      "address": "0x694bF2CB500e0a9bc932B9f113Dc379e82738e1B",
+      "deploymentFile": "../CA1/deployment-info.json"
+    },
+    "ca2": {
+      "address": "0x8035fb3F9387C6c09421f2bE7eA797857Dc9fFc9",
+      "deploymentFile": "../CA2/deployment-info.json"
+    }
+  },
+  "tester": "0xffEa650e76B756aBAb614CC0143210eEB7813Bea",
+  "timestamp": "2025-07-25T19:43:37.872Z",
+  "tests": {
+    "basicInfo": "✅ 通过",
+    "usdtBalance": "✅ 通过",
+    "idnftStatus": "✅ 通过",
+    "recipeNFTStatus": "✅ 通过",
+    "marketplaceConfig": "✅ 通过",
+    "completeFlow": "✅ 通过",
+    "erc4907": "✅ 通过"
+  }
+}

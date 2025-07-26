@@ -274,22 +274,30 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading to IPFS...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting to wallet...';
         submitBtn.disabled = true;
 
         try {
-            // Step 1: Upload image to IPFS
+            // Step 1: Connect to wallet and get signer
+            if (typeof window.ethereum === 'undefined') {
+                throw new Error('MetaMask is not installed. Please install it to continue.');
+            }
+            
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const walletAddress = await signer.getAddress();
+
+            // Step 2: Upload image to IPFS
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading image to IPFS...';
             const imageFile = document.getElementById('cocktail-image').files[0];
             if (!imageFile) {
                 throw new Error('No image file selected');
             }
-
             const imageCID = await apiService.uploadToIPFS(imageFile);
             
-            // Update loading state
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Storing recipe...';
-
-            // Step 2: Prepare recipe data
+            // Step 3: Prepare and upload metadata to IPFS
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading metadata to IPFS...';
             const ingredients = Array.from(document.querySelectorAll('input[name="ingredients[]"]'))
                 .map(input => input.value.trim())
                 .filter(value => value);
@@ -297,7 +305,45 @@ document.addEventListener('DOMContentLoaded', function() {
             const instructions = Array.from(document.querySelectorAll('input[name="instructions[]"]'))
                 .map(input => input.value.trim())
                 .filter(value => value);
+                
+            const metadata = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                image: `ipfs://${imageCID}`,
+                attributes: [
+                    {
+                        trait_type: 'Category',
+                        value: formData.get('category')
+                    },
+                    {
+                        trait_type: 'Price',
+                        value: formData.get('price')
+                    },
+                    {
+                        trait_type: 'Royalties',
+                        value: formData.get('royalties')
+                    }
+                ],
+                properties: {
+                    ingredients: ingredients,
+                    instructions: instructions
+                }
+            };
 
+            const metadataCID = await apiService.uploadMetadataToIPFS(metadata);
+            const metadataURI = `ipfs://${metadataCID}`;
+
+            // Step 4: Mint the NFT
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Minting NFT...';
+            const contractAddress = APP_CONFIG.blockchain.recipeNft.address;
+            const contractABI = APP_CONFIG.blockchain.recipeNft.abi;
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            const transaction = await contract.mintRecipeNFT(metadataURI);
+            await transaction.wait();
+            
+            // Step 5: Store recipe in backend (optional, if still needed)
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing...';
             const recipeData = {
                 recipe_name: formData.get('name'),
                 intro: formData.get('description'),
@@ -307,29 +353,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 ingredients: ingredients,
                 instructions: instructions,
                 image_cid: imageCID,
-                owner_nft_address: '0x' + Math.random().toString(16).substr(2, 40), // Placeholder - should come from connected wallet
-                nft_id: 'NFT_' + Date.now(),
-                nft_hash: 'HASH_' + Math.random().toString(16).substr(2, 32), // Placeholder - should be generated properly
+                metadata_cid: metadataCID,
+                owner_nft_address: walletAddress,
+                nft_id: transaction.hash,
                 created_at: new Date().toISOString()
             };
 
-            // Step 3: Store recipe in backend
             const success = await apiService.storeRecipe(recipeData);
-            
+
             if (success) {
-                // Reset button
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
-
-                // Show success message
                 showNotification('NFT created successfully! Redirecting to marketplace...', 'success');
-
-                // Redirect to marketplace after a delay
                 setTimeout(() => {
                     window.location.href = 'marketplace.html';
                 }, 2000);
             } else {
-                throw new Error('Failed to store recipe');
+                throw new Error('Failed to store recipe in backend');
             }
 
         } catch (error) {
