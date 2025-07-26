@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             <div style="position: relative;">
                 <img src="${nft.image}" alt="${nft.name}" class="nft-image">
-                <div class="nft-price">${nft.price} USDT</div>
+                <div class="nft-price">${nft.price} INJ</div>
             </div>
             <div class="nft-info">
                 <h3>${nft.name}</h3>
@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${detailedRecipe.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${detailedRecipe.tokenId}</p>
                     <p><strong>Category:</strong> ${detailedRecipe.category}</p>
-                    <p><strong>Price:</strong> ${detailedRecipe.price} USDT</p>
+                    <p><strong>Price:</strong> ${detailedRecipe.price} INJ</p>
                     ${detailedRecipe.intro ? `<p><strong>Description:</strong> ${detailedRecipe.intro}</p>` : ''}
                     ${detailedRecipe.user_addresses && detailedRecipe.user_addresses.length > 0 ? `
                         <div class="recipe-section">
@@ -567,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${detailedRecipe.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary" onclick="buyNFT('${detailedRecipe.tokenId}', '${detailedRecipe.price}', '${detailedRecipe.name}')">Buy Now - ${detailedRecipe.price} USDT</button>
+                    <button class="btn-primary" onclick="buyNFT('${detailedRecipe.tokenId}', '${detailedRecipe.price}', '${detailedRecipe.name}')">Buy Now - ${detailedRecipe.price} INJ</button>
                 </div>
             `;
 
@@ -582,13 +582,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${nft.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${nft.tokenId}</p>
                     <p><strong>Category:</strong> ${nft.category}</p>
-                    <p><strong>Price:</strong> ${nft.price} USDT</p>
+                    <p><strong>Price:</strong> ${nft.price} INJ</p>
                     ${nft.intro ? `<p><strong>Description:</strong> ${nft.intro}</p>` : ''}
                     <p class="error-message">Could not load detailed recipe information</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${nft.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary" onclick="buyNFT('${nft.tokenId}', '${nft.price}', '${nft.name}')">Buy Now - ${nft.price} USDT</button>
+                    <button class="btn-primary" onclick="buyNFT('${nft.tokenId}', '${nft.price}', '${nft.name}')">Buy Now - ${nft.price} INJ</button>
                 </div>
             `;
                  }
@@ -994,22 +994,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="fee-breakdown">
                         <h4>Purchase Summary</h4>
                         <p><strong>Recipe:</strong> ${recipeName}</p>
-                        <p><strong>Price:</strong> ${fees.price} USDT</p>
-                        <p><strong>Platform Fee (${(fees.feeRate * 100).toFixed(2)}%):</strong> ${fees.platformFee.toFixed(6)} USDT</p>
-                        <p><strong>Seller Receives:</strong> ${fees.sellerAmount.toFixed(6)} USDT</p>
+                        <p><strong>Price:</strong> ${fees.price} INJ</p>
+                        <p><strong>Platform Fee (${(fees.feeRate * 100).toFixed(2)}%):</strong> ${fees.platformFee.toFixed(6)} INJ</p>
+                        <p><strong>Seller Receives:</strong> ${fees.sellerAmount.toFixed(6)} INJ</p>
                     </div>
-                    <p>Checking USDT balance...</p>
+                    <p>Checking INJ balance...</p>
                 `);
 
-                // Check user's USDT balance
-                const balance = await window.marketplaceService.getUserUSDTBalance(userAddress);
+                // Check user's INJ balance
+                const balance = await window.marketplaceService.getUserINJBalance(userAddress);
                 if (parseFloat(balance) < parseFloat(price)) {
                     updateBuyingModal(loadingModal, `
                         <div class="error-message">
                             <h4>Insufficient Balance</h4>
-                            <p>Your USDT balance: ${parseFloat(balance).toFixed(6)} USDT</p>
-                            <p>Required: ${price} USDT</p>
-                            <p>Please add more USDT to your wallet and try again.</p>
+                            <p>Your INJ balance: ${parseFloat(balance).toFixed(6)} INJ</p>
+                            <p>Required: ${price} INJ</p>
+                            <p>Please add more INJ to your wallet and try again.</p>
                             <button class="btn-primary" onclick="closeBuyingModal('${loadingModal.id}')" style="margin-top: 1rem;">Close</button>
                         </div>
                     `);

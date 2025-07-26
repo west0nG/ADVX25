@@ -579,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p style="color: #9ca3af; margin-bottom: 1rem;">${description}</p>
                             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                                 <span style="background: rgba(37, 242, 242, 0.2); color: #25f2f2; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.875rem;">${category}</span>
-                                <span style="background: rgba(37, 242, 242, 0.2); color: #25f2f2; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.875rem;">${price} USDT</span>
+                                <span style="background: rgba(37, 242, 242, 0.2); color: #25f2f2; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.875rem;">${price} INJ</span>
                             </div>
                         </div>
                         <div>
