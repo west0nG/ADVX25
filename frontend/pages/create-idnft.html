@@ -253,36 +253,28 @@
                     
                     // Upload bar data to IPFS via your existing API
                     this.showStatus('Uploading bar data to IPFS...', 'loading');
-                    const uploadResult = await this.uploadBarToIPFSWithFallback(barName, barLocation, barIntro, barPhotoFile);
+                    const uploadResult = await this.uploadBarToIPFS(barName, barLocation, barIntro, barPhotoFile);
                     
-                    if (uploadResult.development_mode) {
-                        this.showStatus('⚠️ Development mode: Using mock data since backend is not available', 'error');
-                        // Still show success for development testing
-                        setTimeout(() => {
-                            this.showStatus('Development mode complete - IDNFT creation requires backend integration', 'success');
-                        }, 1000);
-                    } else {
-                        // Data uploaded successfully to IPFS, now mint the IDNFT
-                        this.showStatus('✅ Bar data uploaded to IPFS successfully!', 'success');
+                    // Data uploaded successfully to IPFS, now mint the IDNFT
+                    this.showStatus('✅ Bar data uploaded to IPFS successfully!', 'success');
+                    
+                    // Try to mint the IDNFT on blockchain
+                    this.showStatus('Creating Identity NFT on blockchain...', 'loading');
+                    
+                    try {
+                        const mintResult = await this.createIDNFTOnBlockchain(uploadResult.cid);
+                        this.showStatus('✅ Bar Identity NFT created successfully!', 'success');
                         
-                        // Try to mint the IDNFT on blockchain
-                        this.showStatus('Creating Identity NFT on blockchain...', 'loading');
+                        // Call backend to sync the bar data with ERC-6551 tokenId
+                        await this.syncBarToBackend(uploadResult.cid, barName, mintResult.tokenId);
                         
-                        try {
-                            const mintResult = await this.createIDNFTOnBlockchain(uploadResult.ipfs_cid);
-                            this.showStatus('✅ Bar Identity NFT created successfully!', 'success');
-                            
-                            // Call backend to sync the bar data with ERC-6551 tokenId
-                            await this.syncBarToBackend(uploadResult.ipfs_cid, barName, mintResult.tokenId);
-                            
-                        } catch (mintError) {
-                            console.error('IDNFT minting failed:', mintError);
-                            this.showStatus(`IDNFT creation failed: ${mintError.message}`, 'error');
-                            throw mintError;
-                        }
-                        
-                        console.log('Bar data uploaded successfully:', uploadResult);
+                    } catch (mintError) {
+                        console.error('IDNFT minting failed:', mintError);
+                        this.showStatus(`IDNFT creation failed: ${mintError.message}`, 'error');
+                        throw mintError;
                     }
+                    
+                    console.log('Bar data uploaded successfully:', uploadResult);
                     
                     // Wait a bit for the transaction to be confirmed
                     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -361,6 +353,7 @@
                     }
                     
                     console.log('Upload successful:', result);
+                    // Return the result in the expected format {"cid": str}
                     return result;
                 } catch (error) {
                     console.error('Bar upload error:', error);
@@ -376,98 +369,7 @@
                 }
             }
             
-            async uploadBarToIPFSWithFallback(barName, barLocation, barIntro, barPhotoFile) {
-                // List of possible API endpoints and base URLs to try (based on API documentation)
-                const baseUrls = [
-                    window.apiService.baseUrl, // Current configured URL
-                    'http://localhost:8080', // Backend without /api prefix
-                    'http://localhost:3000', // Node.js default
-                    'http://localhost:5000', // Flask default
-                    'http://127.0.0.1:8080'  // Alternative localhost
-                ];
-                
-                const endpoints = ['/api/bars/upload_bar_ipfs', '/bars/upload_bar_ipfs'];
-                
-                let lastError = null;
-                
-                // Try each combination of base URL and endpoint
-                for (const baseUrl of baseUrls) {
-                    for (const endpoint of endpoints) {
-                        try {
-                            console.log(`Trying: ${baseUrl}${endpoint}`);
-                            
-                            const formData = new FormData();
-                            // Based on API documentation, the endpoint expects specific field names
-                            formData.append('bar_name', barName);
-                            formData.append('bar_location', barLocation);  
-                            formData.append('bar_intro', barIntro);
-                            formData.append('jpg_file', barPhotoFile);
-                            
-                            // Debug: Log the FormData contents
-                            console.log('FormData contents:');
-                            for (let [key, value] of formData.entries()) {
-                                console.log(`  ${key}:`, value instanceof File ? `File(${value.name}, ${value.type})` : value);
-                            }
-                            
-                            const response = await fetch(`${baseUrl}${endpoint}`, {
-                                method: 'POST',
-                                body: formData,
-                                timeout: 10000 // 10 second timeout per attempt
-                            });
-                            
-                            // Check if we got a JSON response
-                            const contentType = response.headers.get('content-type');
-                            console.log(`Response content-type: ${contentType}`);
-                            
-                            if (contentType && contentType.includes('application/json')) {
-                                const result = await response.json();
-                                console.log(`JSON Response:`, result);
-                                
-                                if (response.ok) {
-                                    console.log(`SUCCESS: Found working endpoint at ${baseUrl}${endpoint}`);
-                                    // Update the config for future use
-                                    window.apiService.baseUrl = baseUrl;
-                                    return result;
-                                } else {
-                                    console.log(`Endpoint exists but returned error: ${response.status}`, result);
-                                    lastError = new Error(`API error (${response.status}): ${result.detail || result.message || 'Unknown error'}`);
-                                }
-                            } else {
-                                const textResponse = await response.text();
-                                console.log(`Non-JSON response (${response.status}):`, textResponse.substring(0, 300));
-                                
-                                if (response.status === 200) {
-                                    // Sometimes the backend returns HTML even for successful requests
-                                    console.warn('Got HTML response with 200 status - this might indicate CORS or routing issues');
-                                }
-                            }
-                        } catch (error) {
-                            console.log(`Failed ${baseUrl}${endpoint}:`, error.message);
-                            lastError = error;
-                        }
-                    }
-                }
-                
-                // If we get here, all attempts failed - provide mock response for development
-                console.error('All API endpoint attempts failed, using mock response');
-                console.warn('DEVELOPMENT MODE: Using mock IPFS response since backend is not available');
-                
-                // Return a mock successful response for development purposes
-                const mockResponse = {
-                    success: true,
-                    message: 'Mock IPFS upload (backend not available)',
-                    cid: 'QmMOCK' + Date.now(),
-                    final_cid: 'QmMOCK' + Date.now(),
-                    metadata_cid: 'QmMOCK' + Date.now(),
-                    ipfs_url: `ipfs://QmMOCK${Date.now()}`,
-                    development_mode: true
-                };
-                
-                // Show warning to user
-                this.showStatus('⚠️ Backend not available - using development mode. IDNFT creation may not work fully.', 'error');
-                
-                return mockResponse;
-            }
+
             
             // IDNFT creation must be handled by the backend since it requires contract owner permissions
             // The CA1 contract's createIDNFT function can only be called by the contract owner
