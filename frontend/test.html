@@ -564,7 +564,7 @@
 
     <script>
         // Configuration
-        const API_BASE_URL = 'http://localhost:8000/api';
+        const API_BASE_URL = 'http://localhost:8080/api';
         
         // Tab management
         function showTab(tabName) {
@@ -962,40 +962,6 @@
         }
 
         // Transactions & Mint API Functions
-        async function uploadPictureToIPFS() {
-            const button = event.target;
-            const originalText = showLoading(button);
-            
-            try {
-                const formData = new FormData();
-                const fileInput = document.getElementById('trans-picture');
-                if (fileInput.files.length > 0) {
-                    formData.append('file', fileInput.files[0]);
-                } else {
-                    throw new Error('Please select a file');
-                }
-
-                const response = await fetch(`${API_BASE_URL}/trans/upload_pic_to_ipfs`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showResult('upload-picture-result', result, 'success');
-                    showStatus('Picture uploaded to IPFS successfully!');
-                } else {
-                    showResult('upload-picture-result', result, 'error');
-                    showStatus('Failed to upload picture to IPFS', 'error');
-                }
-            } catch (error) {
-                showResult('upload-picture-result', `Error: ${error.message}`, 'error');
-                showStatus('Network error occurred', 'error');
-            } finally {
-                hideLoading(button, originalText);
-            }
-        }
 
         async function completeTransaction() {
             const button = event.target;
@@ -1027,41 +993,6 @@
                 }
             } catch (error) {
                 showResult('complete-transaction-result', `Error: ${error.message}`, 'error');
-                showStatus('Network error occurred', 'error');
-            } finally {
-                hideLoading(button, originalText);
-            }
-        }
-
-        async function completeRecipeMint() {
-            const button = event.target;
-            const originalText = showLoading(button);
-            
-            try {
-                const data = {
-                    recipe_nft: document.getElementById('complete-mint-recipe').value,
-                    owner: document.getElementById('complete-mint-owner').value
-                };
-
-                const response = await fetch(`${API_BASE_URL}/trans/complete_recipe_mint`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showResult('complete-mint-result', result, 'success');
-                    showStatus('Recipe mint completed successfully!');
-                } else {
-                    showResult('complete-mint-result', result, 'error');
-                    showStatus('Failed to complete recipe mint', 'error');
-                }
-            } catch (error) {
-                showResult('complete-mint-result', `Error: ${error.message}`, 'error');
                 showStatus('Network error occurred', 'error');
             } finally {
                 hideLoading(button, originalText);

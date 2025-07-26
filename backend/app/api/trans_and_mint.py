@@ -29,32 +29,6 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.post("/upload_pic_to_ipfs")
-async def upload_pic_to_ipfs(file: UploadFile = File(...)):
-    """上传图片到IPFS，返回CID供前端mint使用"""
-    # 验证文件格式
-    if not file.filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-        raise HTTPException(status_code=400, detail="文件必须是JPG或PNG格式")
-    
-    try:
-        # 保存文件到临时目录
-        pics_folder = os.path.join(os.path.dirname(__file__), "..", "services", "pics")
-        os.makedirs(pics_folder, exist_ok=True)
-        file_path = os.path.join(pics_folder, file.filename)
-        
-        with open(file_path, "wb") as f:
-            f.write(await file.read())
-        
-        # 上传到IPFS获取CID
-        cid = upload_picture_to_pinata(file_path)
-        
-        # 清理临时文件
-        os.remove(file_path)
-        
-        return {"cid": cid}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"上传失败: {str(e)}")
 
 @router.post("/complete_transaction")
 async def complete_transaction(
@@ -107,32 +81,6 @@ async def complete_transaction(
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"完成交易失败: {str(e)}")
-
-@router.post("/complete_recipe_mint")
-async def complete_recipe_mint(
-    request: CompleteRecipeMintRequest,
-    db: AsyncSession = Depends(get_db)
-):
-    """完成recipe mint后同步数据到后端"""
-    try:
-        # 更新owner的owned_recipes
-        result = await db.execute(
-            select(Bar).where(Bar.bar_address == request.owner)
-        )
-        owner_bar = result.scalar_one_or_none()
-        
-        if owner_bar:
-            owned_recipes = json.loads(owner_bar.owned_recipes) if owner_bar.owned_recipes else []
-            if request.recipe_nft not in owned_recipes:
-                owned_recipes.append(request.recipe_nft)
-                owner_bar.owned_recipes = json.dumps(owned_recipes)
-                await db.commit()
-        
-        return {"success": True}
-        
-    except Exception as e:
-        await db.rollback()
-        raise HTTPException(status_code=500, detail=f"完成mint失败: {str(e)}")
 
 @router.get("/transaction_history/{address}")
 async def get_transaction_history(

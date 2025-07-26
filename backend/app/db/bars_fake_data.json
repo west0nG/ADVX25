@@ -1,0 +1,82 @@
+[
+    {
+      "bar_address": "QmNyaZ2C5i2wNAeTDtHr2nkB6xwnpAmXscxLJz9o8o3f2v",
+      "bar_photo": "QmTPQjsRqPgEa7CGUFPWivDuQRA4ggpMQoRkmtdczh52Km",
+      "bar_name": "The Golden Shaker",
+      "bar_location": "New York City",
+      "bar_intro": "A classic cocktail lounge with a modern twist, specializing in rare spirits.",
+      "owned_recipes": [
+        "QmVG9kL4jK1pZ2n3o8x7y6w5u4t3s2r1q9p0o8i7h6g",
+        "QmT1EaF5bG6cH7dI8eJ9fK0lM1nO2pQ3rS4tU5vW6xY",
+        "QmZ2Y3X4C5V6B7N8M9L0K1J2H3G4F5D6S7A8Q9W0E1R"
+      ],
+      "used_recipes": [
+        "QmPQR9sT0uV1wX2yZ3aB4cD5eF6gH7iJ8kL9mN0o1pQ",
+        "QmJ0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6A7B8C9",
+        "QmDEF3G4H5I6J7K8L9M0N1O2P3Q4R5S6T7U8V9W0X1Y"
+      ]
+    },
+    {
+      "bar_address": "QmVX7qP8jL9nM0o1eC2fG3hI4jK5lM6nO7pQ8rS9tU0vW",
+      "bar_photo": "QmD4F5G6H7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y",
+      "bar_name": "Velvet & Rye",
+      "bar_location": "Los Angeles",
+      "bar_intro": "An intimate speakeasy known for its innovative and handcrafted cocktails.",
+      "owned_recipes": [
+        "QmPQR9sT0uV1wX2yZ3aB4cD5eF6gH7iJ8kL9mN0o1pQ",
+        "QmA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U"
+      ],
+      "used_recipes": [
+        "QmVG9kL4jK1pZ2n3o8x7y6w5u4t3s2r1q9p0o8i7h6g",
+        "QmB2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V",
+        "QmFGH7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A",
+        "QmXCVB1N2M3L4K5J6H7G8F9D0S1A2Q3W4E5R6T7Y8U9"
+      ]
+    },
+    {
+      "bar_address": "QmY5aB6cD7eF8gH9iJ0kL1mN2oP3qR4sT5uV6wX7yZ8aB",
+      "bar_photo": "QmF1G2H3I4J5K6L7M8N9O0P1Q2R3S4T5U6V7W8X9Y0Z",
+      "bar_name": "The Copper Kettle",
+      "bar_location": "Chicago",
+      "bar_intro": "A cozy neighborhood bar offering classic cocktails and a relaxed atmosphere.",
+      "owned_recipes": [
+        "QmXCVB1N2M3L4K5J6H7G8F9D0S1A2Q3W4E5R6T7Y8U9",
+        "QmJ0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6A7B8C9"
+      ],
+      "used_recipes": [
+        "QmFGH7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A",
+        "QmZ2Y3X4C5V6B7N8M9L0K1J2H3G4F5D6S7A8Q9W0E1R",
+        "QmPQR9sT0uV1wX2yZ3aB4cD5eF6gH7iJ8kL9mN0o1pQ"
+      ]
+    },
+    {
+      "bar_address": "QmC3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W",
+      "bar_photo": "QmZXC9V8B7N6M5L4K3J2H1G0F9D8S7A6Q5W4E3R2T1Y",
+      "bar_name": "Azure Horizon",
+      "bar_location": "Miami",
+      "bar_intro": "A rooftop bar with stunning views and refreshing tropical cocktails.",
+      "owned_recipes": [
+        "QmFGH7I8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A"
+      ],
+      "used_recipes": [
+        "QmXCVB1N2M3L4K5J6H7G8F9D0S1A2Q3W4E5R6T7Y8U9",
+        "QmA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U",
+        "QmT1EaF5bG6cH7dI8eJ9fK0lM1nO2pQ3rS4tU5vW6xY"
+      ]
+    },
+    {
+      "bar_address": "QmA9B0C1D2E3F4G5H6I7J8K9L0M1N2O3P4Q5R6S7T8U",
+      "bar_photo": "QmW1X2Y3Z4A5B6C7D8E9F0G1H2I3J4K5L6M7N8O9P0Q",
+      "bar_name": "The Alchemist's Den",
+      "bar_location": "Seattle",
+      "bar_intro": "An experimental bar pushing the boundaries of mixology with unique ingredients.",
+      "owned_recipes": [
+        "QmB2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V",
+        "QmDEF3G4H5I6J7K8L9M0N1O2P3Q4R5S6T7U8V9W0X1Y"
+      ],
+      "used_recipes": [
+        "QmT1EaF5bG6cH7dI8eJ9fK0lM1nO2pQ3rS4tU5vW6xY",
+        "QmVG9kL4jK1pZ2n3o8x7y6w5u4t3s2r1q9p0o8i7h6g"
+      ]
+    }
+  ]

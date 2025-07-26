@@ -15,62 +15,66 @@ fake = Faker()
 engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-async def create_fake_bars(session, n=100):
+async def create_fake_bars(session, n=5):
+    # Load real bar data from JSON file
+    with open('app/db/bars_fake_data.json', 'r', encoding='utf-8') as f:
+        bars_data = json.load(f)
+    
     bars = []
-    for _ in range(n):
+    for bar_data in bars_data:
         bar = Bar(
-            bar_photo=fake.image_url(),
-            bar_name=fake.company(),
-            bar_location=fake.address(),
-            bar_intro=fake.text(max_nb_chars=200),
-            bar_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
-            owned_recipes=json.dumps([fake.word() for _ in range(random.randint(0, 3))]),
-            used_recipes=json.dumps([fake.word() for _ in range(random.randint(0, 3))]),
+            bar_photo=bar_data['bar_photo'],
+            bar_name=bar_data['bar_name'],
+            bar_location=bar_data['bar_location'],
+            bar_intro=bar_data['bar_intro'],
+            bar_address=bar_data['bar_address'],
+            owned_recipes=json.dumps(bar_data['owned_recipes']),
+            used_recipes=json.dumps(bar_data['used_recipes']),
         )
         bars.append(bar)
     session.add_all(bars)
     await session.flush()
     return bars
 
-async def create_fake_recipes(session, n=100, bar_addresses=None):
+async def create_fake_recipes(session, n=10, bar_addresses=None):
+    # Load real recipe data from JSON file
+    with open('app/db/recipes_fake_data.json', 'r', encoding='utf-8') as f:
+        recipes_data = json.load(f)
+    
     recipes = []
-    for _ in range(n):
-        owner = random.choice(bar_addresses) if bar_addresses else '0x' + ''.join(random.choices('0123456789abcdef', k=40))
+    for recipe_data in recipes_data:
         recipe = Recipe(
-            cocktail_name=fake.word().capitalize() + ' Cocktail',
-            cocktail_intro=fake.text(max_nb_chars=150),
-            cocktail_photo=fake.image_url(),
-            cocktail_recipe=fake.text(max_nb_chars=300),
-            recipe_photo=fake.image_url(),
-            owner_address=owner,
-            user_address=json.dumps(['0x' + ''.join(random.choices('0123456789abcdef', k=40)) for _ in range(random.randint(0, 3))]),
-            price=round(random.uniform(5, 100), 2),
-            status=random.choice(['listed', 'unlisted', 'sold']),
-            recipe_address='0x' + ''.join(random.choices('0123456789abcdef', k=40)),
+            cocktail_name=recipe_data['cocktail_name'],
+            cocktail_intro=recipe_data['cocktail_intro'],
+            cocktail_photo=recipe_data['cocktail_photo'],
+            cocktail_recipe=recipe_data['cocktail_recipe'],
+            recipe_photo=recipe_data['recipe_photo'],
+            owner_address=recipe_data['owner_address'],
+            user_address=json.dumps(recipe_data['user_address']),
+            price=recipe_data['price'],
+            status=recipe_data['status'],
+            recipe_address=recipe_data['recipe_address'],
         )
         recipes.append(recipe)
     session.add_all(recipes)
     await session.flush()
     return recipes
 
-async def create_fake_transactions(session, n=200, bars=None, recipes=None):
+async def create_fake_transactions(session, n=15, bars=None, recipes=None):
+    # Load real transaction data from JSON file
+    with open('app/db/transactions_fake_data.json', 'r', encoding='utf-8') as f:
+        transactions_data = json.load(f)
+    
     transactions = []
-    if not bars or not recipes:
-        return transactions
-    bar_addresses = [bar.bar_address for bar in bars]
-    recipe_objs = recipes
-    for _ in range(n):
-        recipe = random.choice(recipe_objs)
-        seller = recipe.owner_address
-        # buyer不能和seller一样
-        buyer = random.choice([addr for addr in bar_addresses if addr != seller]) if len(bar_addresses) > 1 else seller
-        # 随机时间
+    for tx_data in transactions_data:
+        # Convert timestamp string to datetime object
         days_ago = random.randint(0, 365)
         tx_time = datetime.now() - timedelta(days=days_ago, hours=random.randint(0, 23), minutes=random.randint(0, 59))
+        
         transaction = Transaction(
-            buyer=buyer,
-            seller=seller,
-            recipe_address=recipe.recipe_address,
+            buyer=tx_data['buyer'],
+            seller=tx_data['seller'],
+            recipe_address=tx_data['recipe_address'],
             timestamp=tx_time
         )
         transactions.append(transaction)
@@ -80,10 +84,10 @@ async def create_fake_transactions(session, n=200, bars=None, recipes=None):
 
 async def main():
     async with AsyncSessionLocal() as session:
-        bars = await create_fake_bars(session, 100)
+        bars = await create_fake_bars(session, 5)  # 5 bars from JSON file
         bar_addresses = [bar.bar_address for bar in bars]
-        recipes = await create_fake_recipes(session, 100, bar_addresses=bar_addresses)
-        await create_fake_transactions(session, 200, bars=bars, recipes=recipes)
+        recipes = await create_fake_recipes(session, 10, bar_addresses=bar_addresses)  # 10 recipes
+        await create_fake_transactions(session, 15, bars=bars, recipes=recipes)  # 15 transactions
         await session.commit()
     await engine.dispose()
 
