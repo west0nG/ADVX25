@@ -12,19 +12,22 @@
 
 ## Routers to Implement in `recipes.py`
 
-### 1. upload_ipfs
+### 1. upload_recipe_to_ipfs
 
-- **Purpose:** Upload a JPG image to IPFS and return its CID.
-- **Input:** JPG file (multipart/form-data)
+- **Purpose:** Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID.
+- **Input:** JPG file (multipart/form-data) and JSON file (multipart/form-data)
 - **Output:** `{ "cid": "<IPFS_CID>" }`
 - **Backend Steps:**
-  - Create a POST endpoint `/recipes/upload_ipfs`
+  - Create a POST endpoint `/recipes/upload_recipe_to_ipfs`
   - Use FastAPI’s `File` and `UploadFile`
-  - Call IPFS upload logic (in `ipfs_service.py`)
-  - Return the CID
+  - First upload JPG to IPFS, get JPG CID
+  - Integrate JPG CID into JSON metadata
+  - Upload complete metadata JSON to IPFS, get final CID
+  - Return the final metadata CID
 - **Frontend Steps:**
-  - Add file upload UI and JS to call this endpoint
-  - Display or use the returned CID
+  - Add file upload UI for both JPG and JSON files
+  - JS to call this endpoint with both files
+  - Display or use the returned final CID
 
 ### 2. store_recipe
 
@@ -114,7 +117,7 @@
 
 | Endpoint        | Method | Path                       | Input              | Output       | Backend File                        | Frontend File(s)          |
 | --------------- | ------ | -------------------------- | ------------------ | ------------ | ----------------------------------- | ------------------------- |
-| upload_ipfs     | POST   | /recipes/upload_ipfs       | JPG file           | CID          | api/v1/recipes.py, ipfs_service.py  | assets/js/recipe.js, HTML |
+| upload_recipe_to_ipfs     | POST   | /recipes/upload_recipe_to_ipfs       | JPG file + JSON file | FINAL_CID    | api/v1/recipes.py, ipfs_service.py  | assets/js/recipe.js, HTML |
 | store_recipe    | POST   | /recipes/store             | JSON               | success bool | api/v1/recipes.py, models/recipe.py | assets/js/recipe.js, HTML |
 | get_ten_recipes | GET    | /recipes/ten               | None               | JSON (10)    | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
 | get_all_recipes | GET    | /recipes/all               | None               | JSON (all)   | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
@@ -165,17 +168,20 @@
 
 ### 1. upload_bar_photo_ipfs
 
-- **Purpose:** 上传酒吧照片（JPG）到 IPFS，返回 CID。
-- **Input:** JPG 文件（multipart/form-data）
-- **Output:** `{ "cid": "<IPFS_CID>" }`
+- **Purpose:** Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID.
+- **Input:** JPG file (multipart/form-data) and JSON file (multipart/form-data)
+- **Output:** `{ "cid": "<FINAL_METADATA_CID>" }`
 - **Backend Steps:**
-  - 创建 POST 接口 `/bars/upload_bar_photo_ipfs`
-  - 使用 FastAPI 的 `File` 和 `UploadFile`
-  - 调用 `ipfs_service.py` 的上传逻辑
-  - 返回 CID
+  - Create a POST endpoint `/bars/upload_bar_photo_ipfs`
+  - Use FastAPI's `File` and `UploadFile` for both files
+  - First upload JPG to IPFS, get JPG CID
+  - Integrate JPG CID into JSON metadata
+  - Upload complete metadata JSON to IPFS, get final CID
+  - Return the final metadata CID
 - **Frontend Steps:**
-  - 增加文件上传 UI，JS 调用该接口
-  - 显示或使用返回的 CID
+  - Add file upload UI for both JPG and JSON files
+  - JS to call this endpoint with both files
+  - Display or use the returned final CID
 
 ### 2. get_bar
 
@@ -247,7 +253,7 @@
 
 | Endpoint                | Method | Path                                         | Input                | Output         | Backend File                        | Frontend File(s)          |
 |-------------------------|--------|----------------------------------------------|----------------------|---------------|-------------------------------------|---------------------------|
-| upload_bar_photo_ipfs   | POST   | /bars/upload_bar_photo_ipfs                  | JPG file             | CID           | api/bars.py, ipfs_service.py        | assets/js/bar.js, HTML    |
+| upload_bar_photo_ipfs   | POST   | /bars/upload_bar_photo_ipfs                  | JPG file + JSON file | FINAL_CID     | api/bars.py, ipfs_service.py        | assets/js/bar.js, HTML    |
 | get_bar                 | GET    | /bars/get/{erc6551_address}                  | ERC6551 address      | JSON          | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
 | update_bar              | POST   | /bars/update                                 | JSON                 | success bool  | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
 | set_bar                 | POST   | /bars/set                                    | JSON                 | success bool  | api/bars.py, models/bar.py          | assets/js/bar.js, HTML    |
