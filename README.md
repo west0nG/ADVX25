@@ -186,3 +186,17 @@ RecipeMarketplace: 0x03bEdd3242b625a8Ce602137314901D77Bc26503
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
+
+
+
+# AI Agent
+- 输入内容
+   - 输入 你的酒吧开在哪里
+   - 输入 你的酒吧希望什么风格
+      - 可选 日式调酒 美式调酒 英式调酒 拉美调酒
+   - 输入 你的酒吧的主题
+      - belike 植物 四季 天空 东方快车谋杀案
+   - 输入 你的预算
+
+- 输出 装修和设计建议 文字
+- 输出 推荐买的酒谱
