@@ -36,7 +36,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.post("/recipes/upload_ipfs")
+@router.post("/upload_ipfs")
 async def upload_recipe_to_ipfs(
     item: RecipeMetadata,
     jpg_file: UploadFile = File(..., description="JPG image file")
@@ -67,7 +67,7 @@ async def upload_recipe_to_ipfs(
 
 
 
-@router.post("/recipes/store_recipe/{recipe_address}/{metadata_cid}/{owner_address}/{price}")
+@router.post("/store_recipe/{recipe_address}/{metadata_cid}/{owner_address}/{price}")
 async def store_recipe(
     recipe_address: str,
     metadata_cid: str,
@@ -103,7 +103,7 @@ async def store_recipe(
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Failed to store recipe: {str(e)}")
 
-@router.get("/recipes/get_ten_recipes")
+@router.get("/get_ten_recipes")
 async def get_ten_recipes():
     """Get 10 recipes for display."""
     async with AsyncSessionLocal() as db:
@@ -130,7 +130,7 @@ async def get_ten_recipes():
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
 
-@router.get("/recipes/get_all_recipes")
+@router.get("/get_all_recipes")
 async def get_all_recipes():
     """Get all recipes."""
     async with AsyncSessionLocal() as db:
@@ -158,7 +158,7 @@ async def get_all_recipes():
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
 
-@router.get("/recipes/search_recipes")
+@router.get("/search_recipes")
 async def search_recipes(
     query: str = Query(..., description="Search query string")
 ):
@@ -195,7 +195,7 @@ async def search_recipes(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
-@router.get("/recipes/get_one_recipe/{nft_address}/{user_address}") # search from what? ERC4907 address from chain? that's one additional step
+@router.get("/get_one_recipe/{nft_address}/{user_address}") # search from what? ERC4907 address from chain? that's one additional step
 async def get_one_recipe(
     nft_address: str,
     user_address: str
