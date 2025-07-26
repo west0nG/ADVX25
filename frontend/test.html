@@ -718,16 +718,9 @@
             
             try {
                 const formData = new FormData();
-                
-                // Add JSON metadata
-                const metadata = {
-                    cocktail_name: document.getElementById('cocktail-name').value,
-                    cocktail_intro: document.getElementById('cocktail-intro').value,
-                    cocktail_recipe: document.getElementById('cocktail-recipe').value,
-                    recipe_photo: ""
-                };
-                
-                formData.append('item', JSON.stringify(metadata));
+                formData.append('cocktail_name', document.getElementById('cocktail-name').value);
+                formData.append('cocktail_intro', document.getElementById('cocktail-intro').value);
+                formData.append('cocktail_recipe', document.getElementById('cocktail-recipe').value);
                 
                 const fileInput = document.getElementById('recipe-photo');
                 if (fileInput.files.length > 0) {
