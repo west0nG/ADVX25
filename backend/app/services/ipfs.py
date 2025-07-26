@@ -123,8 +123,8 @@ def upload_bar_to_pinata(
 
 # 用法示例
 # 1. 上传图片获取CID
-cocktail_photo_cid = upload_picture_to_pinata("/path/to/cocktail.jpg")
-recipe_photo_cid = upload_picture_to_pinata("/path/to/recipe.jpg")
+cocktail_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
+recipe_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
 
 # 2. 上传Recipe元数据
 recipe_metadata_cid = upload_recipe_to_pinata(
@@ -136,7 +136,7 @@ recipe_metadata_cid = upload_recipe_to_pinata(
 )
 
 # 3. 上传Bar元数据
-bar_photo_cid = upload_picture_to_pinata("/path/to/bar.jpg")
+bar_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")
 bar_metadata_cid = upload_bar_to_pinata(
     bar_photo_cid=bar_photo_cid,
     bar_name="蓝调酒吧",
@@ -146,5 +146,6 @@ bar_metadata_cid = upload_bar_to_pinata(
 
 print(cocktail_photo_cid)
 print(recipe_photo_cid)
+print(recipe_metadata_cid)
 print(bar_metadata_cid)
 
