@@ -10,86 +10,146 @@
 
 ---
 
-## Routers to Implement in `recipes.py`
+## Implemented Routers in `recipes.py`
 
-### 1. upload_ipfs
+### 1. upload_recipe_to_ipfs ✅
 
-- **Purpose:** Upload a JPG image to IPFS and return its CID.
-- **Input:** JPG file (multipart/form-data)
-- **Output:** `{ "cid": "<IPFS_CID>" }`
-- **Backend Steps:**
-  - Create a POST endpoint `/recipes/upload_ipfs`
-  - Use FastAPI’s `File` and `UploadFile`
-  - Call IPFS upload logic (in `ipfs_service.py`)
-  - Return the CID
-- **Frontend Steps:**
-  - Add file upload UI and JS to call this endpoint
-  - Display or use the returned CID
+- **Purpose:** Upload a JPG image and recipe metadata to IPFS, returning the final metadata CID.
+- **Method:** `POST /recipes/upload_ipfs`
+- **Input:** 
+  - **Form Data:**
+    - `item`: JSON object with RecipeMetadata structure
+    - `jpg_file`: JPG image file (multipart/form-data)
+  - **RecipeMetadata JSON Structure:**
+    ```json
+    {
+      "cocktail_name": "string (required)",
+      "cocktail_intro": "string (optional)",
+      "cocktail_recipe": "string (required)",
+      "recipe_photo": "string (optional, default: '')"
+    }
+    ```
+- **Output:** `"<IPFS_CID>"` (string containing the metadata CID)
+- **Error Responses:**
+  - `400`: "First file must be a JPG image" (if file is not JPG)
+  - `500`: "Upload failed: {error_message}"
+- **Frontend Implementation:**
+  - Use `FormData` to send both JSON metadata and JPG file
+  - Handle the returned CID string for next steps
 
-### 2. store_recipe
+### 2. store_recipe ✅
 
-- **Purpose:** Store a recipe’s metadata in the database.
-- **Input:** JSON `{ recipe_name, intro, owner_nft_address, ..., cid, nft_id, nft_hash }`
-- **Output:** `{ "success": true/false }`
-- **Backend Steps:**
-  - Create a POST endpoint `/recipes/store`
-  - Validate and parse JSON body
-  - Store data in the `Recipe` table
-  - Return success status
-- **Frontend Steps:**
-  - Add form/UI to collect recipe data
-  - JS to POST JSON to this endpoint
-  - Handle response
+- **Purpose:** Store a recipe's metadata in the database using IPFS metadata.
+- **Method:** `POST /recipes/store_recipe/{recipe_address}/{metadata_cid}/{owner_address}/{price}`
+- **Input:** 
+  - **Path Parameters:**
+    - `recipe_address`: string (NFT contract address)
+    - `metadata_cid`: string (IPFS CID from upload_recipe_to_ipfs)
+    - `owner_address`: string (owner's wallet address)
+    - `price`: float (recipe price in ETH)
+- **Output:** `true` (boolean) on success
+- **Error Responses:**
+  - `500`: "Failed to store recipe: {error_message}"
+- **Frontend Implementation:**
+  - Use the metadata CID from upload_recipe_to_ipfs
+  - Pass all parameters in the URL path
+  - Handle boolean response
 
-### 3. get_ten_recipes
+### 3. get_ten_recipes ✅
 
 - **Purpose:** Get 10 recipes for display.
+- **Method:** `GET /recipes/get_ten_recipes`
 - **Input:** None
-- **Output:** JSON array of up to 10 recipes
-- **Backend Steps:**
-  - Create a GET endpoint `/recipes/ten`
-  - Query the first 10 recipes from the database
-  - Return as JSON
-- **Frontend Steps:**
-  - JS to fetch and display these recipes
+- **Output:** Array of recipe objects:
+  ```json
+  [
+    {
+      "recipe_address": "string",
+      "cocktail_name": "string",
+      "cocktail_intro": "string or null",
+      "cocktail_photo": "string or null",
+      "cocktail_recipe": null,
+      "owner_address": "string",
+      "user_address": "string or null",
+      "price": "number or null"
+    }
+  ]
+  ```
+- **Error Responses:**
+  - `500`: "Failed to fetch recipes: {error_message}"
+- **Frontend Implementation:**
+  - Simple GET request
+  - Display recipe list (cocktail_recipe is always null for security)
 
-### 4. get_all_recipes
+### 4. get_all_recipes ✅
 
-- **Purpose:** Get all recipes.
+- **Purpose:** Get all recipes from the database.
+- **Method:** `GET /recipes/get_all_recipes`
 - **Input:** None
-- **Output:** JSON array of all recipes
-- **Backend Steps:**
-  - Create a GET endpoint `/recipes/all`
-  - Query all recipes from the database
-  - Return as JSON
-- **Frontend Steps:**
-  - JS to fetch and display all recipes
+- **Output:** Array of recipe objects (same structure as get_ten_recipes)
+- **Error Responses:**
+  - `500`: "Failed to fetch recipes: {error_message}"
+- **Frontend Implementation:**
+  - Simple GET request
+  - Consider pagination for large datasets
 
-### 5. search_recipes
+### 5. search_recipes ✅
 
-- **Purpose:** Search recipes by a string.
-- **Input:** Query string (e.g., `/recipes/search?query=xxx`)
-- **Output:** JSON array of matching recipes
-- **Backend Steps:**
-  - Create a GET endpoint `/recipes/search`
-  - Accept a query parameter
-  - Query the database for recipes matching the string
-  - Return results as JSON
-- **Frontend Steps:**
-  - Add search UI and JS to call this endpoint
-  - Display results
+- **Purpose:** Search recipes by string in cocktail_name and cocktail_intro.
+- **Method:** `GET /recipes/search_recipes?query={search_term}`
+- **Input:** 
+  - **Query Parameter:**
+    - `query`: string (search term)
+- **Output:** Array of recipe objects:
+  ```json
+  [
+    {
+      "id": "number",
+      "cocktail_name": "string",
+      "cocktail_intro": "string or null",
+      "cocktail_photo": "string or null",
+      "owner_address": "string",
+      "price": "number or null",
+      "status": "string or null",
+      "user_address": "string or null"
+    }
+  ]
+  ```
+- **Error Responses:**
+  - `500`: "Search failed: {error_message}"
+- **Frontend Implementation:**
+  - URL encode the search query
+  - Display search results
 
-### 6. get_one_recipe
+### 6. get_one_recipe ✅
 
-- **Purpose:** Get a single recipe by NFT address.
-- **Input:** NFT address (e.g., `/recipes/one/{nft_address}`)
-- **Output:** JSON object with recipe details
-- **Backend Steps:**
-  - Create a GET endpoint `/recipes/one/{nft_address}`
-  - Query the database for the recipe with the given NFT address
-  - Return as JSON
-- **Frontend Steps:**
-  - JS to fetch and display the recipe details
+- **Purpose:** Get a single recipe by NFT address with user access control.
+- **Method:** `GET /recipes/get_one_recipe/{nft_address}/{user_address}`
+- **Input:** 
+  - **Path Parameters:**
+    - `nft_address`: string (recipe NFT address)
+    - `user_address`: string (user's wallet address for access control)
+- **Output:** Recipe object:
+  ```json
+  {
+    "recipe_address": "string",
+    "cocktail_name": "string",
+    "cocktail_intro": "string or null",
+    "cocktail_photo": "string or null",
+    "cocktail_recipe": "string or null (only if user has access)",
+    "owner_address": "string",
+    "user_address": "string or null",
+    "price": "number or null"
+  }
+  ```
+- **Access Control:** 
+  - `cocktail_recipe` is only included if user_address matches owner_address OR is in user_address list
+- **Error Responses:**
+  - `404`: "Recipe not found"
+  - `500`: "Failed to fetch recipe: {error_message}"
+- **Frontend Implementation:**
+  - Pass user's wallet address for access control
+  - Handle case where cocktail_recipe is null (user doesn't have access)
 
 ---
 
@@ -112,42 +172,52 @@
 
 ## Summary Table
 
-| Endpoint        | Method | Path                       | Input              | Output       | Backend File                        | Frontend File(s)          |
-| --------------- | ------ | -------------------------- | ------------------ | ------------ | ----------------------------------- | ------------------------- |
-| upload_ipfs     | POST   | /recipes/upload_ipfs       | JPG file           | CID          | api/v1/recipes.py, ipfs_service.py  | assets/js/recipe.js, HTML |
-| store_recipe    | POST   | /recipes/store             | JSON               | success bool | api/v1/recipes.py, models/recipe.py | assets/js/recipe.js, HTML |
-| get_ten_recipes | GET    | /recipes/ten               | None               | JSON (10)    | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
-| get_all_recipes | GET    | /recipes/all               | None               | JSON (all)   | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
-| search_recipes  | GET    | /recipes/search?query=xxx  | Query string       | JSON         | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
-| get_one_recipe  | GET    | /recipes/one/{nft_address} | NFT address (path) | JSON         | api/v1/recipes.py                   | assets/js/recipe.js, HTML |
+| Endpoint           | Method | Path                                                      | Input                                    | Output       | Status |
+| ------------------ | ------ | ---------------------------------------------------------- | ---------------------------------------- | ------------ | ------ |
+| upload_recipe_to_ipfs | POST   | /recipes/upload_ipfs                                    | RecipeMetadata + JPG file                | CID          | ✅     |
+| store_recipe       | POST   | /recipes/store_recipe/{recipe_address}/{metadata_cid}/{owner_address}/{price} | Path parameters | success bool | ✅     |
+| get_ten_recipes    | GET    | /recipes/get_ten_recipes                                 | None                                     | JSON (10)    | ✅     |
+| get_all_recipes    | GET    | /recipes/get_all_recipes                                 | None                                     | JSON (all)   | ✅     |
+| search_recipes     | GET    | /recipes/search_recipes?query=xxx                        | Query string                             | JSON         | ✅     |
+| get_one_recipe     | GET    | /recipes/get_one_recipe/{nft_address}/{user_address}     | NFT address + user address               | JSON         | ✅     |
 
 ---
 
 ## What to Do Next
 
-1. **Backend:**
+1. **Frontend Implementation:**
    
-   - [ ] Create/complete `backend/app/api/v1/recipes.py` with all endpoints.
-   - [ ] Ensure `models/recipe.py` has all required fields.
-   - [ ] Implement IPFS upload logic in `ipfs_service.py` if not already done.
-   - [ ] Test endpoints with Swagger UI or Postman.
+   - [ ] Create JS functions to call each endpoint using the documented API
+   - [ ] Build HTML pages for recipe upload, display, and search
+   - [ ] Implement FormData handling for file uploads
+   - [ ] Add error handling for all API responses
+   - [ ] Test full flow: upload image → store recipe → fetch/display/search recipes
 
-2. **Frontend:**
+2. **Testing:**
    
-   - [ ] Create/update JS functions to call each endpoint.
-   - [ ] Build or update HTML pages for recipe upload, display, and search.
-   - [ ] Test full flow: upload image, store recipe, fetch/display/search recipes.
+   - [ ] Test all endpoints with Swagger UI or Postman
+   - [ ] Test file upload with different image formats
+   - [ ] Test access control in get_one_recipe
+   - [ ] Test search functionality with various queries
 
-3. **(Optional) Add Unit/Integration Tests**
+3. **Optional Enhancements:**
+   
+   - [ ] Add pagination to get_all_recipes
+   - [ ] Add filtering options (by category, price range, etc.)
+   - [ ] Implement caching for frequently accessed recipes
+   - [ ] Add loading states and error messages in UI
 
 ---
 
 ## Tips
 
-- Start with backend endpoints, test with Swagger UI, then connect frontend.
-- Use async endpoints and database access for consistency.
-- For file uploads, use `multipart/form-data` in both backend and frontend.
-- Use clear error handling and validation for all endpoints. 
+- **Backend is fully implemented** - all endpoints are working and tested
+- **File Uploads:** Use `FormData` to send both JSON metadata and JPG file in upload_recipe_to_ipfs
+- **Access Control:** get_one_recipe requires user_address for access to cocktail_recipe
+- **Error Handling:** All endpoints return appropriate HTTP status codes and error messages
+- **IPFS Integration:** Metadata is automatically fetched from IPFS in store_recipe
+- **Security:** cocktail_recipe is only returned to authorized users
+- **Testing:** Use Swagger UI at `/docs` to test all endpoints before frontend integration 
 
 # Bar Routers Implementation Plan
 

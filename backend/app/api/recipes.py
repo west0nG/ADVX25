@@ -195,7 +195,7 @@ async def search_recipes(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
-@router.get("/recipes/get_one_recipe{nft_address}/{user_address}") # search from what? ERC4907 address from chain? that's one additional step
+@router.get("/recipes/get_one_recipe/{nft_address}/{user_address}") # search from what? ERC4907 address from chain? that's one additional step
 async def get_one_recipe(
     nft_address: str,
     user_address: str
@@ -221,7 +221,7 @@ async def get_one_recipe(
                 "user_address": recipe.user_address,
                 "price": recipe.price,
             }
-            if user_address in recipe.user_address or user_address == recipe.owner_address:
+            if recipe.user_address and (user_address in json.loads(recipe.user_address) or user_address == recipe.owner_address):
                 recipe_dict["cocktail_recipe"] = recipe.cocktail_recipe
             
             return recipe_dict
