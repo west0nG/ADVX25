@@ -777,8 +777,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const pagination = document.querySelector('.pagination');
         
         pagination.addEventListener('click', (e) => {
-            if (e.target.classList.contains('pagination-btn')) {
-                const page = e.target.dataset.page;
+            if (e.target.classList.contains('page-btn') || e.target.closest('.page-btn')) {
+                const button = e.target.classList.contains('page-btn') ? e.target : e.target.closest('.page-btn');
+                const page = button.dataset.page;
                 
                 if (page === 'prev' && currentPage > 1) {
                     currentPage--;
@@ -803,13 +804,58 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update page numbers
         if (pageNumbers) {
             pageNumbers.innerHTML = '';
-            for (let i = 1; i <= totalPages; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'page-btn';
-                btn.dataset.page = i;
-                btn.textContent = i;
-                if (i === currentPage) btn.classList.add('active');
-                pageNumbers.appendChild(btn);
+            
+            if (totalPages <= 7) {
+                // Show all pages if 7 or fewer
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'page-btn';
+                    btn.dataset.page = i;
+                    btn.textContent = i;
+                    if (i === currentPage) btn.classList.add('active');
+                    pageNumbers.appendChild(btn);
+                }
+            } else {
+                // Show truncated pagination
+                const addPageBtn = (pageNum) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'page-btn';
+                    btn.dataset.page = pageNum;
+                    btn.textContent = pageNum;
+                    if (pageNum === currentPage) btn.classList.add('active');
+                    pageNumbers.appendChild(btn);
+                };
+
+                const addDots = () => {
+                    const dots = document.createElement('span');
+                    dots.className = 'page-dots';
+                    dots.textContent = '...';
+                    pageNumbers.appendChild(dots);
+                };
+
+                // Always show first page
+                addPageBtn(1);
+
+                if (currentPage > 3) {
+                    addDots();
+                }
+
+                // Show pages around current page
+                const start = Math.max(2, currentPage - 1);
+                const end = Math.min(totalPages - 1, currentPage + 1);
+                
+                for (let i = start; i <= end; i++) {
+                    addPageBtn(i);
+                }
+
+                if (currentPage < totalPages - 2) {
+                    addDots();
+                }
+
+                // Always show last page (if more than 1 page)
+                if (totalPages > 1) {
+                    addPageBtn(totalPages);
+                }
             }
         }
 
@@ -820,7 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (nextBtn) {
-            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
             nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
         }
     }

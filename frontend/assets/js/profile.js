@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Pagination variables
+    let currentPage = 1;
+    let itemsPerPage = 6;
+    let currentNFTs = [];
+
     // Sample user data
     const userData = {
         username: "@CocktailCreator",
@@ -54,11 +59,66 @@ document.addEventListener('DOMContentLoaded', function() {
                 category: "tropical",
                 tokenId: "089",
                 owned: true
+            },
+            {
+                id: 4,
+                name: "Golden Sunset",
+                image: "https://static.paraflowcontent.com/public/resource/image/ba8d3a63-545f-4315-84ed-cdec7398b05c.jpeg",
+                price: "0.92",
+                creator: "@SunsetMixer",
+                creatorAvatar: "https://static.paraflowcontent.com/public/resource/image/92eb35ba-c295-406e-ba06-3ff38ef83dc8.jpeg",
+                category: "tropical",
+                tokenId: "203",
+                owned: true
+            },
+            {
+                id: 5,
+                name: "Arctic Breeze",
+                image: "https://static.paraflowcontent.com/public/resource/image/7f49f0a0-2563-4404-b3af-ed545f45f183.jpeg",
+                price: "1.5",
+                creator: "@IceMaster",
+                creatorAvatar: "https://static.paraflowcontent.com/public/resource/image/d5298df2-1d97-499a-b761-38a5a9db07ac.jpeg",
+                category: "modern",
+                tokenId: "078",
+                owned: true
+            },
+            {
+                id: 6,
+                name: "Smoky Whisper",
+                image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&h=400&fit=crop",
+                price: "0.78",
+                creator: "@VintageSoul",
+                creatorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+                category: "classic",
+                tokenId: "067",
+                owned: true
+            },
+            {
+                id: 7,
+                name: "Tropical Storm",
+                image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=400&fit=crop",
+                price: "0.89",
+                creator: "@StormMixer",
+                creatorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+                category: "tropical",
+                tokenId: "234",
+                owned: true
+            },
+            {
+                id: 8,
+                name: "Midnight Oil",
+                image: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=400&h=400&fit=crop",
+                price: "1.67",
+                creator: "@MidnightMixer",
+                creatorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+                category: "modern",
+                tokenId: "789",
+                owned: true
             }
         ],
         created: [
             {
-                id: 4,
+                id: 9,
                 name: "Midnight Espresso",
                 image: "https://static.paraflowcontent.com/public/resource/image/332d64f2-579a-484c-995b-1079a0f9ca5f.jpeg",
                 price: "0.45",
@@ -69,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 owned: false
             },
             {
-                id: 5,
+                id: 10,
                 name: "Golden Sunset",
                 image: "https://static.paraflowcontent.com/public/resource/image/ba8d3a63-545f-4315-84ed-cdec7398b05c.jpeg",
                 price: "0.92",
@@ -77,6 +137,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 creatorAvatar: "https://static.paraflowcontent.com/public/resource/image/92eb35ba-c295-406e-ba06-3ff38ef83dc8.jpeg",
                 category: "tropical",
                 tokenId: "203",
+                owned: false
+            },
+            {
+                id: 11,
+                name: "Ruby Fizz",
+                image: "https://images.unsplash.com/photo-1571104508999-893933ded431?w=400&h=400&fit=crop",
+                price: "0.56",
+                creator: "@CocktailCreator",
+                creatorAvatar: "https://images.unsplash.com/photo-1494790108755-2616b2e12dff?w=100&h=100&fit=crop&crop=face",
+                category: "modern",
+                tokenId: "178",
+                owned: false
+            },
+            {
+                id: 12,
+                name: "Bourbon Blaze",
+                image: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&h=400&fit=crop",
+                price: "1.45",
+                creator: "@CocktailCreator",
+                creatorAvatar: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face",
+                category: "classic",
+                tokenId: "456",
+                owned: false
+            },
+            {
+                id: 13,
+                name: "Cucumber Zen",
+                image: "https://images.unsplash.com/photo-1546171753-97d7676e4602?w=400&h=400&fit=crop",
+                price: "0.34",
+                creator: "@CocktailCreator",
+                creatorAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+                category: "non-alcoholic",
+                tokenId: "923",
+                owned: false
+            },
+            {
+                id: 14,
+                name: "Passion Fruit Paradise",
+                image: "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=400&fit=crop",
+                price: "0.82",
+                creator: "@CocktailCreator",
+                creatorAvatar: "https://images.unsplash.com/photo-1464863979621-258859e62245?w=100&h=100&fit=crop&crop=face",
+                category: "tropical",
+                tokenId: "567",
+                owned: false
+            },
+            {
+                id: 15,
+                name: "Electric Lime",
+                image: "https://images.unsplash.com/photo-1541188495357-ad2dc89487f4?w=400&h=400&fit=crop",
+                price: "0.91",
+                creator: "@CocktailCreator",
+                creatorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+                category: "modern",
+                tokenId: "654",
                 owned: false
             }
         ]
@@ -88,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadUserNFTs();
         setupViewOptions();
         setupSettingsForm();
+        setupPagination();
     }
 
     // Setup tab switching
@@ -117,10 +233,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         break;
                     case 'transactions':
                         // Transactions are already loaded in HTML
+                        // Hide pagination for transactions tab
+                        const pagination = document.querySelector('.pagination');
+                        if (pagination) pagination.style.display = 'none';
                         break;
                     case 'settings':
                         loadUserSettings();
+                        // Hide pagination for settings tab
+                        const paginationSettings = document.querySelector('.pagination');
+                        if (paginationSettings) paginationSettings.style.display = 'none';
                         break;
+                }
+                
+                // Show pagination for nfts and created tabs
+                if (targetTab === 'nfts' || targetTab === 'created') {
+                    const pagination = document.querySelector('.pagination');
+                    if (pagination) pagination.style.display = 'flex';
                 }
             });
         });
@@ -128,22 +256,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load user's NFTs
     function loadUserNFTs() {
-        const nftGrid = document.getElementById('my-nfts-grid');
-        nftGrid.innerHTML = '';
-
-        userData.nfts.forEach(nft => {
-            const nftCard = createNFTCard(nft, true);
-            nftGrid.appendChild(nftCard);
-        });
+        currentNFTs = userData.nfts;
+        currentPage = 1;
+        renderNFTs('my-nfts-grid', true);
+        updatePagination();
     }
 
     // Load created NFTs
     function loadCreatedNFTs() {
-        const nftGrid = document.getElementById('created-nfts-grid');
-        nftGrid.innerHTML = '';
+        currentNFTs = userData.created;
+        currentPage = 1;
+        renderNFTs('created-nfts-grid', false);
+        updatePagination();
+    }
 
-        userData.created.forEach(nft => {
-            const nftCard = createNFTCard(nft, false);
+    // Render NFTs with pagination
+    function renderNFTs(gridId, isOwned) {
+        const nftGrid = document.getElementById(gridId);
+        if (!nftGrid) return;
+        
+        nftGrid.innerHTML = '';
+        
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageNFTs = currentNFTs.slice(startIndex, endIndex);
+
+        pageNFTs.forEach(nft => {
+            const nftCard = createNFTCard(nft, isOwned);
             nftGrid.appendChild(nftCard);
         });
     }
@@ -396,6 +535,128 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             notification.remove();
         }, 5000);
+    }
+
+    // Setup pagination
+    function setupPagination() {
+        const pagination = document.querySelector('.pagination');
+        if (!pagination) return;
+        
+        pagination.addEventListener('click', (e) => {
+            if (e.target.classList.contains('page-btn') || e.target.closest('.page-btn')) {
+                const button = e.target.classList.contains('page-btn') ? e.target : e.target.closest('.page-btn');
+                const page = button.dataset.page;
+                
+                if (page === 'prev' || page === 'Previous') {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updateCurrentTab();
+                    }
+                } else if (page === 'next' || page === 'Next') {
+                    const totalPages = Math.ceil(currentNFTs.length / itemsPerPage);
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updateCurrentTab();
+                    }
+                } else if (!isNaN(parseInt(page))) {
+                    currentPage = parseInt(page);
+                    updateCurrentTab();
+                }
+            }
+        });
+    }
+
+    // Update current tab with pagination
+    function updateCurrentTab() {
+        const activeTab = document.querySelector('.profile-tab.active');
+        if (!activeTab) return;
+        
+        const tabType = activeTab.dataset.tab;
+        
+        if (tabType === 'nfts') {
+            renderNFTs('my-nfts-grid', true);
+        } else if (tabType === 'created') {
+            renderNFTs('created-nfts-grid', false);
+        }
+        
+        updatePagination();
+    }
+
+    // Update pagination display
+    function updatePagination() {
+        const totalPages = Math.ceil(currentNFTs.length / itemsPerPage);
+        const pageNumbers = document.querySelector('.page-numbers');
+        const prevBtn = document.querySelector('.page-btn.prev');
+        const nextBtn = document.querySelector('.page-btn.next');
+
+        if (!pageNumbers) return;
+
+        // Update page numbers
+        pageNumbers.innerHTML = '';
+        
+        if (totalPages <= 7) {
+            // Show all pages if 7 or fewer
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn';
+                btn.dataset.page = i;
+                btn.textContent = i;
+                if (i === currentPage) btn.classList.add('active');
+                pageNumbers.appendChild(btn);
+            }
+        } else {
+            // Show truncated pagination
+            const addPageBtn = (pageNum) => {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn';
+                btn.dataset.page = pageNum;
+                btn.textContent = pageNum;
+                if (pageNum === currentPage) btn.classList.add('active');
+                pageNumbers.appendChild(btn);
+            };
+
+            const addDots = () => {
+                const dots = document.createElement('span');
+                dots.className = 'page-dots';
+                dots.textContent = '...';
+                pageNumbers.appendChild(dots);
+            };
+
+            // Always show first page
+            addPageBtn(1);
+
+            if (currentPage > 3) {
+                addDots();
+            }
+
+            // Show pages around current page
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            
+            for (let i = start; i <= end; i++) {
+                addPageBtn(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                addDots();
+            }
+
+            // Always show last page (if more than 1 page)
+            if (totalPages > 1) {
+                addPageBtn(totalPages);
+            }
+        }
+
+        // Update prev/next buttons
+        if (prevBtn) {
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+        }
+        
+        if (nextBtn) {
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+            nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+        }
     }
 
     // Initialize
