@@ -121,6 +121,18 @@ def upload_bar_to_pinata(
         raise Exception(f"上传Bar元数据失败: {result}")
 
 
+def fetch_metadata_from_ipfs(cid: str) -> dict:
+    """从IPFS获取元数据"""
+    try:
+        # 使用IPFS网关获取数据
+        response = requests.get(f"https://gateway.pinata.cloud/ipfs/{cid}")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"无法从IPFS获取数据: {response.status_code}")
+    except Exception as e:
+        raise Exception(f"获取IPFS元数据失败: {str(e)}")
+
 # 用法示例
 # 1. 上传图片获取CID
 cocktail_photo_cid = upload_picture_to_pinata("/Users/mac/Desktop/Dataflow.png")

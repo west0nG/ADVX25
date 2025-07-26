@@ -8,7 +8,7 @@ import json
 import os
 from pydantic import BaseModel
 
-from app.services.ipfs import upload_picture_to_pinata, upload_recipe_to_pinata
+from app.services.ipfs import upload_picture_to_pinata, upload_recipe_to_pinata, fetch_metadata_from_ipfs
 from app.models.recipe import Recipe
 from app.db.session import AsyncSessionLocal
 
@@ -19,41 +19,32 @@ class RecipeMetadata(BaseModel):
     cocktail_name: str
     cocktail_intro: Optional[str] = None
     cocktail_recipe: str
-    # recipe_photo_cid: Optional[str] = None
-    owner_address: str
-    user_address: List[str] = []
-    price: Optional[float] = None
-    status: Optional[str] = "listed"
+    recipe_photo: str = ""
 
 # Define Pydantic model for storing recipe in database
 class StoreRecipeRequest(BaseModel):
     cocktail_name: str
+    recipe_address: str
     cocktail_intro: Optional[str] = None
     cocktail_photo: Optional[str] = None
     cocktail_recipe: Optional[str] = None
-    recipe_photo: Optional[str] = None
     owner_address: str
     user_address: List[str] = []
     price: Optional[float] = None
-    status: Optional[str] = "listed"
 
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.post("/upload_recipe_to_ipfs")
+@router.post("/recipes/upload_ipfs")
 async def upload_recipe_to_ipfs(
-    jpg_file: UploadFile = File(..., description="JPG image file"),
-    # json_file: UploadFile = File(..., description="JSON metadata file")
+    item: RecipeMetadata,
+    jpg_file: UploadFile = File(..., description="JPG image file")
 ):
     """Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID."""
     # Validate JPG file
     if not jpg_file.filename.lower().endswith('.jpg'):
         raise HTTPException(status_code=400, detail="First file must be a JPG image")
-    
-    # Validate JSON file
-    if not json_file.filename.lower().endswith('.json'):
-        raise HTTPException(status_code=400, detail="Second file must be a JSON file")
     
     try:
         # Step 1: Save JPG file to ADVX25.backend.app.db.pics folder
@@ -67,53 +58,52 @@ async def upload_recipe_to_ipfs(
         # Step 2: Upload JPG to IPFS using upload_picture_to_pinata
         picture_cid = upload_picture_to_pinata(jpg_file_path)
         
-        # Step 3: Parse JSON with Pydantic BaseModel
-        json_content = await json_file.read()
-        json_data = json.loads(json_content.decode('utf-8'))
-        recipe_metadata = RecipeMetadata(**json_data)
+        # Step 3: Upload recipe metadata to IPFS using upload_recipe_to_pinata
+        final_cid = upload_recipe_to_pinata(item.cocktail_name, item.cocktail_intro, picture_cid, item.cocktail_recipe, item.recipe_photo)
+        return final_cid
         
-        # Step 4: Upload recipe metadata to IPFS using upload_recipe_to_pinata
-        final_cid = upload_recipe_to_pinata(recipe_metadata.dict(), picture_cid)
-        
-        return {"cid": final_cid}
-        
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid JSON file")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 
 
-@router.post("/store_recipe")
+@router.post("/recipes/store_recipe/{recipe_address}/{metadata_cid}/{owner_address}/{price}")
 async def store_recipe(
-    item: StoreRecipeRequest
+    recipe_address: str,
+    metadata_cid: str,
+    owner_address: str,
+    price: float
 ):
     """Store a recipe's metadata in the database."""
+    # get metadata from ipfs
+    item = fetch_metadata_from_ipfs(metadata_cid)
+
     async with AsyncSessionLocal() as db:
         try:
             # Create new recipe using the validated Pydantic model
             recipe = Recipe(
+                recipe_address=recipe_address,
                 cocktail_name=item.cocktail_name,
                 cocktail_intro=item.cocktail_intro,
                 cocktail_photo=item.cocktail_photo,
                 cocktail_recipe=item.cocktail_recipe,
-                recipe_photo=item.recipe_photo,
-                owner_address=item.owner_address,
-                user_address=json.dumps(item.user_address) if item.user_address else None,
-                price=item.price,
-                status=item.status
+                recipe_photo=None,
+                owner_address=owner_address,
+                user_address=[],
+                price=price,
+                status=None
             )
             
             db.add(recipe)
             await db.commit()
             await db.refresh(recipe)
-            
             return True
+
         except Exception as e:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Failed to store recipe: {str(e)}")
 
-@router.get("/get_ten_recipes")
+@router.get("/recipes/get_ten_recipes")
 async def get_ten_recipes():
     """Get 10 recipes for display."""
     async with AsyncSessionLocal() as db:
@@ -124,13 +114,14 @@ async def get_ten_recipes():
             recipe_list = []
             for recipe in recipes:
                 recipe_dict = {
-                    "id": recipe.id,
+                    "recipe_address": recipe.recipe_address,
                     "cocktail_name": recipe.cocktail_name,
                     "cocktail_intro": recipe.cocktail_intro,
                     "cocktail_photo": recipe.cocktail_photo,
+                    "cocktail_recipe": None,
                     "owner_address": recipe.owner_address,
+                    "user_address": recipe.user_address,
                     "price": recipe.price,
-                    "status": recipe.status
                 }
                 if recipe.user_address:
                     recipe_dict["user_address"] = json.loads(recipe.user_address)
@@ -139,7 +130,7 @@ async def get_ten_recipes():
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
 
-@router.get("/get_all_recipes")
+@router.get("/recipes/get_all_recipes")
 async def get_all_recipes():
     """Get all recipes."""
     async with AsyncSessionLocal() as db:
@@ -150,15 +141,14 @@ async def get_all_recipes():
             recipe_list = []
             for recipe in recipes:
                 recipe_dict = {
-                    "id": recipe.id,
+                    "recipe_address": recipe.recipe_address,
                     "cocktail_name": recipe.cocktail_name,
                     "cocktail_intro": recipe.cocktail_intro,
                     "cocktail_photo": recipe.cocktail_photo,
-                    "cocktail_recipe": recipe.cocktail_recipe,
-                    "recipe_photo": recipe.recipe_photo,
+                    "cocktail_recipe": None,
                     "owner_address": recipe.owner_address,
+                    "user_address": recipe.user_address,
                     "price": recipe.price,
-                    "status": recipe.status
                 }
                 if recipe.user_address:
                     recipe_dict["user_address"] = json.loads(recipe.user_address)
@@ -168,7 +158,7 @@ async def get_all_recipes():
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
 
-@router.get("/search_recipes")
+@router.get("/recipes/search_recipes")
 async def search_recipes(
     query: str = Query(..., description="Search query string")
 ):
@@ -205,15 +195,16 @@ async def search_recipes(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
-@router.get("/get_one_recipe/{nft_address}") # search from what? ERC4907 address from chain? that's one additional step
+@router.get("/recipes/get_one_recipe{nft_address}/{user_address}") # search from what? ERC4907 address from chain? that's one additional step
 async def get_one_recipe(
-    nft_address: str
+    nft_address: str,
+    user_address: str
 ):
     """Get a single recipe by NFT address (owner_address)."""
     async with AsyncSessionLocal() as db:
         try:
             result = await db.execute(
-                select(Recipe).where(Recipe.id == nft_address)
+                select(Recipe).where(Recipe.recipe_address == nft_address)
             )
             recipe = result.scalar_one_or_none()
             
@@ -221,18 +212,17 @@ async def get_one_recipe(
                 raise HTTPException(status_code=404, detail="Recipe not found")
             
             recipe_dict = {
-                "id": recipe.id,
+                "recipe_address": recipe.recipe_address,
                 "cocktail_name": recipe.cocktail_name,
                 "cocktail_intro": recipe.cocktail_intro,
                 "cocktail_photo": recipe.cocktail_photo,
-                "cocktail_recipe": recipe.cocktail_recipe,
-                "recipe_photo": recipe.recipe_photo,
+                "cocktail_recipe": None,
                 "owner_address": recipe.owner_address,
+                "user_address": recipe.user_address,
                 "price": recipe.price,
-                "status": recipe.status
             }
-            if recipe.user_address:
-                recipe_dict["user_address"] = json.loads(recipe.user_address)
+            if user_address in recipe.user_address or user_address == recipe.owner_address:
+                recipe_dict["cocktail_recipe"] = recipe.cocktail_recipe
             
             return recipe_dict
         except HTTPException:
