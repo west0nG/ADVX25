@@ -12,21 +12,65 @@ function startTypewriter() {
     
     console.log('✅ Found title element:', titleElement);
     
-    const text = "Sip, Own, Create: The Art of the Cocktail, On-Chain";
+    const text = "Sip, Own, Create: The Art of the Cocktail, On-Chain."; // Added dot at the end
     titleElement.innerHTML = ''; // Clear any existing content
+    
+    // Create text span and cursor span from the start
+    const textSpan = document.createElement('span');
+    textSpan.className = 'typewriter-text';
+    
+    const cursorSpan = document.createElement('span');
+    cursorSpan.innerHTML = '&nbsp;'; // Use a space character
+    cursorSpan.className = 'typewriter-cursor-dynamic';
+    
+    // Create cursor as a thick solid block
+    cursorSpan.style.cssText = `
+        display: inline-block !important;
+        width: 6px !important;
+        height: 1.1em !important;
+        background-color: #0ea5e9 !important;
+        margin-left: 3px !important;
+        margin-right: 1px !important;
+        vertical-align: baseline !important;
+        opacity: 1 !important;
+        border-radius: 2px !important;
+        position: relative !important;
+        top: 0 !important;
+    `;
+    
+    titleElement.appendChild(textSpan);
+    titleElement.appendChild(cursorSpan);
+    
+    console.log('👁️ Cursor created and visible during typing (no blinking)!');
     
     let index = 0;
     
     function typeCharacter() {
         if (index < text.length) {
-            titleElement.innerHTML += text.charAt(index);
+            textSpan.textContent += text.charAt(index);
             index++;
             console.log(`⌨️ Typed: "${text.substring(0, index)}"`);
             setTimeout(typeCharacter, 80); // 80ms delay between characters
         } else {
             console.log('✨ Typewriter animation complete!');
-            // Add blinking cursor after text is complete
-            titleElement.innerHTML += '<span style="color: #25f2f2; animation: blinkSlow 2s infinite;">|</span>';
+            // Wait a moment, then start blinking to emphasize completion
+            setTimeout(() => {
+                // Clear all inline styles and apply blinking class
+                cursorSpan.style.cssText = `
+                    display: inline-block !important;
+                    width: 6px !important;
+                    height: 1.1em !important;
+                    background-color: #0ea5e9 !important;
+                    margin-left: 3px !important;
+                    margin-right: 1px !important;
+                    vertical-align: baseline !important;
+                    border-radius: 2px !important;
+                    position: relative !important;
+                    top: 0 !important;
+                `;
+                cursorSpan.classList.add('blinking');
+                console.log('👁️ Cursor now blinking after text completion!');
+            }, 300); // 300ms delay after text completion
         }
     }
     

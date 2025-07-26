@@ -130,17 +130,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <div id="footer-container"></div>
-
     <script>
-        // Load footer
-        fetch('../components/footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer-container').innerHTML = data;
-            });
-
         // Load current configuration
         document.addEventListener('DOMContentLoaded', function() {
             loadCurrentConfig();
@@ -240,5 +230,9 @@
             }, 5000);
         }
     </script>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script src="../assets/js/footer-loader.js"></script>
 </body>
 </html> 

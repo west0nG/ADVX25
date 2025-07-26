@@ -361,11 +361,75 @@
 
 /* ==================== TYPEWRITER ANIMATION ==================== */
 
+.typewriter-text {
+    /* Let the text inherit the gradient styling from parent */
+    background: inherit;
+    -webkit-background-clip: inherit;
+    -webkit-text-fill-color: inherit;
+    background-clip: inherit;
+}
+
+/* Thick cursor styling without glow effects */
+.typewriter-cursor-dynamic {
+    display: inline-block !important;
+    width: 6px !important;
+    height: 1.1em !important;
+    background-color: #0ea5e9 !important;
+    margin-left: 3px !important;
+    vertical-align: baseline !important;
+    border-radius: 2px !important;
+}
+
+/* Ensure blinking animation works */
+.typewriter-cursor-dynamic.blinking {
+    animation: blinkCursor 2s steps(1, end) infinite !important;
+}
+
+.typewriter-cursor-standalone {
+    color: #25f2f2 !important;
+    background: none !important;
+    background-image: none !important;
+    -webkit-text-fill-color: #25f2f2 !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    font-family: monospace !important;
+    font-size: 4rem !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
+    animation: blinkSlow 1.5s infinite;
+    margin-left: 4px;
+    vertical-align: top;
+    display: inline-block;
+    position: relative;
+    top: -2px;
+}
+
+.typewriter-cursor {
+    color: #25f2f2 !important;
+    -webkit-text-fill-color: #25f2f2 !important;
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    animation: blinkSlow 2s infinite;
+    font-weight: normal;
+    margin-left: 2px;
+}
+
 @keyframes blinkSlow {
-    0%, 50% {
+    0%, 70% {
         opacity: 1;
     }
-    51%, 100% {
+    71%, 100% {
+        opacity: 0;
+    }
+}
+
+@keyframes blinkCursor {
+    0%, 49% {
+        opacity: 1;
+    }
+    50%, 100% {
         opacity: 0;
     }
 }

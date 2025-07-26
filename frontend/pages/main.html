@@ -267,9 +267,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <div id="footer-container"></div>
-
     <!-- Wallet Services -->
     <script src="../assets/js/wallet-service.js"></script>
     <script src="../assets/js/auth-manager.js"></script>
@@ -278,13 +275,6 @@
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/header-loader.js"></script>
     <script>
-        // Load footer
-        fetch('../components/footer.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('footer-container').innerHTML = data;
-            });
-
         // Bar dashboard functionality
         function editBarProfile() {
             alert('Edit Bar Profile functionality would open here');
@@ -327,5 +317,9 @@
             window.walletService.disconnect();
         }
     </script>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script src="../assets/js/footer-loader.js"></script>
 </body>
 </html> 
