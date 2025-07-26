@@ -590,8 +590,8 @@ class WalletService {
                             chainName: network.name,
                             rpcUrls: [network.rpcUrl],
                             nativeCurrency: {
-                                name: network.currency || 'ETH',
-                                symbol: network.currency || 'ETH',
+                                name: network.currency || 'USDT',
+                                symbol: network.currency || 'USDT',
                                 decimals: 18
                             },
                             blockExplorerUrls: network.blockExplorer ? [network.blockExplorer] : null

@@ -130,7 +130,7 @@ class UserRecipeManager {
         }
 
         const createdDate = new Date(parseInt(recipe.createdAt) * 1000).toLocaleDateString();
-        const priceETH = parseFloat(ethers.utils.formatEther(recipe.price || '0'));
+        const priceUSDT = parseFloat(ethers.utils.formatEther(recipe.price || '0'));
 
         return `
             <div class="recipe-card user-recipe-card">
@@ -155,7 +155,7 @@ class UserRecipeManager {
                         </div>
                         <div class="detail-item">
                             <span class="label">Price:</span>
-                            <span class="value">${priceETH} ETH</span>
+                            <span class="value">${priceUSDT} USDT</span>
                         </div>
                         <div class="detail-item">
                             <span class="label">For Sale:</span>
@@ -226,7 +226,7 @@ class UserRecipeManager {
                             <div class="status-info">
                                 <p><strong>Active:</strong> ${recipe.isActive ? 'Yes' : 'No'}</p>
                                 <p><strong>For Sale:</strong> ${recipe.isForSale ? 'Yes' : 'No'}</p>
-                                <p><strong>Price:</strong> ${parseFloat(ethers.utils.formatEther(recipe.price || '0'))} ETH</p>
+                                <p><strong>Price:</strong> ${parseFloat(ethers.utils.formatEther(recipe.price || '0'))} USDT</p>
                             </div>
                         </div>
                     </div>

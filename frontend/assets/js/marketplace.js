@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             <div style="position: relative;">
                 <img src="${nft.image}" alt="${nft.name}" class="nft-image">
-                <div class="nft-price">${nft.price} ETH</div>
+                <div class="nft-price">${nft.price} USDT</div>
             </div>
             <div class="nft-info">
                 <h3>${nft.name}</h3>
@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${detailedRecipe.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${detailedRecipe.tokenId}</p>
                     <p><strong>Category:</strong> ${detailedRecipe.category}</p>
-                    <p><strong>Price:</strong> ${detailedRecipe.price} ETH</p>
+                    <p><strong>Price:</strong> ${detailedRecipe.price} USDT</p>
                     ${detailedRecipe.intro ? `<p><strong>Description:</strong> ${detailedRecipe.intro}</p>` : ''}
                     ${detailedRecipe.user_addresses && detailedRecipe.user_addresses.length > 0 ? `
                         <div class="recipe-section">
@@ -567,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${detailedRecipe.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary">Buy Now - ${detailedRecipe.price} ETH</button>
+                    <button class="btn-primary" onclick="buyNFT('${detailedRecipe.tokenId}', '${detailedRecipe.price}', '${detailedRecipe.name}')">Buy Now - ${detailedRecipe.price} USDT</button>
                 </div>
             `;
 
@@ -582,13 +582,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${nft.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${nft.tokenId}</p>
                     <p><strong>Category:</strong> ${nft.category}</p>
-                    <p><strong>Price:</strong> ${nft.price} ETH</p>
+                    <p><strong>Price:</strong> ${nft.price} USDT</p>
                     ${nft.intro ? `<p><strong>Description:</strong> ${nft.intro}</p>` : ''}
                     <p class="error-message">Could not load detailed recipe information</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${nft.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary">Buy Now - ${nft.price} ETH</button>
+                    <button class="btn-primary" onclick="buyNFT('${nft.tokenId}', '${nft.price}', '${nft.name}')">Buy Now - ${nft.price} USDT</button>
                 </div>
             `;
                  }
@@ -667,6 +667,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 display: flex;
                 gap: 1rem;
                 margin-top: 1.5rem;
+            }
+            .fee-breakdown {
+                background: rgba(55, 65, 81, 0.5);
+                padding: 1rem;
+                border-radius: 10px;
+                margin-bottom: 1rem;
+            }
+            .fee-breakdown h4 {
+                color: #25f2f2;
+                margin-bottom: 0.5rem;
+            }
+            .fee-breakdown p {
+                margin: 0.25rem 0;
+                color: #d1d5db;
+            }
+            .success-message {
+                text-align: center;
+                color: #10b981;
+            }
+            .success-message h4 {
+                color: #10b981;
+                margin-bottom: 1rem;
+            }
+            .success-message code {
+                background: rgba(55, 65, 81, 0.5);
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                word-break: break-all;
+                display: block;
+                margin: 0.5rem 0;
+            }
+            .error-message {
+                text-align: center;
+                color: #ef4444;
+            }
+            .error-message h4 {
+                color: #ef4444;
+                margin-bottom: 1rem;
+            }
+            .loading-message {
+                text-align: center;
+                color: #9ca3af;
+                padding: 2rem;
             }
         `;
         document.head.appendChild(style);
@@ -872,6 +916,182 @@ document.addEventListener('DOMContentLoaded', function() {
             nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
         }
     }
+
+    // Buy NFT function - handles the purchase transaction
+    window.buyNFT = async function(tokenId, price, recipeName) {
+        try {
+            // Check if MetaMask is available
+            if (typeof window.ethereum === 'undefined') {
+                alert('Please install MetaMask to purchase NFTs');
+                return;
+            }
+
+            // Request wallet connection
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            
+            // Get user address
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length === 0) {
+                alert('Please connect your wallet to purchase NFTs');
+                return;
+            }
+            const userAddress = accounts[0];
+
+            // Check if user has active ID NFT
+            try {
+                await window.idnftService.ensureInitialized();
+                const idnftResult = await window.idnftService.checkUserIDNFT(userAddress);
+                if (!idnftResult.hasActive) {
+                    alert('You need an active ID NFT to purchase recipes. Please mint an ID NFT first.');
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking ID NFT:', error);
+                alert('Error checking ID NFT status. Please try again.');
+                return;
+            }
+
+            // Show loading modal
+            const loadingModal = showBuyingModal(recipeName, price);
+
+            try {
+                // Initialize marketplace service
+                await window.marketplaceService.ensureInitialized();
+
+                // Convert tokenId to number for contract call
+                // Since tokenId is formatted from recipe address, we need to use a numeric ID
+                // For now, we'll use a simple mapping based on the tokenId or default to 1
+                let recipeTokenId = 1;
+                if (tokenId && !isNaN(parseInt(tokenId))) {
+                    recipeTokenId = parseInt(tokenId);
+                } else if (tokenId) {
+                    // If tokenId is a hex string (last 4 chars of address), convert to number
+                    recipeTokenId = parseInt(tokenId, 16) % 1000 + 1; // Keep within reasonable range
+                }
+                
+                // Calculate fees
+                updateBuyingModal(loadingModal, 'Calculating fees...');
+                const fees = await window.marketplaceService.calculateFees(price);
+
+                // Show fee breakdown
+                updateBuyingModal(loadingModal, `
+                    <div class="fee-breakdown">
+                        <h4>Purchase Summary</h4>
+                        <p><strong>Recipe:</strong> ${recipeName}</p>
+                        <p><strong>Price:</strong> ${fees.price} USDT</p>
+                        <p><strong>Platform Fee (${(fees.feeRate * 100).toFixed(2)}%):</strong> ${fees.platformFee.toFixed(6)} USDT</p>
+                        <p><strong>Seller Receives:</strong> ${fees.sellerAmount.toFixed(6)} USDT</p>
+                    </div>
+                    <p>Checking USDT balance...</p>
+                `);
+
+                // Check user's USDT balance
+                const balance = await window.marketplaceService.getUserUSDTBalance(userAddress);
+                if (parseFloat(balance) < parseFloat(price)) {
+                    updateBuyingModal(loadingModal, `
+                        <div class="error-message">
+                            <h4>Insufficient Balance</h4>
+                            <p>Your USDT balance: ${parseFloat(balance).toFixed(6)} USDT</p>
+                            <p>Required: ${price} USDT</p>
+                            <p>Please add more USDT to your wallet and try again.</p>
+                            <button class="btn-primary" onclick="closeBuyingModal('${loadingModal.id}')" style="margin-top: 1rem;">Close</button>
+                        </div>
+                    `);
+                    return;
+                }
+
+                // Execute purchase
+                updateBuyingModal(loadingModal, 'Processing purchase...');
+                const receipt = await window.marketplaceService.purchaseRecipe(recipeTokenId, price);
+
+                // Show success
+                updateBuyingModal(loadingModal, `
+                    <div class="success-message">
+                        <h4>✅ Purchase Successful!</h4>
+                        <p>You have successfully purchased access to <strong>${recipeName}</strong></p>
+                        <p><strong>Transaction Hash:</strong></p>
+                        <p><code>${receipt.transactionHash}</code></p>
+                        <p>You now have authorization to view and use this recipe!</p>
+                        <button class="btn-primary" onclick="closeBuyingModal('${loadingModal.id}')" style="margin-top: 1rem;">Close</button>
+                    </div>
+                `);
+
+                // Sync with backend
+                try {
+                    await apiService.completeTransaction({
+                        recipe_address: tokenId,
+                        buyer_address: userAddress,
+                        transaction_hash: receipt.transactionHash,
+                        price: price
+                    });
+                } catch (backendError) {
+                    console.error('Failed to sync transaction with backend:', backendError);
+                }
+
+            } catch (purchaseError) {
+                console.error('Purchase failed:', purchaseError);
+                let errorMessage = 'Purchase failed. Please try again.';
+                
+                if (purchaseError.message.includes('user rejected')) {
+                    errorMessage = 'Transaction cancelled by user.';
+                } else if (purchaseError.message.includes('insufficient')) {
+                    errorMessage = 'Insufficient balance or allowance.';
+                } else if (purchaseError.message.includes('active ID NFT')) {
+                    errorMessage = 'You need an active ID NFT to make purchases.';
+                } else if (purchaseError.message.includes('own recipe')) {
+                    errorMessage = 'You cannot purchase your own recipe.';
+                }
+
+                updateBuyingModal(loadingModal, `
+                    <div class="error-message">
+                        <h4>❌ Purchase Failed</h4>
+                        <p>${errorMessage}</p>
+                        <button class="btn-primary" onclick="closeBuyingModal('${loadingModal.id}')" style="margin-top: 1rem;">Close</button>
+                    </div>
+                `);
+            }
+
+        } catch (error) {
+            console.error('Error during purchase:', error);
+            alert('An error occurred during purchase. Please check the console for details.');
+        }
+    };
+
+    // Show buying modal
+    function showBuyingModal(recipeName, price) {
+        const modalId = 'buying-modal-' + Date.now();
+        const modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Purchasing ${recipeName}</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="loading-message">Initializing purchase...</div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        return modal;
+    }
+
+    // Update buying modal content
+    function updateBuyingModal(modal, content) {
+        const modalBody = modal.querySelector('.modal-body');
+        modalBody.innerHTML = content;
+    }
+
+    // Close buying modal
+    window.closeBuyingModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.remove();
+        }
+    };
 
     // Initialize
     initMarketplace();

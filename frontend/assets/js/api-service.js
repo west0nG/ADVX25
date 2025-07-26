@@ -102,7 +102,7 @@ class APIService {
     }
 
     // ===============================
-    // BARS API METHODS
+    // BARS API MUSDTODS
     // ===============================
 
     // Upload Bar to IPFS
@@ -255,7 +255,7 @@ class APIService {
     // No separate create_idnft endpoint exists in the API
 
     // ===============================
-    // RECIPES API METHODS
+    // RECIPES API MUSDTODS
     // ===============================
 
     // Upload image to IPFS: jpg -> CID

@@ -110,7 +110,7 @@ async function updateUserStats(account) {
     
     if (createdEl) createdEl.textContent = stats.created;
     if (collectedEl) collectedEl.textContent = stats.collected;
-    if (earnedEl) earnedEl.textContent = stats.earned + ' ETH';
+    if (earnedEl) earnedEl.textContent = stats.earned + ' USDT';
 }
 
 /**
@@ -141,7 +141,7 @@ async function loadUserNFTs(account) {
                 <img src="${nft.image}" alt="${nft.name}" loading="lazy">
                 <div class="nft-info">
                     <h4>${nft.name}</h4>
-                    <p>${nft.price} ETH</p>
+                    <p>${nft.price} USDT</p>
                 </div>
             </div>
         `).join('');

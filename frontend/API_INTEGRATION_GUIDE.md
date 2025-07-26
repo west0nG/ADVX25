@@ -95,7 +95,7 @@ The backend should implement these endpoints:
 - recipe_address: String (blockchain address)
 - metadata_cid: String (IPFS CID)
 - owner_address: String (wallet address)
-- price: String (ETH amount)
+- price: String (USDT amount)
 
 #### Frontend to Backend (legacy store_recipe - JSON body)
 ```json
@@ -103,7 +103,7 @@ The backend should implement these endpoints:
   "recipe_name": "String",
   "intro": "String (description)",
   "category": "classic|modern|tropical|non-alcoholic",
-  "price": "String (ETH amount)",
+  "price": "String (USDT amount)",
   "royalties": "String (percentage)",
   "ingredients": ["Array", "of", "ingredient", "strings"],
   "instructions": ["Array", "of", "instruction", "strings"],

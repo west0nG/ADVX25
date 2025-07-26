@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             <div style="position: relative;">
                 <img src="${nft.image}" alt="${nft.name}" class="nft-image">
-                <div class="nft-price">${nft.price} ETH</div>
+                <div class="nft-price">${nft.price} USDT</div>
                 ${isOwned ? '<div style="position: absolute; top: 1rem; left: 1rem; background: rgba(34, 197, 94, 0.9); color: #0a0f1a; padding: 0.25rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">OWNED</div>' : ''}
             </div>
             <div class="nft-info">
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p><strong>Creator:</strong> ${nft.creator}</p>
                         <p><strong>Token ID:</strong> #${nft.tokenId}</p>
                         <p><strong>Category:</strong> ${nft.category}</p>
-                        <p><strong>Price:</strong> ${nft.price} ETH</p>
+                        <p><strong>Price:</strong> ${nft.price} USDT</p>
                     </div>
                     <div class="modal-actions">
                         <button class="btn-secondary">View Recipe</button>
