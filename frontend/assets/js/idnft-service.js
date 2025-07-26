@@ -10,9 +10,38 @@ class IDNFTService {
         this.config = null;
     }
 
+    // Wait for ethers library to be loaded
+    waitForEthers() {
+        return new Promise((resolve) => {
+            if (typeof ethers !== 'undefined') {
+                resolve();
+            } else {
+                const checkEthers = setInterval(() => {
+                    if (typeof ethers !== 'undefined') {
+                        clearInterval(checkEthers);
+                        resolve();
+                    }
+                }, 100);
+                
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    clearInterval(checkEthers);
+                    resolve();
+                }, 10000);
+            }
+        });
+    }
+
     // 初始化服务 - 使用配置中的合约地址和ABI
     async initialize() {
         try {
+            // Wait for ethers library to be loaded
+            await this.waitForEthers();
+            
+            if (typeof ethers === 'undefined') {
+                throw new Error('Ethers library failed to load. Please refresh the page and try again.');
+            }
+
             if (typeof window.ethereum === 'undefined') {
                 throw new Error('MetaMask not found');
             }
