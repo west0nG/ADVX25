@@ -81,16 +81,16 @@ contract IDNFT6551 is ERC721, ERC721URIStorage, Ownable {
     {}
 
     /**
-     * @dev 设置Injective模式（仅所有者）
+     * @dev 设置Injective模式（所有用户都可以调用）
      * @param _injectiveMode 是否启用Injective模式
      */
-    function setInjectiveMode(bool _injectiveMode) external onlyOwner {
+    function setInjectiveMode(bool _injectiveMode) external {
         injectiveMode = _injectiveMode;
         emit InjectiveModeSet(_injectiveMode);
     }
 
     /**
-     * @dev 创建ID NFT（只能由合约所有者调用）
+     * @dev 创建ID NFT（所有用户都可以调用）
      * @param to 接收者地址
      * @param uri IPFS元数据URI
      * @return tokenId 新创建的token ID
@@ -98,7 +98,7 @@ contract IDNFT6551 is ERC721, ERC721URIStorage, Ownable {
     function createIDNFT(
         address to,
         string memory uri
-    ) external onlyOwner returns (uint256) {
+    ) external returns (uint256) {
         require(to != address(0), "IDNFT6551: Invalid address");
         require(bytes(uri).length > 0, "IDNFT6551: Token URI cannot be empty");
         require(addressToTokenId[to] == 0, "IDNFT6551: Address already has an ID NFT");

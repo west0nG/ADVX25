@@ -98,10 +98,10 @@ contract RecipeNFT is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @dev 设置ID NFT合约地址（仅所有者）
+     * @dev 设置ID NFT合约地址（所有用户都可以调用）
      * @param _idnftContract 新的ID NFT合约地址
      */
-    function setIDNFTContract(address _idnftContract) external onlyOwner {
+    function setIDNFTContract(address _idnftContract) external {
         require(_idnftContract != address(0), "RecipeNFT: Invalid ID NFT contract address");
         address oldContract = address(idnftContract);
         idnftContract = IIDNFT(_idnftContract);

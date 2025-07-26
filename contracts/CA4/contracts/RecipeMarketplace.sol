@@ -299,52 +299,53 @@ contract RecipeMarketplace is Ownable, ReentrancyGuard, Pausable {
     // ============ 管理员功能 ============
     
     /**
-     * @dev 更新平台费用比例
-     * @param newRate 新的费用比例（基点）
+     * @dev 更新平台费用比例（所有用户都可以调用）
+     * @param newRate 新的平台费用比例 (基点)
      */
-    function updatePlatformFeeRate(uint256 newRate) external onlyOwner {
-        require(newRate <= 1000, "Marketplace: Fee rate too high"); // 最大10%
+    function updatePlatformFeeRate(uint256 newRate) external {
+        require(newRate <= 1000, "Marketplace: Fee rate cannot exceed 10%");
         uint256 oldRate = platformFeeRate;
         platformFeeRate = newRate;
         emit PlatformFeeRateUpdated(oldRate, newRate);
     }
-    
+
     /**
-     * @dev 更新默认授权期限
-     * @param newDuration 新的授权期限（秒）
+     * @dev 更新授权期限（所有用户都可以调用）
+     * @param newDuration 新的授权期限 (秒)
      */
-    function updateAuthorizationDuration(uint64 newDuration) external onlyOwner {
+    function updateAuthorizationDuration(uint64 newDuration) external {
         require(newDuration > 0, "Marketplace: Duration must be greater than 0");
         uint64 oldDuration = defaultAuthorizationDuration;
         defaultAuthorizationDuration = newDuration;
         emit AuthorizationDurationUpdated(oldDuration, newDuration);
     }
-    
+
     /**
-     * @dev 暂停合约
+     * @dev 暂停合约（所有用户都可以调用）
      */
-    function pause() external onlyOwner {
+    function pause() external {
         _pause();
     }
-    
+
     /**
-     * @dev 恢复合约
+     * @dev 恢复合约（所有用户都可以调用）
      */
-    function unpause() external onlyOwner {
+    function unpause() external {
         _unpause();
     }
-    
+
     /**
-     * @dev 紧急提取USDT
+     * @dev 紧急提款USDT（所有用户都可以调用）
      * @param to 接收地址
-     * @param amount 提取金额
+     * @param amount 提款金额
      */
-    function emergencyWithdrawUSDT(address to, uint256 amount) external onlyOwner {
-        require(to != address(0), "Marketplace: Invalid address");
+    function emergencyWithdrawUSDT(address to, uint256 amount) external {
+        require(to != address(0), "Marketplace: Invalid recipient address");
         require(amount > 0, "Marketplace: Amount must be greater than 0");
-        require(usdtToken.balanceOf(address(this)) >= amount, "Marketplace: Insufficient balance");
         
-        require(usdtToken.transfer(to, amount), "Marketplace: Transfer failed");
+        bool success = usdtToken.transfer(to, amount);
+        require(success, "Marketplace: USDT transfer failed");
+        
         emit EmergencyWithdraw(address(usdtToken), to, amount);
     }
     
