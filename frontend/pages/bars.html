@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Management - BarsHelpBars</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .bars-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .bars-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .bars-header h1 {
+            color: var(--primary-color);
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(37, 242, 242, 0.3);
+        }
+
+        .bars-header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .bars-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(37, 242, 242, 0.2);
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-button:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bar-form {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(37, 242, 242, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(37, 242, 242, 0.2);
+            border-radius: 12px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 242, 242, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(37, 242, 242, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 2px solid rgba(37, 242, 242, 0.3);
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(37, 242, 242, 0.1);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .bars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .bar-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(37, 242, 242, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .bar-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .bar-card h3 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .bar-info {
+            margin-bottom: 15px;
+        }
+
+        .bar-info span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bar-info p {
+            color: var(--text-color);
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        .bar-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(37, 242, 242, 0.2);
+            border-radius: 50px;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .search-input i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            padding: 40px;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .recipes-preview {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(37, 242, 242, 0.2);
+        }
+
+        .recipes-preview h4 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .recipe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .recipe-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .recipe-item span {
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .bars-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tab-button {
+                width: 100%;
+                max-width: 200px;
+                text-align: center;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .bars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <main class="bars-container">
+        <div class="bars-header">
+            <h1><i class="fas fa-building"></i> Bar Management</h1>
+            <p>Create, manage, and explore cocktail bars on the blockchain. Connect bars with their signature recipes and build the ultimate cocktail ecosystem.</p>
+        </div>
+
+        <div class="bars-tabs">
+            <button class="tab-button active" onclick="switchTab('create')">
+                <i class="fas fa-plus"></i> Create Bar
+            </button>
+            <button class="tab-button" onclick="switchTab('manage')">
+                <i class="fas fa-cog"></i> Manage Bars
+            </button>
+            <button class="tab-button" onclick="switchTab('explore')">
+                <i class="fas fa-search"></i> Explore Bars
+            </button>
+        </div>
+
+        <!-- Create Bar Tab -->
+        <div id="create-tab" class="tab-content active">
+            <div class="bar-form">
+                <h2><i class="fas fa-plus-circle"></i> Create New Bar</h2>
+                <div id="create-message"></div>
+                
+                <form id="create-bar-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bar-name">Bar Name</label>
+                            <input type="text" id="bar-name" name="name" placeholder="The Cocktail Lounge" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bar-address">Address</label>
+                            <input type="text" id="bar-address" name="address" placeholder="123 Main Street, City" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bar-owner">Owner Address</label>
+                            <input type="text" id="bar-owner" name="owner" placeholder="0x..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bar-established">Established Year</label>
+                            <input type="text" id="bar-established" name="established" placeholder="2023">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bar-description">Description</label>
+                        <textarea id="bar-description" name="description" placeholder="Describe your bar's atmosphere, specialties, and unique features..." required></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-upload"></i> Create & Upload to IPFS
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-redo"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Manage Bars Tab -->
+        <div id="manage-tab" class="tab-content">
+            <div class="bar-form">
+                <h2><i class="fas fa-cog"></i> Manage Your Bars</h2>
+                <div id="manage-message"></div>
+                
+                <div class="form-group">
+                    <label for="manage-bar-address">Bar Address to Manage</label>
+                    <input type="text" id="manage-bar-address" placeholder="0x...">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-primary" onclick="loadBarForManagement()">
+                        <i class="fas fa-download"></i> Load Bar
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="loadMyBars()">
+                        <i class="fas fa-list"></i> Load My Bars
+                    </button>
+                </div>
+                
+                <div id="manage-form-container" style="display: none;">
+                    <form id="update-bar-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="update-bar-name">Bar Name</label>
+                                <input type="text" id="update-bar-name" name="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="update-bar-address-field">Address</label>
+                                <input type="text" id="update-bar-address-field" name="address">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="update-bar-description">Description</label>
+                            <textarea id="update-bar-description" name="description"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Update Bar
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="viewBarRecipes()">
+                                <i class="fas fa-cocktail"></i> View Recipes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="bar-recipes-section" style="display: none;">
+                <div class="bar-form">
+                    <h3><i class="fas fa-cocktail"></i> Bar Recipes</h3>
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary" onclick="loadOwnedRecipes()">
+                            <i class="fas fa-crown"></i> Owned Recipes
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="loadUsedRecipes()">
+                            <i class="fas fa-glass-cheers"></i> Used Recipes
+                        </button>
+                    </div>
+                    <div id="recipes-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explore Bars Tab -->
+        <div id="explore-tab" class="tab-content">
+            <div class="search-section">
+                <h2><i class="fas fa-search"></i> Explore Bars</h2>
+                <div class="search-input">
+                    <input type="text" id="search-bars" placeholder="Search bars by name, address, or description...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            
+            <div id="explore-message"></div>
+            <div id="bars-grid" class="bars-grid">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading bars...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="../config/app.config.js"></script>
+    <script src="../assets/js/wallet-service.js"></script>
+    <script src="../assets/js/auth-manager.js"></script>
+    <script src="../assets/js/api-service.js"></script>
+    <script src="../assets/js/api-examples.js"></script>
+    <script src="../assets/js/header-loader.js"></script>
+    <script src="../assets/js/footer-loader.js"></script>
+
+    <script>
+        // Tab management
+        function switchTab(tabName) {
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to selected tab and button
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Initialize tab content
+            if (tabName === 'explore') {
+                loadAllBars();
+            }
+        }
+
+        // Create bar functionality
+        document.getElementById('create-bar-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const messageEl = document.getElementById('create-message');
+            messageEl.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Creating and uploading bar...</div>';
+            
+            try {
+                const formData = new FormData(e.target);
+                const barData = {
+                    name: formData.get('name'),
+                    address: formData.get('address'),
+                    description: formData.get('description'),
+                    owner: formData.get('owner'),
+                    established: formData.get('established') || new Date().getFullYear().toString()
+                };
+
+                // Upload to IPFS
+                const uploadResult = await apiService.uploadBarToIPFS(barData);
+                
+                // Set bar data
+                const setResult = await apiService.setBar(barData);
+                
+                messageEl.innerHTML = `
+                    <div class="success">
+                        <i class="fas fa-check-circle"></i> 
+                        Bar created successfully! 
+                        <br><small>IPFS Result: ${JSON.stringify(uploadResult)}</small>
+                        <br><small>Set Result: ${JSON.stringify(setResult)}</small>
+                    </div>
+                `;
+                
+                // Clear form
+                e.target.reset();
+                
+            } catch (error) {
+                messageEl.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error creating bar: ${error.message}
+                    </div>
+                `;
+            }
+        });
+
+        // Update bar functionality
+        document.getElementById('update-bar-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const messageEl = document.getElementById('manage-message');
+            messageEl.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Updating bar...</div>';
+            
+            try {
+                const barAddress = document.getElementById('manage-bar-address').value;
+                const formData = new FormData(e.target);
+                
+                const updateData = {
+                    bar_address: barAddress,
+                    name: formData.get('name'),
+                    address: formData.get('address'),
+                    description: formData.get('description')
+                };
+
+                const result = await apiService.updateBar(updateData);
+                
+                messageEl.innerHTML = `
+                    <div class="success">
+                        <i class="fas fa-check-circle"></i> 
+                        Bar updated successfully! 
+                        <br><small>${JSON.stringify(result)}</small>
+                    </div>
+                `;
+                
+            } catch (error) {
+                messageEl.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error updating bar: ${error.message}
+                    </div>
+                `;
+            }
+        });
+
+        // Load bar for management
+        async function loadBarForManagement() {
+            const barAddress = document.getElementById('manage-bar-address').value;
+            if (!barAddress) {
+                alert('Please enter a bar address');
+                return;
+            }
+
+            const messageEl = document.getElementById('manage-message');
+            messageEl.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading bar...</div>';
+            
+            try {
+                const bar = await apiService.getBar(barAddress);
+                
+                // Populate form
+                document.getElementById('update-bar-name').value = bar.name || '';
+                document.getElementById('update-bar-address-field').value = bar.address || '';
+                document.getElementById('update-bar-description').value = bar.description || '';
+                
+                // Show form
+                document.getElementById('manage-form-container').style.display = 'block';
+                document.getElementById('bar-recipes-section').style.display = 'block';
+                
+                messageEl.innerHTML = `
+                    <div class="success">
+                        <i class="fas fa-check-circle"></i> 
+                        Bar loaded successfully!
+                    </div>
+                `;
+                
+            } catch (error) {
+                messageEl.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading bar: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Load owned recipes
+        async function loadOwnedRecipes() {
+            const barAddress = document.getElementById('manage-bar-address').value;
+            if (!barAddress) {
+                alert('Please load a bar first');
+                return;
+            }
+
+            const container = document.getElementById('recipes-container');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading owned recipes...</div>';
+            
+            try {
+                const recipes = await apiService.getOwnedRecipes(barAddress);
+                displayRecipes(recipes, 'owned');
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading owned recipes: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Load used recipes
+        async function loadUsedRecipes() {
+            const barAddress = document.getElementById('manage-bar-address').value;
+            if (!barAddress) {
+                alert('Please load a bar first');
+                return;
+            }
+
+            const container = document.getElementById('recipes-container');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading used recipes...</div>';
+            
+            try {
+                const recipes = await apiService.getUsedRecipes(barAddress);
+                displayRecipes(recipes, 'used');
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading used recipes: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Display recipes
+        function displayRecipes(recipes, type) {
+            const container = document.getElementById('recipes-container');
+            
+            if (!recipes || recipes.length === 0) {
+                container.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-info-circle"></i> 
+                        No ${type} recipes found.
+                    </div>
+                `;
+                return;
+            }
+
+            const recipesHtml = recipes.map(recipe => `
+                <div class="recipe-item">
+                    <strong>${recipe.recipe_name || recipe.name || 'Unknown Recipe'}</strong>
+                    <br><small>${recipe.description || recipe.intro || 'No description'}</small>
+                    ${recipe.price ? `<br><small>Price: ${recipe.price} ETH</small>` : ''}
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <h4><i class="fas fa-cocktail"></i> ${type.charAt(0).toUpperCase() + type.slice(1)} Recipes (${recipes.length})</h4>
+                <div class="recipe-list">
+                    ${recipesHtml}
+                </div>
+            `;
+        }
+
+        // View bar recipes
+        function viewBarRecipes() {
+            document.getElementById('bar-recipes-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Load all bars for exploration
+        async function loadAllBars() {
+            const container = document.getElementById('bars-grid');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading bars...</div>';
+            
+            try {
+                // Note: This would require a "get all bars" endpoint which isn't in the current API
+                // For now, we'll show a message about this limitation
+                container.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-info-circle"></i> 
+                        Bar exploration feature requires a "get all bars" endpoint to be implemented in the backend.
+                        <br><br>You can currently:
+                        <ul style="text-align: left; margin-top: 15px;">
+                            <li>Create new bars</li>
+                            <li>Manage existing bars by address</li>
+                            <li>View bar recipes</li>
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading bars: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Utility functions
+        function clearForm() {
+            document.getElementById('create-bar-form').reset();
+            document.getElementById('create-message').innerHTML = '';
+        }
+
+        function loadMyBars() {
+            // This would require wallet integration to get the user's address
+            // and then query bars owned by that address
+            alert('This feature requires wallet integration to load bars owned by your address.');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-populate owner address if wallet is connected
+            if (window.walletService && window.walletService.account) {
+                document.getElementById('bar-owner').value = window.walletService.account;
+            }
+        });
+
+        // Search functionality (placeholder)
+        document.getElementById('search-bars').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            // This would filter displayed bars based on the search query
+            // For now, it's just a placeholder since we need the backend to support bar listing
+        });
+    </script>
+</body>
+</html> 

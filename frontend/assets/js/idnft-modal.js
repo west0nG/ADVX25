@@ -368,17 +368,32 @@ class IDNFTModal {
 
     // 处理登录成功
     handleLoginSuccess(walletAddress) {
+        console.log('IDNFTModal: Login success for address:', walletAddress);
+        
         // WalletService已经处理了基本的连接信息存储
-        // 这里只需存储IDNFT特定的信息
+        // 这里只需存储IDNFT特定的信息，使用localStorage保持一致性
         localStorage.setItem('hasIDNFT', 'true');
+        localStorage.setItem('idnft_verified_at', new Date().toISOString());
         
         // 显示成功消息
-        this.showSuccess('连接成功！', `欢迎回来，${window.idnftService.getShortAddress(walletAddress)}`);
+        this.showSuccess('连接成功！', `欢迎回来，${this.getShortAddress(walletAddress)}`);
         
         // 使用AuthManager进行导航
         setTimeout(() => {
-            window.authManager.redirectToIntendedDestination();
+            if (window.authManager) {
+                window.authManager.redirectToIntendedDestination();
+            } else {
+                // Fallback navigation
+                const targetPage = sessionStorage.getItem('intendedDestination') || 'pages/profile.html';
+                window.location.href = targetPage;
+            }
         }, 2000);
+    }
+
+    // 获取短地址格式（添加这个方法如果不存在）
+    getShortAddress(address) {
+        if (!address) return '';
+        return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
     }
 
     // 显示错误消息

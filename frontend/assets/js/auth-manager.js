@@ -53,14 +53,42 @@ class AuthManager {
             return;
         }
 
-        // Check authentication state
-        const connectionInfo = window.walletService.getConnectionInfo();
-        
-        if (!connectionInfo.isConnected) {
-            // Store intended destination
-            sessionStorage.setItem('intendedDestination', window.location.href);
+        // Wait for wallet service to be ready
+        this.checkAuthenticationWhenReady();
+    }
+
+    /**
+     * Check authentication when wallet service is ready
+     */
+    async checkAuthenticationWhenReady() {
+        try {
+            // Ensure wallet service is initialized
+            if (window.walletService) {
+                await window.walletService.ensureReady();
+            }
             
-            // Redirect to auth page
+            // Check authentication state
+            const connectionInfo = window.walletService?.getConnectionInfo() || { isConnected: false };
+            
+            console.log('AuthManager: Checking authentication', {
+                page: this.getCurrentPage(),
+                isConnected: connectionInfo.isConnected,
+                account: connectionInfo.account
+            });
+            
+            if (!connectionInfo.isConnected) {
+                // Store intended destination using sessionStorage (appropriate for navigation)
+                sessionStorage.setItem('intendedDestination', window.location.href);
+                
+                console.log('AuthManager: Not authenticated, redirecting to auth page');
+                // Redirect to auth page
+                this.redirectToAuth();
+            } else {
+                console.log('AuthManager: Authentication check passed');
+            }
+        } catch (error) {
+            console.error('AuthManager: Error checking authentication:', error);
+            // On error, redirect to auth page to be safe
             this.redirectToAuth();
         }
     }
@@ -98,7 +126,12 @@ class AuthManager {
         const intendedDestination = sessionStorage.getItem('intendedDestination');
         sessionStorage.removeItem('intendedDestination');
         
-        if (intendedDestination) {
+        console.log('AuthManager: Redirecting after login', {
+            intended: intendedDestination,
+            current: window.location.href
+        });
+        
+        if (intendedDestination && intendedDestination !== window.location.href) {
             window.location.href = intendedDestination;
         } else {
             // Default to profile page
@@ -116,7 +149,7 @@ class AuthManager {
         // Wallet connected
         window.addEventListener('walletConnected', (event) => {
             const { account, chainId } = event.detail;
-            console.log('Wallet connected:', account, chainId);
+            console.log('AuthManager: Wallet connected event received', { account, chainId });
             
             // Update global UI
             this.updateGlobalUI({
@@ -128,6 +161,7 @@ class AuthManager {
             
             // If on auth page, redirect to intended destination
             if (this.getCurrentPage() === this.authPage) {
+                console.log('AuthManager: On auth page, redirecting after successful connection');
                 setTimeout(() => {
                     this.redirectToIntendedDestination();
                 }, 1500);
@@ -136,7 +170,7 @@ class AuthManager {
 
         // Wallet disconnected
         window.addEventListener('walletDisconnected', () => {
-            console.log('Wallet disconnected');
+            console.log('AuthManager: Wallet disconnected event received');
             
             // Update global UI
             this.updateGlobalUI({
@@ -148,6 +182,7 @@ class AuthManager {
             
             // If on protected route, redirect to auth
             if (this.isProtectedRoute(this.getCurrentPage())) {
+                console.log('AuthManager: On protected route, redirecting to auth page');
                 this.redirectToAuth();
             }
         });
@@ -155,7 +190,7 @@ class AuthManager {
         // Account changed
         window.addEventListener('accountChanged', (event) => {
             const { account } = event.detail;
-            console.log('Account changed:', account);
+            console.log('AuthManager: Account changed event received', { account });
             
             // Update global UI
             this.updateGlobalUI({
@@ -169,7 +204,7 @@ class AuthManager {
         // Chain changed
         window.addEventListener('chainChanged', (event) => {
             const { chainId, network } = event.detail;
-            console.log('Chain changed:', chainId, network);
+            console.log('AuthManager: Chain changed event received', { chainId, network });
             
             // Update global UI
             this.updateGlobalUI({
@@ -183,7 +218,7 @@ class AuthManager {
         // Unsupported network
         window.addEventListener('unsupportedNetwork', (event) => {
             const { chainId } = event.detail;
-            console.warn('Unsupported network:', chainId);
+            console.warn('AuthManager: Unsupported network event received', { chainId });
             
             // Show network warning
             this.showNetworkWarning(chainId);

@@ -7,17 +7,25 @@ const APP_CONFIG = {
     
     // API Configuration
     api: {
-        baseUrl: 'http://localhost:8080', // Update this to your backend server URL
+        baseUrl: 'http://localhost:8080/api',   // <- was 8080
         timeout: 30000,
         retries: 3,
         endpoints: {
+            bars: {
+                uploadBarIPFS: '/bars/upload_bar_ipfs',
+                getBar: '/bars/get',  // /{bar_address}
+                updateBar: '/bars/update',
+                setBar: '/bars/set',
+                getOwnedRecipes: '/bars/owned_recipes',  // /{bar_address}
+                getUsedRecipes: '/bars/used_recipes'     // /{bar_address}
+            },
             recipes: {
                 uploadIPFS: '/recipes/upload_ipfs',
-                storeRecipe: '/recipes/store_recipe',
+                storeRecipe: '/recipes/store_recipe',    // /{recipe_address}/{metadata_cid}/{owner_address}/{price}
                 getTenRecipes: '/recipes/get_ten_recipes',
                 getAllRecipes: '/recipes/get_all_recipes',
                 searchRecipes: '/recipes/search_recipes',
-                getOneRecipe: '/recipes/get_one_recipe'
+                getOneRecipe: '/recipes/get_one_recipe'  // /{nft_address}/{user_address}
             }
         }
     },
@@ -27,8 +35,11 @@ const APP_CONFIG = {
         protectedRoutes: ['main.html', 'create.html', 'profile.html', 'marketplace.html'],
         authPage: 'auth.html',
         defaultRedirect: 'profile.html',
-        sessionTimeout: 7200000, // 2 hours
-        stateValidationInterval: 30000 // 30 seconds
+        sessionTimeout: 86400000, // 24 hours (increased from 2 hours to reduce frequent re-auth)
+        stateValidationInterval: 60000, // 60 seconds (reduced frequency)
+        debug: false, // Set to true for debugging auth issues
+        autoReconnect: true, // Automatically try to reconnect on page load
+        persistentSession: true // Use localStorage for persistent sessions across browser restarts
     },
     
     // Blockchain Configuration

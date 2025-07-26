@@ -4,7 +4,8 @@ class APIService {
         this.baseUrl = APP_CONFIG.api.baseUrl;
         this.timeout = APP_CONFIG.api.timeout;
         this.retries = APP_CONFIG.api.retries;
-        this.endpoints = APP_CONFIG.api.endpoints.recipes;
+        this.recipeEndpoints = APP_CONFIG.api.endpoints.recipes;
+        this.barEndpoints = APP_CONFIG.api.endpoints.bars;
     }
 
     // Helper method to make HTTP requests with retries
@@ -80,13 +81,114 @@ class APIService {
         }
     }
 
-    // 1. Upload image to IPFS: jpg -> CID
+    // ===============================
+    // BARS API METHODS
+    // ===============================
+
+    // Upload Bar to IPFS
+    async uploadBarToIPFS(barData) {
+        try {
+            const formData = new FormData();
+            
+            // Handle different data types - if it's a file, append as is, otherwise as JSON
+            if (barData instanceof File) {
+                formData.append('bar_data', barData);
+            } else {
+                formData.append('bar_data', JSON.stringify(barData));
+            }
+
+            const url = `${this.baseUrl}${this.barEndpoints.uploadBarIPFS}`;
+            const result = await this.makeFormDataRequest(url, formData);
+            
+            return result;
+        } catch (error) {
+            console.error('Failed to upload bar to IPFS:', error);
+            throw error;
+        }
+    }
+
+    // Get Bar by address
+    async getBar(barAddress) {
+        try {
+            const url = `${this.baseUrl}${this.barEndpoints.getBar}/${barAddress}`;
+            const result = await this.makeRequest(url);
+            
+            return result;
+        } catch (error) {
+            console.error('Failed to get bar:', error);
+            throw error;
+        }
+    }
+
+    // Update Bar
+    async updateBar(barData) {
+        try {
+            const url = `${this.baseUrl}${this.barEndpoints.updateBar}`;
+            const result = await this.makeRequest(url, {
+                method: 'POST',
+                body: JSON.stringify(barData)
+            });
+            
+            return result;
+        } catch (error) {
+            console.error('Failed to update bar:', error);
+            throw error;
+        }
+    }
+
+    // Set Bar
+    async setBar(barData) {
+        try {
+            const url = `${this.baseUrl}${this.barEndpoints.setBar}`;
+            const result = await this.makeRequest(url, {
+                method: 'POST',
+                body: JSON.stringify(barData)
+            });
+            
+            return result;
+        } catch (error) {
+            console.error('Failed to set bar:', error);
+            throw error;
+        }
+    }
+
+    // Get All Owned Recipes for a bar
+    async getOwnedRecipes(barAddress) {
+        try {
+            const url = `${this.baseUrl}${this.barEndpoints.getOwnedRecipes}/${barAddress}`;
+            const result = await this.makeRequest(url);
+            
+            return result.recipes || result;
+        } catch (error) {
+            console.error('Failed to get owned recipes:', error);
+            throw error;
+        }
+    }
+
+    // Get All Used Recipes for a bar
+    async getUsedRecipes(barAddress) {
+        try {
+            const url = `${this.baseUrl}${this.barEndpoints.getUsedRecipes}/${barAddress}`;
+            const result = await this.makeRequest(url);
+            
+            return result.recipes || result;
+        } catch (error) {
+            console.error('Failed to get used recipes:', error);
+            throw error;
+        }
+    }
+
+    // ===============================
+    // RECIPES API METHODS
+    // ===============================
+
+    // Upload image to IPFS: jpg -> CID
     async uploadToIPFS(imageFile) {
         try {
             const formData = new FormData();
             formData.append('image', imageFile);
 
-            const url = `${this.baseUrl}${this.endpoints.uploadIPFS}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.uploadIPFS}`;
             const result = await this.makeFormDataRequest(url, formData);
             
             return result.cid; // Assuming backend returns { cid: "..." }
@@ -96,10 +198,10 @@ class APIService {
         }
     }
 
-    // 2. Upload metadata to IPFS: json -> CID
+    // Upload metadata to IPFS: json -> CID
     async uploadMetadataToIPFS(metadata) {
         try {
-            const url = `${this.baseUrl}${this.endpoints.uploadIPFS}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.uploadIPFS}`;
             const result = await this.makeRequest(url, {
                 method: 'POST',
                 body: JSON.stringify({ metadata: metadata })
@@ -112,39 +214,54 @@ class APIService {
         }
     }
 
-    // 2. Store recipe: json{recipe name, intro, owner NFT address, ..., CID, NFT ID, NFT hash} -> bool
-    async storeRecipe(recipeData) {
+    // Store recipe with path parameters
+    async storeRecipe(recipeAddress, metadataCid, ownerAddress, price) {
         try {
-            const url = `${this.baseUrl}${this.endpoints.storeRecipe}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.storeRecipe}/${recipeAddress}/${metadataCid}/${ownerAddress}/${price}`;
             const result = await this.makeRequest(url, {
-                method: 'POST',
-                body: JSON.stringify(recipeData)
+                method: 'POST'
             });
             
-            return result.success || result; // Assuming backend returns { success: true } or boolean
+            return result.success || result;
         } catch (error) {
             console.error('Failed to store recipe:', error);
             throw error;
         }
     }
 
-    // 3. Get ten recipes: none -> json{recipe name, intro, owner NFT address, ...}
+    // Legacy store recipe method for backward compatibility (with JSON body)
+    async storeRecipeData(recipeData) {
+        try {
+            const url = `${this.baseUrl}${this.recipeEndpoints.storeRecipe}`;
+            const result = await this.makeRequest(url, {
+                method: 'POST',
+                body: JSON.stringify(recipeData)
+            });
+            
+            return result.success || result;
+        } catch (error) {
+            console.error('Failed to store recipe:', error);
+            throw error;
+        }
+    }
+
+    // Get ten recipes: none -> json{recipe name, intro, owner NFT address, ...}
     async getTenRecipes() {
         try {
-            const url = `${this.baseUrl}${this.endpoints.getTenRecipes}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.getTenRecipes}`;
             const result = await this.makeRequest(url);
             
-            return result.recipes || result; // Handle different response formats
+            return result.recipes || result;
         } catch (error) {
             console.error('Failed to get ten recipes:', error);
             throw error;
         }
     }
 
-    // 4. Get all recipes: none -> json
+    // Get all recipes: none -> json
     async getAllRecipes() {
         try {
-            const url = `${this.baseUrl}${this.endpoints.getAllRecipes}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.getAllRecipes}`;
             const result = await this.makeRequest(url);
             
             return result.recipes || result;
@@ -154,10 +271,10 @@ class APIService {
         }
     }
 
-    // 5. Search recipes: string -> json
+    // Search recipes: string -> json
     async searchRecipes(searchQuery) {
         try {
-            const url = `${this.baseUrl}${this.endpoints.searchRecipes}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.searchRecipes}`;
             const result = await this.makeRequest(url, {
                 method: 'POST',
                 body: JSON.stringify({ query: searchQuery })
@@ -170,10 +287,23 @@ class APIService {
         }
     }
 
-    // 6. Get one recipe: NFT address -> json
-    async getOneRecipe(nftAddress) {
+    // Get one recipe with path parameters
+    async getOneRecipe(nftAddress, userAddress) {
         try {
-            const url = `${this.baseUrl}${this.endpoints.getOneRecipe}`;
+            const url = `${this.baseUrl}${this.recipeEndpoints.getOneRecipe}/${nftAddress}/${userAddress}`;
+            const result = await this.makeRequest(url);
+            
+            return result.recipe || result;
+        } catch (error) {
+            console.error('Failed to get recipe:', error);
+            throw error;
+        }
+    }
+
+    // Legacy get one recipe method for backward compatibility (with JSON body)
+    async getOneRecipeByAddress(nftAddress) {
+        try {
+            const url = `${this.baseUrl}${this.recipeEndpoints.getOneRecipe}`;
             const result = await this.makeRequest(url, {
                 method: 'POST',
                 body: JSON.stringify({ nft_address: nftAddress })

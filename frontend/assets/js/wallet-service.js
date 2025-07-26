@@ -16,6 +16,11 @@ class WalletService {
         this.metamaskListeners = {};
         this.abortController = new AbortController();
         
+        // State validation control
+        this.isValidating = false;
+        this.lastValidationTime = 0;
+        this.validationCooldown = 5000; // 5 seconds between validations
+        
         // Configuration
         this.SUPPORTED_CHAINS = {
             '0x1': { name: 'Ethereum Mainnet', id: 1 },
@@ -24,8 +29,28 @@ class WalletService {
             '0x5': { name: 'Goerli Testnet', id: 5 }
         };
         
+        // Storage keys - using consistent localStorage for persistence
+        this.STORAGE_KEYS = {
+            CONNECTED: 'wallet_connected',
+            ADDRESS: 'wallet_address',
+            CHAIN_ID: 'wallet_chain_id',
+            TYPE: 'wallet_type',
+            CONNECTION_TIME: 'wallet_connection_time',
+            SESSION_ID: 'wallet_session_id'
+        };
+        
+        // Generate session ID for this browser session
+        this.sessionId = this.generateSessionId();
+        
         // Initialize service (async)
         this.initializeAsync();
+    }
+
+    /**
+     * Generate unique session ID
+     */
+    generateSessionId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
 
     /**
@@ -54,6 +79,8 @@ class WalletService {
      * Initialize the service and validate stored state
      */
     async initialize() {
+        console.log('WalletService: Initializing...');
+        
         if (!this.isMetaMaskAvailable()) {
             console.log('MetaMask not available');
             return;
@@ -62,14 +89,20 @@ class WalletService {
         // Setup cleanup on page unload
         window.addEventListener('beforeunload', () => this.cleanup(), { signal: this.abortController.signal });
         
-        // Validate stored state
+        // Validate stored state with improved logic
         await this.validateStoredState();
         
         // Setup event listeners
         this.setupEventListeners();
         
-        // Start periodic state validation
+        // Start periodic state validation with better timing
         this.startStateValidation();
+        
+        console.log('WalletService: Initialization complete', {
+            state: this.connectionState,
+            account: this.currentAccount,
+            chainId: this.currentChainId
+        });
     }
 
     /**
@@ -80,33 +113,84 @@ class WalletService {
     }
 
     /**
-     * Validate stored authentication state
+     * Validate stored authentication state with improved logic
      */
     async validateStoredState() {
-        const storedAddress = localStorage.getItem('walletAddress');
-        if (!storedAddress) return;
-
+        // Prevent concurrent validations
+        if (this.isValidating) {
+            console.log('WalletService: Validation already in progress');
+            return;
+        }
+        
+        // Rate limiting
+        const now = Date.now();
+        if (now - this.lastValidationTime < this.validationCooldown) {
+            console.log('WalletService: Validation rate limited');
+            return;
+        }
+        
+        this.isValidating = true;
+        this.lastValidationTime = now;
+        
         try {
+            const storedAddress = localStorage.getItem(this.STORAGE_KEYS.ADDRESS);
+            const storedChainId = localStorage.getItem(this.STORAGE_KEYS.CHAIN_ID);
+            const storedConnected = localStorage.getItem(this.STORAGE_KEYS.CONNECTED);
+            
+            if (!storedAddress || storedConnected !== 'true') {
+                console.log('WalletService: No stored connection found');
+                this.clearStoredState();
+                return;
+            }
+
+            // Check MetaMask connection status
             const accounts = await window.ethereum.request({ method: 'eth_accounts' });
             const currentAddress = accounts[0]?.toLowerCase();
-            const storedAddressLower = storedAddress.toLowerCase();
+            const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
 
-            if (!currentAddress || currentAddress !== storedAddressLower) {
-                // Mismatch detected - clear invalid state
-                console.log('Stored state mismatch detected, clearing...');
+            if (!currentAddress) {
+                console.log('WalletService: No MetaMask accounts found');
                 this.clearStoredState();
-            } else {
-                // Valid state - update current account
-                this.currentAccount = currentAddress;
-                this.connectionState = 'CONNECTED';
-                
-                // Get current chain
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                this.currentChainId = chainId;
+                return;
             }
+
+            if (currentAddress !== storedAddress.toLowerCase()) {
+                console.log('WalletService: Address mismatch detected', {
+                    stored: storedAddress,
+                    current: currentAddress
+                });
+                // Update to new address instead of clearing
+                this.handleAccountChange(currentAddress);
+                return;
+            }
+
+            // Valid state - restore connection
+            this.currentAccount = currentAddress;
+            this.currentChainId = currentChainId;
+            this.connectionState = 'CONNECTED';
+            
+            // Update chain ID if changed
+            if (currentChainId !== storedChainId) {
+                console.log('WalletService: Chain ID updated', {
+                    stored: storedChainId,
+                    current: currentChainId
+                });
+                this.updateStoredState(currentAddress, currentChainId);
+            }
+            
+            console.log('WalletService: State validation successful', {
+                account: this.currentAccount,
+                chainId: this.currentChainId
+            });
+            
         } catch (error) {
-            console.error('Error validating stored state:', error);
-            this.clearStoredState();
+            console.error('WalletService: Error validating stored state:', error);
+            // Don't clear state for network errors
+            if (error.code !== -32603) {
+                this.clearStoredState();
+            }
+        } finally {
+            this.isValidating = false;
         }
     }
 
@@ -230,7 +314,7 @@ class WalletService {
             }
 
             // Store connection info
-            this.updateStoredState(account);
+            this.updateStoredState(account, chainId);
 
             // Notify UI of successful connection
             window.dispatchEvent(new CustomEvent('walletConnected', {
@@ -323,11 +407,16 @@ class WalletService {
     }
 
     /**
-     * Handle account change
+     * Handle account change with improved logic
      */
     handleAccountChange(newAccount) {
+        console.log('WalletService: Account changed', {
+            old: this.currentAccount,
+            new: newAccount
+        });
+        
         this.currentAccount = newAccount;
-        this.updateStoredState(newAccount);
+        this.updateStoredState(newAccount, this.currentChainId);
 
         // Notify UI
         window.dispatchEvent(new CustomEvent('accountChanged', {
@@ -336,10 +425,16 @@ class WalletService {
     }
 
     /**
-     * Handle chain change
+     * Handle chain change with improved logging
      */
     handleChainChange(chainId) {
+        console.log('WalletService: Chain changed', {
+            old: this.currentChainId,
+            new: chainId
+        });
+        
         this.currentChainId = chainId;
+        this.updateStoredState(this.currentAccount, chainId);
 
         // Check if supported
         if (!this.SUPPORTED_CHAINS[chainId]) {
@@ -357,39 +452,112 @@ class WalletService {
      * Handle disconnect
      */
     handleDisconnect() {
+        console.log('WalletService: Wallet disconnected');
         this.disconnect();
     }
 
     /**
-     * Update stored authentication state
+     * Update stored authentication state with consistent storage
      */
-    updateStoredState(account) {
-        localStorage.setItem('walletConnected', 'true');
-        localStorage.setItem('walletAddress', account);
-        localStorage.setItem('walletType', 'metamask');
-        localStorage.setItem('connectionTime', new Date().toISOString());
+    updateStoredState(account, chainId = null) {
+        const now = new Date().toISOString();
+        const currentChainId = chainId || this.currentChainId;
+        
+        // Use consistent localStorage for all auth state
+        localStorage.setItem(this.STORAGE_KEYS.CONNECTED, 'true');
+        localStorage.setItem(this.STORAGE_KEYS.ADDRESS, account);
+        localStorage.setItem(this.STORAGE_KEYS.CHAIN_ID, currentChainId);
+        localStorage.setItem(this.STORAGE_KEYS.TYPE, 'metamask');
+        localStorage.setItem(this.STORAGE_KEYS.CONNECTION_TIME, now);
+        localStorage.setItem(this.STORAGE_KEYS.SESSION_ID, this.sessionId);
+        
+        // Clear any old inconsistent storage
+        sessionStorage.removeItem('intendedDestination'); // This should be separate
+        
+        console.log('WalletService: State updated', {
+            account,
+            chainId: currentChainId,
+            time: now
+        });
     }
 
     /**
-     * Clear stored authentication state
+     * Check if session has expired
+     */
+    isSessionExpired() {
+        const connectionTime = localStorage.getItem(this.STORAGE_KEYS.CONNECTION_TIME);
+        if (!connectionTime) return true;
+        
+        const sessionTimeout = window.APP_CONFIG?.auth?.sessionTimeout || 86400000; // 24 hours default
+        const elapsed = Date.now() - new Date(connectionTime).getTime();
+        
+        return elapsed > sessionTimeout;
+    }
+
+    /**
+     * Get debug information
+     */
+    getDebugInfo() {
+        return {
+            connectionState: this.connectionState,
+            currentAccount: this.currentAccount,
+            currentChainId: this.currentChainId,
+            sessionId: this.sessionId,
+            isValidating: this.isValidating,
+            lastValidationTime: this.lastValidationTime,
+            storedState: {
+                connected: localStorage.getItem(this.STORAGE_KEYS.CONNECTED),
+                address: localStorage.getItem(this.STORAGE_KEYS.ADDRESS),
+                chainId: localStorage.getItem(this.STORAGE_KEYS.CHAIN_ID),
+                connectionTime: localStorage.getItem(this.STORAGE_KEYS.CONNECTION_TIME),
+                sessionId: localStorage.getItem(this.STORAGE_KEYS.SESSION_ID)
+            },
+            sessionExpired: this.isSessionExpired(),
+            metamaskAvailable: this.isMetaMaskAvailable()
+        };
+    }
+
+    /**
+     * Clear stored authentication state completely
      */
     clearStoredState() {
+        console.log('WalletService: Clearing stored state');
+        
+        // Clear all wallet-related localStorage
+        Object.values(this.STORAGE_KEYS).forEach(key => {
+            localStorage.removeItem(key);
+        });
+        
+        // Clear legacy storage keys for compatibility
         localStorage.removeItem('walletConnected');
         localStorage.removeItem('walletAddress');
         localStorage.removeItem('walletType');
         localStorage.removeItem('connectionTime');
+        localStorage.removeItem('hasIDNFT');
+        
+        // Reset internal state
+        this.currentAccount = null;
+        this.currentChainId = null;
+        this.connectionState = 'IDLE';
     }
 
     /**
-     * Start periodic state validation
+     * Start periodic state validation with improved timing
      */
     startStateValidation() {
-        // Validate state every 30 seconds
+        // Clear any existing interval
+        if (this.validationInterval) {
+            clearInterval(this.validationInterval);
+        }
+        
+        // Validate state every 60 seconds (increased from 30 to reduce interruptions)
         this.validationInterval = setInterval(() => {
-            if (this.connectionState === 'CONNECTED') {
+            if (this.connectionState === 'CONNECTED' && !this.isValidating) {
                 this.validateStoredState();
             }
-        }, 30000);
+        }, 60000);
+        
+        console.log('WalletService: State validation started (60s interval)');
     }
 
     /**

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Integration Test - BarsHelpBars</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 100%);
+            color: #f9fafb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #25f2f2;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(37, 242, 242, 0.3);
+        }
+
+        .api-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(37, 242, 242, 0.2);
+        }
+
+        .api-section h2 {
+            color: #ec4899;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ec4899;
+            padding-bottom: 10px;
+        }
+
+        .test-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 4px solid #25f2f2;
+        }
+
+        .test-group h3 {
+            color: #25f2f2;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(37, 242, 242, 0.3);
+            border-radius: 6px;
+            color: #f9fafb;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #25f2f2;
+            box-shadow: 0 0 0 2px rgba(37, 242, 242, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #25f2f2 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 242, 242, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 6px;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .error {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .loading {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .health-status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .health-healthy {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+
+        .health-unhealthy {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍸 API Integration Test Page</h1>
+        
+        <div id="health-status" class="health-status">
+            Checking API health...
+        </div>
+
+        <!-- Bars API Section -->
+        <div class="api-section">
+            <h2>🏪 Bars API Testing</h2>
+            
+            <div class="grid">
+                <!-- Upload Bar to IPFS -->
+                <div class="test-group">
+                    <h3>Upload Bar to IPFS</h3>
+                    <div class="form-group">
+                        <label>Bar Name:</label>
+                        <input type="text" id="bar-name" placeholder="The Cocktail Lounge" value="Test Bar">
+                    </div>
+                    <div class="form-group">
+                        <label>Address:</label>
+                        <input type="text" id="bar-address" placeholder="123 Main St, City" value="123 Test Street">
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <textarea id="bar-description" placeholder="A sophisticated cocktail bar">A test bar for API testing</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Address:</label>
+                        <input type="text" id="bar-owner" placeholder="0x1234..." value="0x1234567890abcdef1234567890abcdef12345678">
+                    </div>
+                    <button onclick="testUploadBarToIPFS()">Upload Bar to IPFS</button>
+                    <div id="upload-bar-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Get Bar -->
+                <div class="test-group">
+                    <h3>Get Bar</h3>
+                    <div class="form-group">
+                        <label>Bar Address:</label>
+                        <input type="text" id="get-bar-address" placeholder="0x1234..." value="0x1234567890abcdef1234567890abcdef12345678">
+                    </div>
+                    <button onclick="testGetBar()">Get Bar</button>
+                    <div id="get-bar-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Update Bar -->
+                <div class="test-group">
+                    <h3>Update Bar</h3>
+                    <div class="form-group">
+                        <label>Bar Address:</label>
+                        <input type="text" id="update-bar-address" placeholder="0x1234..." value="0x1234567890abcdef1234567890abcdef12345678">
+                    </div>
+                    <div class="form-group">
+                        <label>New Description:</label>
+                        <textarea id="update-bar-description" placeholder="Updated description">Updated bar description</textarea>
+                    </div>
+                    <button onclick="testUpdateBar()">Update Bar</button>
+                    <div id="update-bar-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Get Owned Recipes -->
+                <div class="test-group">
+                    <h3>Get Owned Recipes</h3>
+                    <div class="form-group">
+                        <label>Bar Address:</label>
+                        <input type="text" id="owned-recipes-address" placeholder="0x1234..." value="0x1234567890abcdef1234567890abcdef12345678">
+                    </div>
+                    <button onclick="testGetOwnedRecipes()">Get Owned Recipes</button>
+                    <div id="owned-recipes-result" class="result-box" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipes API Section -->
+        <div class="api-section">
+            <h2>🍹 Recipes API Testing</h2>
+            
+            <div class="grid">
+                <!-- Upload Image to IPFS -->
+                <div class="test-group">
+                    <h3>Upload Image to IPFS</h3>
+                    <div class="form-group">
+                        <label>Recipe Image:</label>
+                        <input type="file" id="recipe-image" accept="image/*">
+                    </div>
+                    <button onclick="testUploadImageToIPFS()">Upload Image</button>
+                    <div id="upload-image-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Store Recipe -->
+                <div class="test-group">
+                    <h3>Store Recipe (New Method)</h3>
+                    <div class="form-group">
+                        <label>Recipe Address:</label>
+                        <input type="text" id="recipe-address" placeholder="0xabcdef..." value="0xabcdef1234567890abcdef1234567890abcdef12">
+                    </div>
+                    <div class="form-group">
+                        <label>Metadata CID:</label>
+                        <input type="text" id="metadata-cid" placeholder="QmXXXXXX..." value="QmTestCID123456789">
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Address:</label>
+                        <input type="text" id="recipe-owner" placeholder="0x1234..." value="0x1234567890abcdef1234567890abcdef12345678">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (ETH):</label>
+                        <input type="text" id="recipe-price" placeholder="0.05" value="0.05">
+                    </div>
+                    <button onclick="testStoreRecipe()">Store Recipe</button>
+                    <div id="store-recipe-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Get All Recipes -->
+                <div class="test-group">
+                    <h3>Get All Recipes</h3>
+                    <button onclick="testGetAllRecipes()">Get All Recipes</button>
+                    <div id="all-recipes-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Search Recipes -->
+                <div class="test-group">
+                    <h3>Search Recipes</h3>
+                    <div class="form-group">
+                        <label>Search Query:</label>
+                        <input type="text" id="search-query" placeholder="margarita" value="margarita">
+                    </div>
+                    <button onclick="testSearchRecipes()">Search Recipes</button>
+                    <div id="search-recipes-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <!-- Get One Recipe -->
+                <div class="test-group">
+                    <h3>Get One Recipe</h3>
+                    <div class="form-group">
+                        <label>NFT Address:</label>
+                        <input type="text" id="nft-address" placeholder="0xabcdef..." value="0xabcdef1234567890abcdef1234567890abcdef12">
+                    </div>
+                    <div class="form-group">
+                        <label>User Address:</label>
+                        <input type="text" id="user-address" placeholder="0x1234..." value="0x1234567890abcdef1234567890abcdef12345678">
+                    </div>
+                    <button onclick="testGetOneRecipe()">Get Recipe</button>
+                    <div id="get-recipe-result" class="result-box" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Testing -->
+        <div class="api-section">
+            <h2>🔄 Complete Workflow Testing</h2>
+            
+            <div class="two-column">
+                <div class="test-group">
+                    <h3>Complete Recipe Workflow</h3>
+                    <p style="margin-bottom: 15px; color: #9ca3af;">
+                        This will test the complete recipe creation workflow: upload image → store recipe → retrieve recipe
+                    </p>
+                    <button onclick="testCompleteRecipeWorkflow()">Run Recipe Workflow</button>
+                    <div id="recipe-workflow-result" class="result-box" style="display: none;"></div>
+                </div>
+
+                <div class="test-group">
+                    <h3>Complete Bar Workflow</h3>
+                    <p style="margin-bottom: 15px; color: #9ca3af;">
+                        This will test the complete bar management workflow: upload bar → set bar → get bar → get recipes
+                    </p>
+                    <button onclick="testCompleteBarWorkflow()">Run Bar Workflow</button>
+                    <div id="bar-workflow-result" class="result-box" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utility Functions -->
+        <div class="api-section">
+            <h2>🛠️ Utility Functions</h2>
+            
+            <div class="test-group">
+                <h3>API Methods Reference</h3>
+                <button onclick="listAPIMethods()">List All API Methods</button>
+                <button onclick="recheckHealth()">Recheck API Health</button>
+                <button onclick="clearAllResults()">Clear All Results</button>
+                <div id="utility-result" class="result-box" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include necessary scripts -->
+    <script src="config/app.config.js"></script>
+    <script src="assets/js/api-service.js"></script>
+    <script src="assets/js/api-examples.js"></script>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAPIHealth();
+        });
+
+        // Utility functions
+        function showResult(elementId, content, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result-box ${type}`;
+            element.textContent = content;
+        }
+
+        function showResultJSON(elementId, data, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result-box ${type}`;
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function checkAPIHealth() {
+            const healthElement = document.getElementById('health-status');
+            healthElement.textContent = 'Checking API health...';
+            healthElement.className = 'health-status';
+            
+            try {
+                const isHealthy = await apiService.checkHealth();
+                if (isHealthy) {
+                    healthElement.textContent = '✅ API is healthy and ready!';
+                    healthElement.className = 'health-status health-healthy';
+                } else {
+                    healthElement.textContent = '❌ API is not responding. Check backend server.';
+                    healthElement.className = 'health-status health-unhealthy';
+                }
+            } catch (error) {
+                healthElement.textContent = `❌ Health check failed: ${error.message}`;
+                healthElement.className = 'health-status health-unhealthy';
+            }
+        }
+
+        // Bars API Tests
+        async function testUploadBarToIPFS() {
+            const resultId = 'upload-bar-result';
+            showResult(resultId, 'Uploading bar to IPFS...', 'loading');
+            
+            try {
+                const barData = {
+                    name: document.getElementById('bar-name').value,
+                    address: document.getElementById('bar-address').value,
+                    description: document.getElementById('bar-description').value,
+                    owner: document.getElementById('bar-owner').value
+                };
+
+                const result = await apiService.uploadBarToIPFS(barData);
+                showResultJSON(resultId, { success: true, result: result });
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetBar() {
+            const resultId = 'get-bar-result';
+            showResult(resultId, 'Getting bar information...', 'loading');
+            
+            try {
+                const barAddress = document.getElementById('get-bar-address').value;
+                const bar = await apiService.getBar(barAddress);
+                showResultJSON(resultId, bar);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateBar() {
+            const resultId = 'update-bar-result';
+            showResult(resultId, 'Updating bar...', 'loading');
+            
+            try {
+                const barData = {
+                    bar_address: document.getElementById('update-bar-address').value,
+                    description: document.getElementById('update-bar-description').value
+                };
+
+                const result = await apiService.updateBar(barData);
+                showResultJSON(resultId, result);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetOwnedRecipes() {
+            const resultId = 'owned-recipes-result';
+            showResult(resultId, 'Getting owned recipes...', 'loading');
+            
+            try {
+                const barAddress = document.getElementById('owned-recipes-address').value;
+                const recipes = await apiService.getOwnedRecipes(barAddress);
+                showResultJSON(resultId, recipes);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Recipes API Tests
+        async function testUploadImageToIPFS() {
+            const resultId = 'upload-image-result';
+            const fileInput = document.getElementById('recipe-image');
+            
+            if (!fileInput.files[0]) {
+                showResult(resultId, 'Please select an image file first', 'error');
+                return;
+            }
+
+            showResult(resultId, 'Uploading image to IPFS...', 'loading');
+            
+            try {
+                const cid = await apiService.uploadToIPFS(fileInput.files[0]);
+                showResultJSON(resultId, { success: true, cid: cid });
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStoreRecipe() {
+            const resultId = 'store-recipe-result';
+            showResult(resultId, 'Storing recipe...', 'loading');
+            
+            try {
+                const recipeAddress = document.getElementById('recipe-address').value;
+                const metadataCid = document.getElementById('metadata-cid').value;
+                const ownerAddress = document.getElementById('recipe-owner').value;
+                const price = document.getElementById('recipe-price').value;
+
+                const result = await apiService.storeRecipe(recipeAddress, metadataCid, ownerAddress, price);
+                showResultJSON(resultId, result);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetAllRecipes() {
+            const resultId = 'all-recipes-result';
+            showResult(resultId, 'Getting all recipes...', 'loading');
+            
+            try {
+                const recipes = await apiService.getAllRecipes();
+                showResultJSON(resultId, recipes);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSearchRecipes() {
+            const resultId = 'search-recipes-result';
+            showResult(resultId, 'Searching recipes...', 'loading');
+            
+            try {
+                const query = document.getElementById('search-query').value;
+                const recipes = await apiService.searchRecipes(query);
+                showResultJSON(resultId, recipes);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetOneRecipe() {
+            const resultId = 'get-recipe-result';
+            showResult(resultId, 'Getting recipe...', 'loading');
+            
+            try {
+                const nftAddress = document.getElementById('nft-address').value;
+                const userAddress = document.getElementById('user-address').value;
+                const recipe = await apiService.getOneRecipe(nftAddress, userAddress);
+                showResultJSON(resultId, recipe);
+            } catch (error) {
+                showResult(resultId, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Workflow Tests
+        async function testCompleteRecipeWorkflow() {
+            const resultId = 'recipe-workflow-result';
+            showResult(resultId, 'Running complete recipe workflow...', 'loading');
+            
+            try {
+                const result = await apiExamples.exampleCompleteRecipeWorkflow();
+                showResultJSON(resultId, result);
+            } catch (error) {
+                showResult(resultId, `Workflow failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCompleteBarWorkflow() {
+            const resultId = 'bar-workflow-result';
+            showResult(resultId, 'Running complete bar workflow...', 'loading');
+            
+            try {
+                const result = await apiExamples.exampleCompleteBarWorkflow();
+                showResultJSON(resultId, result);
+            } catch (error) {
+                showResult(resultId, `Workflow failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Utility Functions
+        function listAPIMethods() {
+            const resultId = 'utility-result';
+            showResult(resultId, 'Listing API methods...', 'loading');
+            
+            // Capture console output
+            const originalLog = console.log;
+            let output = '';
+            console.log = function(...args) {
+                output += args.join(' ') + '\n';
+                originalLog.apply(console, args);
+            };
+
+            apiExamples.listAvailableMethods();
+            
+            // Restore console.log
+            console.log = originalLog;
+            
+            showResult(resultId, output);
+        }
+
+        async function recheckHealth() {
+            await checkAPIHealth();
+            showResult('utility-result', 'Health check completed. See status above.', 'success');
+        }
+
+        function clearAllResults() {
+            const resultBoxes = document.querySelectorAll('.result-box');
+            resultBoxes.forEach(box => box.style.display = 'none');
+            showResult('utility-result', 'All results cleared.', 'success');
+        }
+    </script>
+</body>
+</html> 
