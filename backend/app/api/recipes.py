@@ -78,25 +78,27 @@ async def store_recipe(
 ):
     """Store a recipe's metadata in the database."""
     # get metadata from ipfs
-    item = fetch_metadata_from_ipfs(metadata_cid)
+    item1 = fetch_metadata_from_ipfs(metadata_cid)
+    item = item1["metadata"]
+
 
     async with AsyncSessionLocal() as db:
         try:
             # Create new recipe using the validated Pydantic model
             recipe = Recipe(
                 recipe_address=recipe_address,
-                cocktail_name=item.cocktail_name,
-                cocktail_intro=item.cocktail_intro,
-                cocktail_photo=item.cocktail_photo,
-                cocktail_recipe=item.cocktail_recipe,
+                cocktail_intro=item["cocktail_intro"],
+                cocktail_name=item["cocktail_name"],
+                cocktail_photo=item["cocktail_photo"],
+                cocktail_recipe=item["cocktail_recipe"],
                 recipe_photo=None,
                 owner_address=owner_address,
-                user_address=[],
+                user_address=json.dumps([]),
                 price=price,
                 status=None
-            )
-            
+            )            
             db.add(recipe)
+
             await db.commit()
             await db.refresh(recipe)
             return True
