@@ -72,9 +72,9 @@ case $choice in
         echo "1. 确保已创建 .env 文件并配置以下内容:"
         echo "   PRIVATE_KEY=your_private_key_here"
         echo "   SEPOLIA_RPC_URL=your_sepolia_rpc_url"
-        echo "   ETHERSCAN_API_KEY=your_etherscan_api_key"
+        echo "   USDTERSCAN_API_KEY=your_etherscan_api_key"
         echo ""
-        echo "2. 确保有Sepolia测试网ETH"
+        echo "2. 确保有Sepolia测试网USDT"
         echo "3. 确保MetaMask已切换到Sepolia网络"
         echo ""
         

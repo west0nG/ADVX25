@@ -6,7 +6,7 @@ async function main() {
   // 获取部署账户
   const [deployer] = await ethers.getSigners();
   console.log("部署账户:", deployer.address);
-  console.log("账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "ETH");
+  console.log("账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "USDT");
 
   // Sepolia测试网上的合约地址（使用之前部署的合约地址）
   const USDT_ADDRESS = process.env.USDT_ADDRESS || "0x7169D38820dfd117C3FA1f22a697dBA58d90BA06"; // Sepolia USDT

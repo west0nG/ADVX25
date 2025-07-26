@@ -2,10 +2,10 @@
 
 ## 📋 前置要求
 
-### 1. 获取Sepolia测试ETH
+### 1. 获取Sepolia测试USDT
 - 访问 [Sepolia Faucet](https://sepoliafaucet.com/)
 - 或使用 [Alchemy Faucet](https://sepoliafaucet.com/)
-- 确保你的钱包有至少0.1 ETH用于部署和测试
+- 确保你的钱包有至少0.1 USDT用于部署和测试
 
 ### 2. 获取必要的API密钥
 
@@ -44,7 +44,7 @@ IDNFT_CONTRACT_ADDRESS=0x0000000000000000000000000000000000000000
 PRIVATE_KEY=your_wallet_private_key_here
 
 # Etherscan API Key (用于合约验证)
-ETHERSCAN_API_KEY=your_etherscan_api_key_here
+USDTERSCAN_API_KEY=your_etherscan_api_key_here
 
 # Gas Reporter
 REPORT_GAS=true
@@ -132,7 +132,7 @@ cd ../../test-deployment/frontend
 ```
 Error: insufficient funds for gas * price + value
 ```
-**解决方案**: 获取更多Sepolia测试ETH
+**解决方案**: 获取更多Sepolia测试USDT
 
 #### 2. 部署失败 - 网络连接问题
 ```
@@ -167,4 +167,4 @@ Error: network does not match
 现在你可以：
 - 使用前端界面测试所有功能
 - 分享合约地址给其他人测试
-- 准备部署到主网（需要真实ETH） 
+- 准备部署到主网（需要真实USDT） 

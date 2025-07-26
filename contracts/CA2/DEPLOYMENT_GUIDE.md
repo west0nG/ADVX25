@@ -9,7 +9,7 @@
 1. **Node.js** (版本 16 或更高)
 2. **npm** 或 **yarn**
 3. **MetaMask** 钱包
-4. **测试网 ETH** (用于支付gas费)
+4. **测试网 USDT** (用于支付gas费)
 
 ## 🚀 部署步骤
 
@@ -69,7 +69,7 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
+    apiKey: process.env.USDTERSCAN_API_KEY
   }
 };
 ```
@@ -110,7 +110,7 @@ RecipeNFT deployed to: 0x...
 npx hardhat verify --network sepolia DEPLOYED_CONTRACT_ADDRESS "Bars Help Bars Recipe" "BHBR"
 ```
 
-## 🔧 获取测试网 ETH
+## 🔧 获取测试网 USDT
 
 ### Sepolia 测试网
 - [Sepolia Faucet](https://sepoliafaucet.com/)
@@ -147,13 +147,13 @@ npm test
 
 1. **私钥安全**: 永远不要将私钥提交到代码仓库
 2. **环境变量**: 确保 `.env` 文件已添加到 `.gitignore`
-3. **测试网**: 部署前确保有足够的测试网ETH支付gas费
+3. **测试网**: 部署前确保有足够的测试网USDT支付gas费
 4. **合约验证**: 建议在Etherscan上验证合约代码
 
 ## 🆘 常见问题
 
 ### Q: 部署失败，显示 "insufficient funds"
-A: 确保钱包中有足够的测试网ETH支付gas费
+A: 确保钱包中有足够的测试网USDT支付gas费
 
 ### Q: 网络连接错误
 A: 检查RPC URL是否正确，确保API密钥有效

@@ -6,9 +6,9 @@
    - 安装 [MetaMask 浏览器扩展](https://metamask.io/)
    - 创建或导入钱包
 
-2. **Sepolia 测试网 ETH**
+2. **Sepolia 测试网 USDT**
    - 访问 [Sepolia Faucet](https://sepoliafaucet.com/)
-   - 输入你的钱包地址获取测试网ETH
+   - 输入你的钱包地址获取测试网USDT
 
 3. **Node.js 环境**
    - 确保已安装 Node.js (版本 14+)
@@ -26,7 +26,7 @@ cp env.example .env
 ```env
 PRIVATE_KEY=你的私钥（不要带0x前缀）
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID
-ETHERSCAN_API_KEY=你的Etherscan API密钥
+USDTERSCAN_API_KEY=你的Etherscan API密钥
 ```
 
 ### 2. 安装依赖
@@ -139,7 +139,7 @@ cd frontend
    - 在 MetaMask 中切换到 Sepolia 测试网
 
 3. **"Gas费用不足"**
-   - 确保钱包中有足够的 Sepolia ETH
+   - 确保钱包中有足够的 Sepolia USDT
 
 4. **"连接钱包失败"**
    - 检查 MetaMask 是否已解锁

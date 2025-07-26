@@ -4,9 +4,9 @@
 
 ### 步骤1: 环境准备
 
-1. **获取Sepolia测试ETH**
+1. **获取Sepolia测试USDT**
    - 访问 [Sepolia Faucet](https://sepoliafaucet.com/)
-   - 输入你的钱包地址获取测试ETH
+   - 输入你的钱包地址获取测试USDT
 
 2. **获取Infura API密钥**
    - 访问 [Infura](https://infura.io/)
@@ -88,7 +88,7 @@ cd ../../test-deployment/frontend
    ```
    Error: insufficient funds for gas * price + value
    ```
-   **解决**: 获取更多Sepolia测试ETH
+   **解决**: 获取更多Sepolia测试USDT
 
 2. **网络连接失败**
    ```
@@ -128,4 +128,4 @@ cd ../../test-deployment/frontend
 现在你可以：
 - 使用前端界面测试所有功能
 - 分享合约地址给其他人测试
-- 准备部署到主网（需要真实ETH） 
+- 准备部署到主网（需要真实USDT） 

@@ -82,7 +82,7 @@ echo "⚠️  注意: 这是可选的，如果不验证合约可以跳过"
 read -p "请输入Etherscan API Key (可选，按回车跳过): " etherscan_key
 
 if [ ! -z "$etherscan_key" ]; then
-    sed -i.bak "s/ETHERSCAN_API_KEY=/ETHERSCAN_API_KEY=$etherscan_key/" .env
+    sed -i.bak "s/USDTERSCAN_API_KEY=/USDTERSCAN_API_KEY=$etherscan_key/" .env
     echo "✅ Etherscan API Key配置完成"
 else
     echo "✅ 跳过Etherscan API Key配置 (合约将不会在Etherscan上验证)"
@@ -126,7 +126,7 @@ fi
 
 echo ""
 echo "🚀 下一步操作:"
-echo "1. 确保有Sepolia测试网ETH"
+echo "1. 确保有Sepolia测试网USDT"
 echo "2. 运行: ./start-test.sh"
 echo "3. 选择 '2. Sepolia测试网测试'"
 echo "4. 开始部署和测试!"

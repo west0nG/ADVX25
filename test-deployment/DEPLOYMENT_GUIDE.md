@@ -2,9 +2,9 @@
 
 ## 准备工作
 
-### 1. 获取测试网ETH
+### 1. 获取测试网USDT
 - 访问 [Sepolia Faucet](https://sepoliafaucet.com/) 或 [Alchemy Sepolia Faucet](https://sepoliafaucet.com/)
-- 输入你的钱包地址获取测试网ETH
+- 输入你的钱包地址获取测试网USDT
 
 ### 2. 配置环境变量
 在 `contracts/CA1/` 目录下创建 `.env` 文件：
@@ -18,7 +18,7 @@ cp env.example .env
 ```env
 PRIVATE_KEY=你的私钥（不要带0x前缀）
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID
-ETHERSCAN_API_KEY=你的Etherscan API密钥
+USDTERSCAN_API_KEY=你的Etherscan API密钥
 ```
 
 ### 3. 获取必要的API密钥
@@ -99,7 +99,7 @@ npx hardhat test test/IDNFT.test.js
 ### 常见问题
 
 1. **Gas费用不足**
-   - 确保钱包中有足够的Sepolia ETH
+   - 确保钱包中有足够的Sepolia USDT
 
 2. **RPC连接失败**
    - 检查Infura项目ID是否正确

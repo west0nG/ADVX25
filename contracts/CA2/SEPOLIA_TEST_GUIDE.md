@@ -8,7 +8,7 @@
 ### 1. 环境准备
 - Node.js 和 npm 已安装
 - MetaMask 钱包已安装
-- 有Sepolia测试网ETH（可以从水龙头获取）
+- 有Sepolia测试网USDT（可以从水龙头获取）
 
 ### 2. 获取Sepolia测试币
 - [Sepolia Faucet](https://sepoliafaucet.com/)
@@ -24,7 +24,7 @@ PRIVATE_KEY=your_private_key_here
 SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY
 
 # Etherscan API Key (用于验证合约)
-ETHERSCAN_API_KEY=your_etherscan_api_key
+USDTERSCAN_API_KEY=your_etherscan_api_key
 ```
 
 ## 🚀 部署步骤
@@ -165,7 +165,7 @@ npx http-server -p 8080
 **解决**: 
 - 确保MetaMask切换到Sepolia网络
 - 检查RPC URL是否正确
-- 确保有足够的Sepolia ETH
+- 确保有足够的Sepolia USDT
 
 ### 2. 合约加载失败
 **问题**: 合约地址无效或合约不存在

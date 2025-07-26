@@ -6,7 +6,7 @@ async function main() {
   // 获取部署账户
   const [deployer] = await ethers.getSigners();
   console.log("部署账户:", deployer.address);
-  console.log("账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "ETH");
+  console.log("账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "USDT");
 
   // 部署模拟USDT合约（用于测试）
   console.log("\n部署模拟USDT合约...");

@@ -46,7 +46,7 @@
     - `recipe_address`: string (NFT contract address)
     - `metadata_cid`: string (IPFS CID from upload_recipe_to_ipfs)
     - `owner_address`: string (owner's wallet address)
-    - `price`: float (recipe price in ETH)
+    - `price`: float (recipe price in USDT)
 - **Output:** `true` (boolean) on success
 - **Error Responses:**
   - `500`: "Failed to store recipe: {error_message}"

@@ -783,6 +783,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup search
     function setupSearch() {
         const searchInput = document.querySelector('.search-box input');
+        if (!searchInput) {
+            console.log('Search box not found, skipping search setup');
+            return;
+        }
+        
         let searchTimeout;
 
         searchInput.addEventListener('input', (e) => {
