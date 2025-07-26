@@ -451,17 +451,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`NFT successfully minted! Token ID: ${tokenId}, Transaction: ${transaction.hash}`);
             }
             
-            // Step 6: Store recipe in backend (optional, if still needed)
+            // Step 6: Get the ERC-6551 account address (the actual owner of the NFT)
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting ERC-4907 address...';
+            
+            let erc4907Address = null;
+            if (tokenId) {
+                try {
+                    // Get the recipe metadata to extract the ERC-6551 account address
+                    const metadata = await contract.getRecipeMetadata(tokenId);
+                    erc4907Address = metadata.idNFTAccount; // This is the ERC-6551 account address
+                    console.log('ERC-4907 address (ERC-6551 account):', erc4907Address);
+                } catch (error) {
+                    console.warn('Could not get ERC-6551 account address:', error);
+                    // Fallback to token ID if we can't get the account address
+                    erc4907Address = tokenId;
+                }
+            }
+            
+            // Step 7: Store recipe in backend
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizing...';
             
             // The storeRecipe function expects 4 individual parameters
-            // Backend expects: recipe_address: str, metadata_cid: str, owner_address: str, price: float
+            // Backend expects: recipe_address: str (ERC-6551 account), metadata_cid: str, owner_address: str, price: float
             const priceValue = parseFloat(formData.get('price') || '0');
             
             const success = await apiService.storeRecipe(
-                tokenId || transaction.hash,  // recipeAddress (use tokenId if available, fallback to transaction hash)
+                erc4907Address || tokenId || transaction.hash,  // recipeAddress (ERC-6551 account address)
                 finalCID,         // metadataCid (string)
-                walletAddress,    // ownerAddress (string)
+                walletAddress,    // ownerAddress (string - the user who initiated minting)
                 priceValue        // price (float/number)
             );
 

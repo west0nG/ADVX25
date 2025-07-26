@@ -263,9 +263,11 @@
                     
                     try {
                         const mintResult = await this.createIDNFTOnBlockchain(uploadResult.ipfs_cid);
+                        console.log('Mint result:', mintResult);
                         this.showStatus('✅ Bar Identity NFT created successfully!', 'success');
                         
                         // Call backend to sync the bar data with ERC-6551 tokenId
+                        console.log('Syncing to backend with tokenId:', mintResult.tokenId);
                         await this.syncBarToBackend(uploadResult.ipfs_cid, barName, mintResult.tokenId);
                         
                     } catch (mintError) {
@@ -531,8 +533,46 @@
                     console.log('IDNFT creation transaction confirmed:', receipt);
                     
                     // Extract token ID from event logs
-                    const createdEvent = receipt.events?.find(event => event.event === 'IDNFTCreated');
-                    const tokenId = createdEvent?.args?.tokenId?.toString();
+                    console.log('Transaction receipt:', receipt);
+                    console.log('Receipt events:', receipt.events);
+                    
+                    let tokenId = null;
+                    
+                    // Try multiple methods to extract token ID
+                    if (receipt.events && receipt.events.length > 0) {
+                        // Method 1: Look for IDNFTCreated event
+                        const createdEvent = receipt.events.find(event => event.event === 'IDNFTCreated');
+                        if (createdEvent && createdEvent.args) {
+                            tokenId = createdEvent.args.tokenId?.toString();
+                            console.log('Token ID from IDNFTCreated event:', tokenId);
+                        }
+                        
+                        // Method 2: Look for Transfer event (ERC721 standard)
+                        if (!tokenId) {
+                            const transferEvent = receipt.events.find(event => event.event === 'Transfer');
+                            if (transferEvent && transferEvent.args) {
+                                tokenId = transferEvent.args.tokenId?.toString();
+                                console.log('Token ID from Transfer event:', tokenId);
+                            }
+                        }
+                        
+                        // Method 3: Look through all events for any tokenId
+                        if (!tokenId) {
+                            for (const event of receipt.events) {
+                                if (event.args && event.args.tokenId) {
+                                    tokenId = event.args.tokenId.toString();
+                                    console.log('Token ID from event:', event.event, tokenId);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Method 4: If still no tokenId, use a fallback (user address or timestamp)
+                    if (!tokenId) {
+                        console.warn('No token ID found in events, using fallback');
+                        tokenId = this.userAddress; // Use user address as fallback
+                    }
                     
                     console.log('IDNFT created successfully with token ID:', tokenId);
                     return { tokenId, transactionHash: receipt.transactionHash };
