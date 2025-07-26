@@ -18,10 +18,22 @@ router = APIRouter()
 class RecipeMetadata(BaseModel):
     cocktail_name: str
     cocktail_intro: Optional[str] = None
+    cocktail_recipe: str
+    # recipe_photo_cid: Optional[str] = None
+    owner_address: str
+    user_address: List[str] = []
+    price: Optional[float] = None
+    status: Optional[str] = "listed"
+
+# Define Pydantic model for storing recipe in database
+class StoreRecipeRequest(BaseModel):
+    cocktail_name: str
+    cocktail_intro: Optional[str] = None
+    cocktail_photo: Optional[str] = None
     cocktail_recipe: Optional[str] = None
     recipe_photo: Optional[str] = None
     owner_address: str
-    user_address: Optional[List[str]] = None
+    user_address: List[str] = []
     price: Optional[float] = None
     status: Optional[str] = "listed"
 
@@ -32,7 +44,7 @@ async def get_db():
 @router.post("/upload_recipe_to_ipfs")
 async def upload_recipe_to_ipfs(
     jpg_file: UploadFile = File(..., description="JPG image file"),
-    json_file: UploadFile = File(..., description="JSON metadata file")
+    # json_file: UploadFile = File(..., description="JSON metadata file")
 ):
     """Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID."""
     # Validate JPG file
@@ -45,7 +57,7 @@ async def upload_recipe_to_ipfs(
     
     try:
         # Step 1: Save JPG file to ADVX25.backend.app.db.pics folder
-        pics_folder = os.path.join(os.path.dirname(__file__), "..", "db", "pics")
+        pics_folder = os.path.join(os.path.dirname(__file__), "..", "services", "pics")
         os.makedirs(pics_folder, exist_ok=True)
         jpg_file_path = os.path.join(pics_folder, jpg_file.filename)
         
@@ -72,76 +84,142 @@ async def upload_recipe_to_ipfs(
 
 
 
-@router.post("/store")
+@router.post("/store_recipe")
 async def store_recipe(
-    recipe_data: dict,
-    db: AsyncSession = Depends(get_db)
+    item: StoreRecipeRequest
 ):
     """Store a recipe's metadata in the database."""
-    try:
-        # Validate required fields
-        required_fields = ['cocktail_name', 'owner_address']
-        for field in required_fields:
-            if field not in recipe_data:
-                raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
-        
-        # Create new recipe
-        recipe = Recipe(
-            cocktail_name=recipe_data['cocktail_name'],
-            cocktail_intro=recipe_data.get('cocktail_intro'),
-            cocktail_photo=recipe_data.get('cocktail_photo'),
-            cocktail_recipe=recipe_data.get('cocktail_recipe'),
-            recipe_photo=recipe_data.get('recipe_photo'),
-            owner_address=recipe_data['owner_address'],
-            user_address=json.dumps(recipe_data.get('user_address', [])) if recipe_data.get('user_address') else None,
-            price=recipe_data.get('price'),
-            status=recipe_data.get('status', 'listed')
-        )
-        
-        db.add(recipe)
-        await db.commit()
-        await db.refresh(recipe)
-        
-        return {"success": True, "recipe_id": recipe.id}
-    except Exception as e:
-        await db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to store recipe: {str(e)}")
+    async with AsyncSessionLocal() as db:
+        try:
+            # Create new recipe using the validated Pydantic model
+            recipe = Recipe(
+                cocktail_name=item.cocktail_name,
+                cocktail_intro=item.cocktail_intro,
+                cocktail_photo=item.cocktail_photo,
+                cocktail_recipe=item.cocktail_recipe,
+                recipe_photo=item.recipe_photo,
+                owner_address=item.owner_address,
+                user_address=json.dumps(item.user_address) if item.user_address else None,
+                price=item.price,
+                status=item.status
+            )
+            
+            db.add(recipe)
+            await db.commit()
+            await db.refresh(recipe)
+            
+            return True
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Failed to store recipe: {str(e)}")
 
-@router.get("/ten")
-async def get_ten_recipes(db: AsyncSession = Depends(get_db)):
+@router.get("/get_ten_recipes")
+async def get_ten_recipes():
     """Get 10 recipes for display."""
-    try:
-        result = await db.execute(select(Recipe).limit(10))
-        recipes = result.scalars().all()
-        
-        recipe_list = []
-        for recipe in recipes:
-            recipe_dict = {
-                "id": recipe.id,
-                "cocktail_name": recipe.cocktail_name,
-                "cocktail_intro": recipe.cocktail_intro,
-                "cocktail_photo": recipe.cocktail_photo,
-                "owner_address": recipe.owner_address,
-                "price": recipe.price,
-                "status": recipe.status
-            }
-            if recipe.user_address:
-                recipe_dict["user_address"] = json.loads(recipe.user_address)
-            recipe_list.append(recipe_dict)
-        
-        return recipe_list
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
+    async with AsyncSessionLocal() as db:
+        try:
+            result = await db.execute(select(Recipe).limit(10))
+            recipes = result.scalars().all()
+            
+            recipe_list = []
+            for recipe in recipes:
+                recipe_dict = {
+                    "id": recipe.id,
+                    "cocktail_name": recipe.cocktail_name,
+                    "cocktail_intro": recipe.cocktail_intro,
+                    "cocktail_photo": recipe.cocktail_photo,
+                    "owner_address": recipe.owner_address,
+                    "price": recipe.price,
+                    "status": recipe.status
+                }
+                if recipe.user_address:
+                    recipe_dict["user_address"] = json.loads(recipe.user_address)
+                recipe_list.append(recipe_dict)
+            return recipe_list
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
 
-@router.get("/all")
-async def get_all_recipes(db: AsyncSession = Depends(get_db)):
+@router.get("/get_all_recipes")
+async def get_all_recipes():
     """Get all recipes."""
-    try:
-        result = await db.execute(select(Recipe))
-        recipes = result.scalars().all()
-        
-        recipe_list = []
-        for recipe in recipes:
+    async with AsyncSessionLocal() as db:
+        try:
+            result = await db.execute(select(Recipe))
+            recipes = result.scalars().all()
+            
+            recipe_list = []
+            for recipe in recipes:
+                recipe_dict = {
+                    "id": recipe.id,
+                    "cocktail_name": recipe.cocktail_name,
+                    "cocktail_intro": recipe.cocktail_intro,
+                    "cocktail_photo": recipe.cocktail_photo,
+                    "cocktail_recipe": recipe.cocktail_recipe,
+                    "recipe_photo": recipe.recipe_photo,
+                    "owner_address": recipe.owner_address,
+                    "price": recipe.price,
+                    "status": recipe.status
+                }
+                if recipe.user_address:
+                    recipe_dict["user_address"] = json.loads(recipe.user_address)
+                recipe_list.append(recipe_dict)
+            
+            return recipe_list
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
+
+@router.get("/search_recipes")
+async def search_recipes(
+    query: str = Query(..., description="Search query string")
+):
+    """Search recipes by a string."""
+    async with AsyncSessionLocal() as db:
+        try:
+            # Search in cocktail_name, cocktail_intro, and cocktail_recipe
+            result = await db.execute(
+                select(Recipe).where(
+                    or_(
+                        Recipe.cocktail_name.ilike(f"%{query}%"),
+                        Recipe.cocktail_intro.ilike(f"%{query}%"),
+                    )
+                )
+            )
+            recipes = result.scalars().all()
+            
+            recipe_list = []
+            for recipe in recipes:
+                recipe_dict = {
+                    "id": recipe.id,
+                    "cocktail_name": recipe.cocktail_name,
+                    "cocktail_intro": recipe.cocktail_intro,
+                    "cocktail_photo": recipe.cocktail_photo,
+                    "owner_address": recipe.owner_address,
+                    "price": recipe.price,
+                    "status": recipe.status
+                }
+                if recipe.user_address:
+                    recipe_dict["user_address"] = json.loads(recipe.user_address)
+                recipe_list.append(recipe_dict)
+            
+            return recipe_list
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+@router.get("/get_one_recipe/{nft_address}") # search from what? ERC4907 address from chain? that's one additional step
+async def get_one_recipe(
+    nft_address: str
+):
+    """Get a single recipe by NFT address (owner_address)."""
+    async with AsyncSessionLocal() as db:
+        try:
+            result = await db.execute(
+                select(Recipe).where(Recipe.id == nft_address)
+            )
+            recipe = result.scalar_one_or_none()
+            
+            if not recipe:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+            
             recipe_dict = {
                 "id": recipe.id,
                 "cocktail_name": recipe.cocktail_name,
@@ -155,81 +233,9 @@ async def get_all_recipes(db: AsyncSession = Depends(get_db)):
             }
             if recipe.user_address:
                 recipe_dict["user_address"] = json.loads(recipe.user_address)
-            recipe_list.append(recipe_dict)
-        
-        return recipe_list
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch recipes: {str(e)}")
-
-@router.get("/search")
-async def search_recipes(
-    query: str = Query(..., description="Search query string"),
-    db: AsyncSession = Depends(get_db)
-):
-    """Search recipes by a string."""
-    try:
-        # Search in cocktail_name, cocktail_intro, and cocktail_recipe
-        result = await db.execute(
-            select(Recipe).where(
-                or_(
-                    Recipe.cocktail_name.ilike(f"%{query}%"),
-                    Recipe.cocktail_intro.ilike(f"%{query}%"),
-                    Recipe.cocktail_recipe.ilike(f"%{query}%")
-                )
-            )
-        )
-        recipes = result.scalars().all()
-        
-        recipe_list = []
-        for recipe in recipes:
-            recipe_dict = {
-                "id": recipe.id,
-                "cocktail_name": recipe.cocktail_name,
-                "cocktail_intro": recipe.cocktail_intro,
-                "cocktail_photo": recipe.cocktail_photo,
-                "owner_address": recipe.owner_address,
-                "price": recipe.price,
-                "status": recipe.status
-            }
-            if recipe.user_address:
-                recipe_dict["user_address"] = json.loads(recipe.user_address)
-            recipe_list.append(recipe_dict)
-        
-        return recipe_list
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
-
-@router.get("/one/{nft_address}")
-async def get_one_recipe(
-    nft_address: str,
-    db: AsyncSession = Depends(get_db)
-):
-    """Get a single recipe by NFT address (owner_address)."""
-    try:
-        result = await db.execute(
-            select(Recipe).where(Recipe.owner_address == nft_address)
-        )
-        recipe = result.scalar_one_or_none()
-        
-        if not recipe:
-            raise HTTPException(status_code=404, detail="Recipe not found")
-        
-        recipe_dict = {
-            "id": recipe.id,
-            "cocktail_name": recipe.cocktail_name,
-            "cocktail_intro": recipe.cocktail_intro,
-            "cocktail_photo": recipe.cocktail_photo,
-            "cocktail_recipe": recipe.cocktail_recipe,
-            "recipe_photo": recipe.recipe_photo,
-            "owner_address": recipe.owner_address,
-            "price": recipe.price,
-            "status": recipe.status
-        }
-        if recipe.user_address:
-            recipe_dict["user_address"] = json.loads(recipe.user_address)
-        
-        return recipe_dict
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch recipe: {str(e)}")
+            
+            return recipe_dict
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to fetch recipe: {str(e)}")
