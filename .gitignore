@@ -100,3 +100,6 @@ __pycache__/
 *.pyo
 *.pyd
 *.pyc 
+
+# Ignore service pictures directory
+backend/app/services/pics/ 
