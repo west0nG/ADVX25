@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Form
 from fastapi import UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -38,7 +38,9 @@ async def get_db():
 
 @router.post("/upload_ipfs")
 async def upload_recipe_to_ipfs(
-    item: RecipeMetadata,
+    cocktail_name: str = Form(...),
+    cocktail_intro: Optional[str] = Form(None),
+    cocktail_recipe: str = Form(...),
     jpg_file: UploadFile = File(..., description="JPG image file")
 ):
     """Upload a JPG image and JSON metadata to IPFS, returning the final metadata CID."""
@@ -59,7 +61,7 @@ async def upload_recipe_to_ipfs(
         picture_cid = upload_picture_to_pinata(jpg_file_path)
         
         # Step 3: Upload recipe metadata to IPFS using upload_recipe_to_pinata
-        final_cid = upload_recipe_to_pinata(item.cocktail_name, item.cocktail_intro, picture_cid, item.cocktail_recipe, item.recipe_photo)
+        final_cid = upload_recipe_to_pinata(cocktail_name, cocktail_intro, picture_cid, cocktail_recipe, None)
         return final_cid
         
     except Exception as e:
