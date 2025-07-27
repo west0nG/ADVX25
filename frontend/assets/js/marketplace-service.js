@@ -1,8 +1,10 @@
-// Marketplace Service - Handle smart contract interactions for NFT purchases using INJ
+// Marketplace Service - Handle smart contract interactions for NFT purchases using USDT
 class MarketplaceService {
     constructor() {
         this.marketplaceAddress = null;
         this.marketplaceContract = null;
+        this.usdtAddress = null;
+        this.usdtContract = null;
         this.provider = null;
         this.signer = null;
         this.isInitialized = false;
@@ -18,8 +20,8 @@ class MarketplaceService {
 
             // Get configuration
             this.config = window.APP_CONFIG || APP_CONFIG;
-            if (!this.config?.blockchain?.marketplace) {
-                throw new Error('Marketplace contract configuration not found');
+            if (!this.config?.blockchain?.marketplace || !this.config?.blockchain?.mockUsdt) {
+                throw new Error('Marketplace or USDT contract configuration not found');
             }
 
             this.provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -33,10 +35,18 @@ class MarketplaceService {
                 this.signer
             );
 
+            // USDT contract  
+            this.usdtAddress = this.config.blockchain.mockUsdt.address;
+            this.usdtContract = new ethers.Contract(
+                this.usdtAddress,
+                this.getUSDTABI(),
+                this.signer
+            );
+
             this.isInitialized = true;
             console.log('Marketplace Service initialized successfully');
             console.log('Marketplace Address:', this.marketplaceAddress);
-            console.log('Using native INJ for payments');
+            console.log('USDT Address:', this.usdtAddress);
 
             return true;
         } catch (error) {
@@ -82,68 +92,115 @@ class MarketplaceService {
         ];
     }
 
+    // Get USDT contract ABI
+    getUSDTABI() {
+        return [
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "spender", "type": "address"},
+                    {"internalType": "uint256", "name": "amount", "type": "uint256"}
+                ],
+                "name": "approve",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "owner", "type": "address"},
+                    {"internalType": "address", "name": "spender", "type": "address"}
+                ],
+                "name": "allowance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+    }
 
-    // Check user's INJ balance (native token)
-    async getUserINJBalance(userAddress) {
+    // Check user's USDT balance
+    async getUserUSDTBalance(userAddress) {
         try {
             await this.ensureInitialized();
-            const balance = await this.provider.getBalance(userAddress);
-            return ethers.utils.formatEther(balance); // INJ uses 18 decimals like ETH
+            const balance = await this.usdtContract.balanceOf(userAddress);
+            const decimals = await this.usdtContract.decimals();
+            return ethers.utils.formatUnits(balance, decimals);
         } catch (error) {
-            console.error('Error getting INJ balance:', error);
+            console.error('Error getting USDT balance:', error);
             throw error;
         }
     }
 
-    // No allowance needed for native INJ - this method is kept for compatibility but returns max value
-    async getINJAllowance(userAddress) {
+    // Check USDT allowance for marketplace
+    async getUSDTAllowance(userAddress) {
         try {
-            // Native tokens don't need allowance - return a large number to indicate unlimited allowance
-            return ethers.constants.MaxUint256.toString();
+            await this.ensureInitialized();
+            const allowance = await this.usdtContract.allowance(userAddress, this.marketplaceAddress);
+            const decimals = await this.usdtContract.decimals();
+            return ethers.utils.formatUnits(allowance, decimals);
         } catch (error) {
-            console.error('Error in INJ allowance check:', error);
+            console.error('Error getting USDT allowance:', error);
             throw error;
         }
     }
 
-    // No approval needed for native INJ - this method is kept for compatibility but does nothing
-    async approveINJ(amount) {
+    // Approve USDT spending by marketplace
+    async approveUSDT(amount) {
         try {
-            console.log(`INJ is native token - no approval needed for ${amount} INJ`);
-            // Return a dummy successful transaction-like object
-            return { 
-                hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-                status: 1,
-                gasUsed: ethers.BigNumber.from(0)
-            };
+            await this.ensureInitialized();
+            const decimals = await this.usdtContract.decimals();
+            const amountInWei = ethers.utils.parseUnits(amount.toString(), decimals);
+            
+            console.log(`Approving ${amount} USDT for marketplace...`);
+            const tx = await this.usdtContract.approve(this.marketplaceAddress, amountInWei);
+            const receipt = await tx.wait();
+            
+            console.log('USDT approval successful:', receipt);
+            return receipt;
         } catch (error) {
-            console.error('Error in INJ approval (should not happen):', error);
+            console.error('Error approving USDT:', error);
             throw error;
         }
     }
 
-    // Purchase recipe authorization using native INJ
+    // Purchase recipe authorization using USDT
     async purchaseRecipe(recipeTokenId, price) {
         try {
             await this.ensureInitialized();
 
             // Get user address
             const userAddress = await this.signer.getAddress();
-            console.log(`Purchasing recipe ${recipeTokenId} for ${price} INJ...`);
+            console.log(`Purchasing recipe ${recipeTokenId} for ${price} USDT...`);
 
-            // Check INJ balance
-            const balance = await this.getUserINJBalance(userAddress);
+            // Check USDT balance
+            const balance = await this.getUserUSDTBalance(userAddress);
             if (parseFloat(balance) < parseFloat(price)) {
-                throw new Error(`Insufficient INJ balance. Balance: ${balance}, Required: ${price}`);
+                throw new Error(`Insufficient USDT balance. Balance: ${balance}, Required: ${price}`);
             }
 
-            // Convert price to wei (INJ uses 18 decimals)
-            const priceInWei = ethers.utils.parseEther(price.toString());
+            // Check allowance
+            const allowance = await this.getUSDTAllowance(userAddress);
+            if (parseFloat(allowance) < parseFloat(price)) {
+                console.log('Insufficient allowance, requesting approval...');
+                await this.approveUSDT(price);
+            }
 
-            // Execute purchase using the correct function name and send INJ as value
-            const tx = await this.marketplaceContract.purchaseRecipeAuthorization(recipeTokenId, {
-                value: priceInWei
-            });
+            // Execute purchase using the correct function name (no value parameter)
+            const tx = await this.marketplaceContract.purchaseRecipeAuthorization(recipeTokenId);
             
             console.log('Purchase transaction sent:', tx.hash);
             const receipt = await tx.wait();

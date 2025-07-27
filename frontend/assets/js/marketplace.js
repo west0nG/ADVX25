@@ -994,22 +994,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="fee-breakdown">
                         <h4>Purchase Summary</h4>
                         <p><strong>Recipe:</strong> ${recipeName}</p>
-                        <p><strong>Price:</strong> ${fees.price} INJ</p>
-                        <p><strong>Platform Fee (${(fees.feeRate * 100).toFixed(2)}%):</strong> ${fees.platformFee.toFixed(6)} INJ</p>
-                        <p><strong>Seller Receives:</strong> ${fees.sellerAmount.toFixed(6)} INJ</p>
+                        <p><strong>Price:</strong> ${fees.price} USDT</p>
+                        <p><strong>Platform Fee (${(fees.feeRate * 100).toFixed(2)}%):</strong> ${fees.platformFee.toFixed(6)} USDT</p>
+                        <p><strong>Seller Receives:</strong> ${fees.sellerAmount.toFixed(6)} USDT</p>
                     </div>
-                    <p>Checking INJ balance...</p>
+                    <p>Checking USDT balance...</p>
                 `);
 
-                // Check user's INJ balance
-                const balance = await window.marketplaceService.getUserINJBalance(userAddress);
+                // Check user's USDT balance
+                const balance = await window.marketplaceService.getUserUSDTBalance(userAddress);
                 if (parseFloat(balance) < parseFloat(price)) {
                     updateBuyingModal(loadingModal, `
                         <div class="error-message">
                             <h4>Insufficient Balance</h4>
-                            <p>Your INJ balance: ${parseFloat(balance).toFixed(6)} INJ</p>
-                            <p>Required: ${price} INJ</p>
-                            <p>Please add more INJ to your wallet and try again.</p>
+                            <p>Your USDT balance: ${parseFloat(balance).toFixed(6)} USDT</p>
+                            <p>Required: ${price} USDT</p>
+                            <p>Please add more USDT to your wallet and try again.</p>
                             <button class="btn-primary" onclick="closeBuyingModal('${loadingModal.id}')" style="margin-top: 1rem;">Close</button>
                         </div>
                     `);
