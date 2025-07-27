@@ -27,6 +27,6 @@ typing_extensions==4.14.1
 tzdata==2025.2
 urllib3==2.5.0
 uvicorn==0.35.0
-openai==1.35.3
+openai==1.51.2
 langchain==0.2.6
 langchain-openai==0.1.10

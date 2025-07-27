@@ -4,102 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Agent - BarsHelpBars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/wallet-ui.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* AI Agent Specific Styles */
+        .ai-hero {
+            padding: 4rem 2rem 2rem;
+            background: linear-gradient(135deg, var(--very-light-blue) 0%, var(--white) 100%);
+            text-align: center;
+            position: relative;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .navbar-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.3s;
-        }
-
-        .nav-links a:hover {
-            opacity: 0.8;
-        }
-
-        .main-container {
-            flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            width: 100%;
-        }
-
-        .chat-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            height: calc(100vh - 200px);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .chat-status {
+        .ai-hero .hero-content h1 {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .ai-hero .hero-content h1 i {
+            background: var(--primary-blue);
+            -webkit-background-clip: initial;
+            -webkit-text-fill-color: initial;
+            background-clip: initial;
+            color: var(--primary-blue);
+        }
+
+        .ai-hero .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-medium);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
+            color: var(--text-medium);
+            font-weight: 500;
         }
 
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #4ade80;
+            background: var(--success);
             animation: pulse 2s infinite;
         }
 
@@ -108,17 +65,115 @@
             50% { opacity: 0.5; }
         }
 
+        .chat-section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .chat-container {
+            width: 100%;
+        }
+
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .chat-panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--light-gray);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mode-btn.active {
+            background: var(--primary-blue);
+            color: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+
         .chat-messages {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
-            background: #f8fafc;
+            background: var(--light-gray);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            min-height: 400px;
+            max-height: 500px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-medium);
+        }
+
+        .welcome-icon {
+            margin-bottom: 1rem;
+        }
+
+        .welcome-icon i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            opacity: 0.7;
+        }
+
+        .welcome-message h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
         }
 
         .message {
             margin-bottom: 1.5rem;
             display: flex;
             gap: 1rem;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .message.user {
@@ -132,46 +187,48 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: white;
+            font-weight: 600;
+            color: var(--white);
             flex-shrink: 0;
+            font-size: 0.8rem;
         }
 
         .message.user .message-avatar {
-            background: #667eea;
+            background: var(--primary-blue);
         }
 
         .message.assistant .message-avatar {
-            background: #764ba2;
+            background: var(--accent-blue);
         }
 
         .message-content {
             flex: 1;
-            max-width: 70%;
+            max-width: 75%;
         }
 
         .message-bubble {
             padding: 1rem 1.5rem;
-            border-radius: 18px;
-            line-height: 1.5;
+            border-radius: 16px;
+            line-height: 1.6;
             word-wrap: break-word;
         }
 
         .message.user .message-bubble {
-            background: #667eea;
-            color: white;
+            background: var(--primary-blue);
+            color: var(--white);
             margin-left: auto;
         }
 
         .message.assistant .message-bubble {
-            background: white;
-            color: #1f2937;
-            border: 1px solid #e5e7eb;
+            background: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-gray);
+            box-shadow: var(--shadow-sm);
         }
 
         .message-time {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--text-muted);
             margin-top: 0.5rem;
         }
 
@@ -180,84 +237,51 @@
         }
 
         .chat-input-container {
-            padding: 2rem;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .chat-input-form {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-end;
+            background: var(--white);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 1.5rem;
         }
 
         .input-group {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            width: 100%;
         }
 
         .chat-input {
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            font-size: 1rem;
-            font-family: inherit;
-            resize: none;
-            min-height: 20px;
+            resize: vertical;
+            min-height: 60px;
             max-height: 120px;
-            transition: border-color 0.3s;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #667eea;
+            margin-bottom: 1rem;
         }
 
         .input-controls {
             display: flex;
-            gap: 1rem;
+            justify-content: space-between;
             align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .temperature-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-medium);
+            font-size: 0.9rem;
         }
 
         .temperature-slider {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            color: #6b7280;
-        }
-
-        .temperature-slider input {
             width: 80px;
         }
 
-        .send-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 2rem;
-            font-size: 1rem;
+        .temp-value {
             font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: var(--primary-blue);
+            min-width: 30px;
         }
 
-        .send-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .send-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .send-button {
+            min-width: 120px;
         }
 
         .loading {
@@ -265,14 +289,14 @@
             align-items: center;
             justify-content: center;
             padding: 2rem;
-            color: #6b7280;
+            color: var(--text-muted);
         }
 
         .spinner {
             width: 20px;
             height: 20px;
-            border: 2px solid #e5e7eb;
-            border-top: 2px solid #667eea;
+            border: 2px solid var(--border-gray);
+            border-top: 2px solid var(--primary-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 0.5rem;
@@ -283,131 +307,145 @@
             100% { transform: rotate(360deg); }
         }
 
-        .welcome-message {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #6b7280;
-        }
-
-        .welcome-message h2 {
-            color: #1f2937;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .mode-toggle {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .mode-btn {
-            padding: 0.5rem 1rem;
-            border: 2px solid #e5e7eb;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .mode-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .main-container {
-                padding: 1rem;
+            .ai-hero {
+                padding: 3rem 1rem 1.5rem;
             }
-            
-            .chat-container {
-                height: calc(100vh - 160px);
+
+            .ai-hero .hero-content h1 {
+                flex-direction: column;
+                gap: 0.5rem;
             }
-            
-            .nav-links {
-                gap: 1rem;
+
+            .chat-section {
+                padding: 2rem 1rem;
             }
-            
+
+            .chat-panel .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .mode-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+
             .message-content {
                 max-width: 85%;
             }
-            
-            .chat-input-form {
+
+            .input-controls {
                 flex-direction: column;
+                align-items: stretch;
                 gap: 1rem;
             }
-            
-            .input-controls {
-                justify-content: space-between;
+
+            .temperature-control {
+                justify-content: center;
+            }
+
+            .send-button {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-content">
-            <a href="../index.html" class="logo">🍸 BarsHelpBars</a>
-            <div class="nav-links">
-                <a href="../index.html">Home</a>
-                <a href="main.html">Marketplace</a>
-                <a href="create.html">Create</a>
-                <a href="ai-agent.html" style="opacity: 1; font-weight: 600;">AI Agent</a>
-                <a href="profile.html">Profile</a>
-            </div>
-        </div>
-    </nav>
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
 
-    <div class="main-container">
-        <div class="chat-container">
-            <div class="chat-header">
-                <div class="chat-title">🤖 AI Agent Assistant</div>
-                <div class="chat-status">
+    <!-- Main Content Wrapper -->
+    <main class="main-content-wrapper">
+        <!-- AI Agent Hero -->
+        <section class="ai-hero">
+            <div class="hero-content">
+                <h1><i class="fas fa-robot"></i> AI Agent Assistant</h1>
+                <p>Your intelligent assistant powered by Kimi AI. Start a conversation or give me a task to help you with!</p>
+                <div class="status-indicator">
                     <div class="status-dot"></div>
-                    <span>Online</span>
+                    <span>AI Service Online</span>
                 </div>
             </div>
+        </section>
 
-            <div class="chat-messages" id="chatMessages">
-                <div class="welcome-message">
-                    <h2>Welcome to AI Agent</h2>
-                    <p>Your intelligent assistant powered by Kimi AI. Start a conversation or give me a task to help you with!</p>
-                </div>
-            </div>
-
-            <div class="chat-input-container">
-                <div class="mode-toggle">
-                    <button class="mode-btn active" data-mode="chat">💬 Chat Mode</button>
-                    <button class="mode-btn" data-mode="agent">🤖 Agent Mode</button>
-                </div>
-                
-                <form class="chat-input-form" id="chatForm">
-                    <div class="input-group">
-                        <textarea 
-                            class="chat-input" 
-                            id="messageInput" 
-                            placeholder="Type your message or describe a task..."
-                            rows="1"
-                        ></textarea>
-                        <div class="input-controls">
-                            <div class="temperature-slider">
-                                <label>Temperature:</label>
-                                <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.6">
-                                <span id="tempValue">0.6</span>
-                            </div>
+        <!-- Chat Interface -->
+        <section class="chat-section">
+            <div class="chat-container">
+                <div class="action-panel chat-panel">
+                    <div class="panel-header">
+                        <i class="fas fa-comments"></i>
+                        <h3>Chat Interface</h3>
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" data-mode="chat">
+                                <i class="fas fa-comments"></i> Chat Mode
+                            </button>
+                            <button class="mode-btn" data-mode="agent">
+                                <i class="fas fa-robot"></i> Agent Mode
+                            </button>
                         </div>
                     </div>
-                    <button type="submit" class="send-button" id="sendButton">
-                        <span>Send</span>
-                        <span>🚀</span>
-                    </button>
-                </form>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="welcome-message">
+                            <div class="welcome-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h3>Start a Conversation</h3>
+                            <p>Choose between Chat Mode for natural conversation or Agent Mode for task-oriented assistance.</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <form class="chat-input-form" id="chatForm">
+                            <div class="form-group input-group">
+                                <textarea 
+                                    class="form-input chat-input" 
+                                    id="messageInput" 
+                                    placeholder="Type your message or describe a task..."
+                                    rows="2"
+                                ></textarea>
+                                <div class="input-controls">
+                                    <div class="temperature-control">
+                                        <label for="temperature">Temperature:</label>
+                                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.6" class="temperature-slider">
+                                        <span id="tempValue" class="temp-value">0.6</span>
+                                    </div>
+                                    <button type="submit" class="btn-primary send-button" id="sendButton">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Send
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
 
     <script src="../config/api-config.js"></script>
+    <script src="../assets/js/header-loader.js"></script>
+    <script>
+        // Load footer component
+        document.addEventListener('DOMContentLoaded', () => {
+            const footerPlaceholder = document.getElementById('footer-placeholder');
+            if (footerPlaceholder) {
+                fetch('/components/footer.html')
+                    .then(response => response.ok ? response.text() : Promise.reject('Could not load footer'))
+                    .then(data => {
+                        footerPlaceholder.innerHTML = data;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching footer:', error);
+                    });
+            }
+        });
+    </script>
     <script>
         class AIAgentChat {
             constructor() {
@@ -473,6 +511,12 @@
                 
                 const message = this.messageInput.value.trim();
                 if (!message) return;
+
+                // Remove welcome message if it exists
+                const welcome = this.chatMessages.querySelector('.welcome-message');
+                if (welcome) {
+                    welcome.remove();
+                }
 
                 // Add user message to chat
                 this.addMessage('user', message);
@@ -628,13 +672,7 @@
             }
 
             removeWelcomeMessage() {
-                setTimeout(() => {
-                    const welcome = this.chatMessages.querySelector('.welcome-message');
-                    if (welcome && this.chatMessages.children.length > 1) {
-                        welcome.style.opacity = '0';
-                        setTimeout(() => welcome.remove(), 300);
-                    }
-                }, 1000);
+                // Remove welcome message when first message is sent
             }
 
             scrollToBottom() {

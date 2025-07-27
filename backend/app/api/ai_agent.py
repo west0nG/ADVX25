@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from openai import OpenAI
 import os
 from typing import List, Dict, Any
 import asyncio
@@ -11,11 +10,30 @@ router = APIRouter()
 
 # Initialize OpenAI client for Kimi API
 client = None
-if KIMI_API_KEY:
-    client = OpenAI(
-        api_key=KIMI_API_KEY,
-        base_url=KIMI_BASE_URL,
-    )
+
+def get_ai_client():
+    """Get the AI client, initializing it if needed and API key is available."""
+    global client
+    if client is None and KIMI_API_KEY and KIMI_API_KEY.strip():
+        try:
+            # Import OpenAI only when needed to avoid initialization issues
+            from openai import OpenAI
+            client = OpenAI(
+                api_key=KIMI_API_KEY.strip(),
+                base_url=KIMI_BASE_URL,
+            )
+            print("✅ AI client initialized successfully")
+        except ImportError as e:
+            print(f"⚠️  Warning: OpenAI library not available: {str(e)}")
+            client = None
+        except Exception as e:
+            print(f"⚠️  Warning: Failed to initialize AI client: {str(e)}")
+            client = None
+    return client
+
+# Check if we can initialize the client at startup
+if KIMI_API_KEY and KIMI_API_KEY.strip():
+    get_ai_client()
 else:
     print("⚠️  Warning: KIMI_API_KEY not found. AI Agent endpoints will not work until configured.")
 
@@ -48,11 +66,12 @@ executor = ThreadPoolExecutor(max_workers=4)
 
 def _call_kimi_api(messages: List[Dict], temperature: float = 0.6) -> str:
     """Synchronous function to call Kimi API"""
-    if not client:
+    ai_client = get_ai_client()
+    if not ai_client:
         raise HTTPException(status_code=503, detail="AI service not configured. Please set KIMI_API_KEY in environment variables.")
     
     try:
-        completion = client.chat.completions.create(
+        completion = ai_client.chat.completions.create(
             model=KIMI_MODEL,
             messages=messages,
             temperature=temperature,
@@ -158,6 +177,14 @@ async def health_check():
     """
     try:
         # Test API connection with a simple message
+        ai_client = get_ai_client()
+        if not ai_client:
+            return {
+                "status": "unhealthy",
+                "error": "AI client not configured - KIMI_API_KEY not found",
+                "api_connection": "not_configured"
+            }
+        
         test_messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": "Hello"}

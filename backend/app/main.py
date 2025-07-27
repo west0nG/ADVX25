@@ -27,12 +27,25 @@ app.add_middleware(
 )
 
 # 路由导入
-from app.api import bars, recipes, trans_and_mint, ai_agent
+from app.api import bars, recipes, trans_and_mint
 
 app.include_router(bars.router, prefix="/api/bars", tags=["Bars"])
 app.include_router(recipes.router, prefix="/api/recipes", tags=["Recipes"])
 app.include_router(trans_and_mint.router, prefix="/api/trans", tags=["Transactions & Mint"])
-app.include_router(ai_agent.router, prefix="/api/ai", tags=["AI Agent"])
+
+# Conditionally import AI agent based on availability
+try:
+    from app.api import ai_agent
+    app.include_router(ai_agent.router, prefix="/api/ai", tags=["AI Agent"])
+    print("✅ AI Agent service loaded successfully")
+except Exception as e:
+    print(f"⚠️  AI Agent service not available, loading fallback: {str(e)}")
+    try:
+        from app.api import ai_agent_fallback
+        app.include_router(ai_agent_fallback.router, prefix="/api/ai", tags=["AI Agent (Fallback)"])
+        print("✅ AI Agent fallback service loaded")
+    except Exception as fallback_error:
+        print(f"❌ Failed to load AI Agent fallback: {str(fallback_error)}")
 
 @app.on_event("startup")
 async def startup_event():

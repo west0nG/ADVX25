@@ -57,17 +57,18 @@ The backend will be available at `http://localhost:8000`
 
 ### 1. Update API Configuration
 
-Edit `frontend/pages/ai-agent.html` and update the `apiBaseUrl` on line 301:
+The AI agent page now uses a centralized configuration system. Edit `frontend/config/api-config.js` to update the API URLs:
 
-For local development:
+For production deployment, update the production section:
 ```javascript
-this.apiBaseUrl = 'http://localhost:8000/api/ai';
+production: {
+    AI_API_BASE_URL: 'https://your-backend-subdomain.com/api/ai',
+    MAIN_API_BASE_URL: 'https://your-backend-subdomain.com/api',
+    ENVIRONMENT: 'production'
+}
 ```
 
-For production deployment:
-```javascript
-this.apiBaseUrl = 'https://your-backend-subdomain.com/api/ai';
-```
+The system automatically detects the environment based on the hostname.
 
 ### 2. Serve Frontend
 
@@ -161,12 +162,14 @@ Or deploy to your frontend subdomain.
 - Complex problem solving
 
 ### UI Features
-- Modern, responsive design
-- Real-time typing indicators
-- Message history
-- Temperature control
-- Mode switching (Chat/Agent)
-- Mobile-friendly interface
+- **Consistent Design**: Matches the site's white-blue theme and layout patterns
+- **Responsive Layout**: Mobile-friendly with proper breakpoints
+- **Hero Section**: Clean introduction with status indicator
+- **Panel-based Layout**: Follows the site's card/panel design system
+- **Form Integration**: Uses the site's standard form styling
+- **Navigation Integration**: Properly integrated with site header and footer
+- **Mode Switching**: Toggle between Chat and Agent modes
+- **Real-time Interface**: Smooth animations and loading states
 
 ## Troubleshooting
 
@@ -175,6 +178,16 @@ Or deploy to your frontend subdomain.
 1. **API Key Error**: Make sure `KIMI_API_KEY` is properly set in your `.env` file
 2. **CORS Issues**: Backend is configured to allow requests from common development ports
 3. **Connection Issues**: Check that both frontend and backend are running and accessible
+4. **Deployment Errors**: The system now gracefully handles missing API keys during deployment
+
+### Deployment-Safe Architecture
+
+The AI agent system is designed to be deployment-safe:
+
+- **Graceful Degradation**: If `KIMI_API_KEY` is not set, the service loads fallback endpoints
+- **Lazy Loading**: OpenAI client is only initialized when actually needed
+- **Error Handling**: Import errors won't crash the entire application
+- **Fallback Service**: Provides informative responses when AI service is not configured
 
 ### Debug Mode
 
@@ -183,6 +196,14 @@ Set `DEBUG=True` in your `.env` file for detailed error messages.
 ### Health Check
 
 Visit `http://your-backend-url/api/ai/health` to verify the AI service is working correctly.
+
+### Deployment Status Messages
+
+The backend will show one of these messages on startup:
+
+- `✅ AI Agent service loaded successfully` - Full AI functionality available
+- `✅ AI Agent fallback service loaded` - Fallback mode (configuration needed)
+- `⚠️ Warning: KIMI_API_KEY not found` - Service available but needs configuration
 
 ## Security Notes
 
@@ -195,10 +216,12 @@ Visit `http://your-backend-url/api/ai/health` to verify the AI service is workin
 
 ### Backend
 - FastAPI
-- OpenAI Python client
+- OpenAI Python client (v1.51.2+)
 - LangChain (optional, for advanced features)
 - Python-dotenv
 - Uvicorn
+
+**Note**: The system is designed to work even if the OpenAI library is not available or if the API key is not configured.
 
 ### Frontend
 - Pure HTML/CSS/JavaScript (no framework dependencies)
