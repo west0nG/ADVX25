@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: barshelpbars-backend
+    env: python
+    plan: free
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: KIMI_API_KEY
+        sync: false  # Set this in Render dashboard
+      - key: KIMI_BASE_URL
+        value: https://api.moonshot.cn/v1
+      - key: KIMI_MODEL
+        value: kimi-k2-0711-preview
+      - key: DEBUG
+        value: false
+      - key: POSTGRES_USER
+        sync: false  # Set this in Render dashboard
+      - key: POSTGRES_PASSWORD
+        sync: false  # Set this in Render dashboard
+      - key: POSTGRES_DB
+        sync: false  # Set this in Render dashboard
+      - key: POSTGRES_HOST
+        sync: false  # Set this in Render dashboard
+      - key: POSTGRES_PORT
+        value: 5432 

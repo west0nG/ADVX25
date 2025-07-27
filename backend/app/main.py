@@ -56,5 +56,6 @@ async def startup_event():
         await main()  # 注入假数据
 
 @app.get("/")
+@app.head("/")
 def root():
     return {"BNB Running"}

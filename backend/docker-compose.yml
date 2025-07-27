@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_USER=barshelpbars_user
+      - POSTGRES_PASSWORD=barshelpbars_password
+      - POSTGRES_DB=barshelpbars_db
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - KIMI_API_KEY=${KIMI_API_KEY}
+      - KIMI_BASE_URL=https://api.moonshot.cn/v1
+      - KIMI_MODEL=kimi-k2-0711-preview
+      - DEBUG=true
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=barshelpbars_user
+      - POSTGRES_PASSWORD=barshelpbars_password
+      - POSTGRES_DB=barshelpbars_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data: 
