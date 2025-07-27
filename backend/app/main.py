@@ -27,11 +27,12 @@ app.add_middleware(
 )
 
 # 路由导入
-from app.api import bars, recipes, trans_and_mint
+from app.api import bars, recipes, trans_and_mint, ai_agent
 
 app.include_router(bars.router, prefix="/api/bars", tags=["Bars"])
 app.include_router(recipes.router, prefix="/api/recipes", tags=["Recipes"])
 app.include_router(trans_and_mint.router, prefix="/api/trans", tags=["Transactions & Mint"])
+app.include_router(ai_agent.router, prefix="/api/ai", tags=["AI Agent"])
 
 @app.on_event("startup")
 async def startup_event():

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent - BarsHelpBars</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .main-container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #667eea;
+        }
+
+        .message.assistant .message-avatar {
+            background: #764ba2;
+        }
+
+        .message-content {
+            flex: 1;
+            max-width: 70%;
+        }
+
+        .message-bubble {
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.assistant .message-bubble {
+            background: white;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .message.user .message-time {
+            text-align: right;
+        }
+
+        .chat-input-container {
+            padding: 2rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 20px;
+            max-height: 120px;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .temperature-slider {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .temperature-slider input {
+            width: 80px;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+
+        .welcome-message h2 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 160px);
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .chat-input-form {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .input-controls {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="../index.html" class="logo">🍸 BarsHelpBars</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="main.html">Marketplace</a>
+                <a href="create.html">Create</a>
+                <a href="ai-agent.html" style="opacity: 1; font-weight: 600;">AI Agent</a>
+                <a href="profile.html">Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">🤖 AI Agent Assistant</div>
+                <div class="chat-status">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h2>Welcome to AI Agent</h2>
+                    <p>Your intelligent assistant powered by Kimi AI. Start a conversation or give me a task to help you with!</p>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="chat">💬 Chat Mode</button>
+                    <button class="mode-btn" data-mode="agent">🤖 Agent Mode</button>
+                </div>
+                
+                <form class="chat-input-form" id="chatForm">
+                    <div class="input-group">
+                        <textarea 
+                            class="chat-input" 
+                            id="messageInput" 
+                            placeholder="Type your message or describe a task..."
+                            rows="1"
+                        ></textarea>
+                        <div class="input-controls">
+                            <div class="temperature-slider">
+                                <label>Temperature:</label>
+                                <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.6">
+                                <span id="tempValue">0.6</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="send-button" id="sendButton">
+                        <span>Send</span>
+                        <span>🚀</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../config/api-config.js"></script>
+    <script>
+        class AIAgentChat {
+            constructor() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.chatForm = document.getElementById('chatForm');
+                this.sendButton = document.getElementById('sendButton');
+                this.temperatureSlider = document.getElementById('temperature');
+                this.tempValue = document.getElementById('tempValue');
+                this.modeButtons = document.querySelectorAll('.mode-btn');
+                
+                this.currentMode = 'chat';
+                this.conversationHistory = [];
+                
+                // Load API configuration
+                this.apiBaseUrl = window.getAIApiBaseUrl ? window.getAIApiBaseUrl() : 'http://localhost:8000/api/ai';
+                
+                this.initializeEventListeners();
+                this.removeWelcomeMessage();
+            }
+
+            initializeEventListeners() {
+                this.chatForm.addEventListener('submit', this.handleSubmit.bind(this));
+                this.messageInput.addEventListener('keydown', this.handleKeyDown.bind(this));
+                this.messageInput.addEventListener('input', this.autoResizeTextarea.bind(this));
+                this.temperatureSlider.addEventListener('input', this.updateTemperature.bind(this));
+                
+                this.modeButtons.forEach(btn => {
+                    btn.addEventListener('click', this.switchMode.bind(this));
+                });
+            }
+
+            switchMode(event) {
+                this.modeButtons.forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                this.currentMode = event.target.dataset.mode;
+                
+                if (this.currentMode === 'agent') {
+                    this.messageInput.placeholder = "Describe a task or problem you'd like me to solve...";
+                } else {
+                    this.messageInput.placeholder = "Type your message...";
+                }
+            }
+
+            updateTemperature() {
+                this.tempValue.textContent = this.temperatureSlider.value;
+            }
+
+            autoResizeTextarea() {
+                this.messageInput.style.height = 'auto';
+                this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
+            }
+
+            handleKeyDown(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    this.handleSubmit(event);
+                }
+            }
+
+            async handleSubmit(event) {
+                event.preventDefault();
+                
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+
+                // Add user message to chat
+                this.addMessage('user', message);
+                this.messageInput.value = '';
+                this.messageInput.style.height = 'auto';
+
+                // Show loading
+                this.showLoading();
+                this.sendButton.disabled = true;
+
+                try {
+                    let response;
+                    const temperature = parseFloat(this.temperatureSlider.value);
+
+                    if (this.currentMode === 'chat') {
+                        response = await this.sendChatMessage(message, temperature);
+                        this.conversationHistory = response.full_history;
+                        this.addMessage('assistant', response.response);
+                    } else {
+                        response = await this.sendAgentTask(message, temperature);
+                        this.addAgentResponse(response);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.addMessage('assistant', `Sorry, I encountered an error: ${error.message}`);
+                } finally {
+                    this.hideLoading();
+                    this.sendButton.disabled = false;
+                }
+            }
+
+            async sendChatMessage(message, temperature) {
+                const response = await fetch(`${this.apiBaseUrl}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        history: this.conversationHistory,
+                        temperature: temperature
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send message');
+                }
+
+                return await response.json();
+            }
+
+            async sendAgentTask(task, temperature) {
+                const response = await fetch(`${this.apiBaseUrl}/agent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        task: task,
+                        temperature: temperature
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to process task');
+                }
+
+                return await response.json();
+            }
+
+            addMessage(sender, content) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = sender === 'user' ? 'You' : 'AI';
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                bubble.textContent = content;
+
+                const time = document.createElement('div');
+                time.className = 'message-time';
+                time.textContent = new Date().toLocaleTimeString();
+
+                contentDiv.appendChild(bubble);
+                contentDiv.appendChild(time);
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentDiv);
+
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            addAgentResponse(response) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = '🤖';
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                
+                let content = `<strong>Result:</strong><br>${response.result}`;
+                if (response.reasoning) {
+                    content += `<br><br><strong>Reasoning:</strong><br>${response.reasoning}`;
+                }
+                if (response.suggestions && response.suggestions.length > 0) {
+                    content += `<br><br><strong>Suggestions:</strong><br>`;
+                    response.suggestions.forEach(suggestion => {
+                        content += `• ${suggestion}<br>`;
+                    });
+                }
+                
+                bubble.innerHTML = content;
+
+                const time = document.createElement('div');
+                time.className = 'message-time';
+                time.textContent = new Date().toLocaleTimeString();
+
+                contentDiv.appendChild(bubble);
+                contentDiv.appendChild(time);
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentDiv);
+
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            showLoading() {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'loading';
+                loadingDiv.id = 'loading';
+                loadingDiv.innerHTML = '<div class="spinner"></div>AI is thinking...';
+                this.chatMessages.appendChild(loadingDiv);
+                this.scrollToBottom();
+            }
+
+            hideLoading() {
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.remove();
+                }
+            }
+
+            removeWelcomeMessage() {
+                setTimeout(() => {
+                    const welcome = this.chatMessages.querySelector('.welcome-message');
+                    if (welcome && this.chatMessages.children.length > 1) {
+                        welcome.style.opacity = '0';
+                        setTimeout(() => welcome.remove(), 300);
+                    }
+                }, 1000);
+            }
+
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+        }
+
+        // Initialize the chat when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new AIAgentChat();
+        });
+    </script>
+</body>
+</html> 
