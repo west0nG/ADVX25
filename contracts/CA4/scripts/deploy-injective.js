@@ -4,7 +4,7 @@ async function main() {
   console.log("🚀 开始部署 CA4 合约到 Injective 测试网...");
   const [deployer] = await ethers.getSigners();
   console.log("📝 部署账户:", deployer.address);
-  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "INJ");
+  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "USDT");
 
   // 部署 MockUSDT 合约
   console.log("\n📦 部署 MockUSDT 合约...");

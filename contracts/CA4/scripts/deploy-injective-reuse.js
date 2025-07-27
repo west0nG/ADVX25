@@ -5,7 +5,7 @@ async function main() {
   console.log("🚀 开始部署 CA4 合约到 Injective 测试网（重用CA1和CA2合约）...");
   const [deployer] = await ethers.getSigners();
   console.log("📝 部署账户:", deployer.address);
-  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "INJ");
+  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "USDT");
 
   // 读取CA1和CA2的部署信息
   let ca1DeploymentInfo, ca2DeploymentInfo;

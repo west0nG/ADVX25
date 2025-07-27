@@ -5,7 +5,7 @@ async function main() {
   
   const [deployer] = await ethers.getSigners();
   console.log("📝 部署账户:", deployer.address);
-  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "INJ");
+  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "USDT");
 
   // 部署 RecipeNFT 合约
   console.log("\n📦 部署 RecipeNFT 合约...");

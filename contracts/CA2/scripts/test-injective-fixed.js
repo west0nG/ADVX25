@@ -21,7 +21,7 @@ async function main() {
   // 获取部署账户
   const [deployer] = await ethers.getSigners();
   console.log("👤 测试账户:", deployer.address);
-  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "INJ");
+  console.log("💰 账户余额:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "USDT");
 
   // 连接到已部署的合约
   const RecipeNFT = await ethers.getContractFactory("RecipeNFT");
