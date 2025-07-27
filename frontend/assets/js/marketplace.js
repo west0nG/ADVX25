@@ -482,12 +482,11 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             <div style="position: relative;">
                 <img src="${nft.image}" alt="${nft.name}" class="nft-image">
-                <div class="nft-price">${nft.price} INJ</div>
+                <div class="nft-price">${nft.price} USDT</div>
             </div>
             <div class="nft-info">
                 <h3>${nft.name}</h3>
                 <div class="nft-creator">
-                    <img src="${nft.creatorAvatar}" alt="Creator" class="creator-avatar">
                     <span>${nft.creator}</span>
                     <span style="margin-left: auto; color: #9ca3af;">#${nft.tokenId}</span>
                 </div>
@@ -543,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${detailedRecipe.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${detailedRecipe.tokenId}</p>
                     <p><strong>Category:</strong> ${detailedRecipe.category}</p>
-                    <p><strong>Price:</strong> ${detailedRecipe.price} INJ</p>
+                    <p><strong>Price:</strong> ${detailedRecipe.price} USDT</p>
                     ${detailedRecipe.intro ? `<p><strong>Description:</strong> ${detailedRecipe.intro}</p>` : ''}
                     ${detailedRecipe.user_addresses && detailedRecipe.user_addresses.length > 0 ? `
                         <div class="recipe-section">
@@ -567,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${detailedRecipe.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary" onclick="buyNFT('${detailedRecipe.tokenId}', '${detailedRecipe.price}', '${detailedRecipe.name}')">Buy Now - ${detailedRecipe.price} INJ</button>
+                    <button class="btn-primary" onclick="buyNFT('${detailedRecipe.tokenId}', '${detailedRecipe.price}', '${detailedRecipe.name}')">Buy Now - ${detailedRecipe.price} USDT</button>
                 </div>
             `;
 
@@ -582,13 +581,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Recipe Address:</strong> <code>${nft.recipe_address || 'Unknown'}</code></p>
                     <p><strong>Token ID:</strong> #${nft.tokenId}</p>
                     <p><strong>Category:</strong> ${nft.category}</p>
-                    <p><strong>Price:</strong> ${nft.price} INJ</p>
+                    <p><strong>Price:</strong> ${nft.price} USDT</p>
                     ${nft.intro ? `<p><strong>Description:</strong> ${nft.intro}</p>` : ''}
                     <p class="error-message">Could not load detailed recipe information</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="window.open('${nft.image}', '_blank')">View Full Image</button>
-                    <button class="btn-primary" onclick="buyNFT('${nft.tokenId}', '${nft.price}', '${nft.name}')">Buy Now - ${nft.price} INJ</button>
+                    <button class="btn-primary" onclick="buyNFT('${nft.tokenId}', '${nft.price}', '${nft.name}')">Buy Now - ${nft.price} USDT</button>
                 </div>
             `;
                  }
