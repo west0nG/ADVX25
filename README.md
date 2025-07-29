@@ -185,17 +185,7 @@ RecipeMarketplace: 0xB2949598fe711D1B2Db8EE2812ba66658954a5b1
 4. 去中心化存储
    * IPFS（存储图片、配方等大文件）
 
-
------
-<a href="https://github.com/west0nG/ADVX25/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=west0nG/ADVX25" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
-
-
-
-# AI Agent
+## AI Agent
 - 输入内容
    - 输入 你的酒吧开在哪里
    - 输入 你的酒吧希望什么风格
@@ -206,3 +196,11 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 - 输出 装修和设计建议 文字
 - 输出 推荐买的酒谱
+
+
+-----
+<a href="https://github.com/west0nG/ADVX25/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=west0nG/ADVX25" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
